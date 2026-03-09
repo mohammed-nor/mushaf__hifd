@@ -13,7 +13,10 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final fontFamily = prefs.getString('font_family') ?? 'Andalus';
   final fontSize = prefs.getDouble('font_size') ?? 18.0;
-  themeSettingsNotifier.value = ThemeSettings(fontFamily: fontFamily, fontSize: fontSize);
+  themeSettingsNotifier.value = ThemeSettings(
+    fontFamily: fontFamily,
+    fontSize: fontSize,
+  );
 
   runApp(const MyApp());
 }
@@ -37,10 +40,72 @@ class MyApp extends StatelessWidget {
               surface: Color(0xFF1E1E2C), // Deep card background
             ),
             useMaterial3: true,
-            textTheme: const TextTheme().apply(bodyColor: Colors.white, displayColor: Colors.white, fontSizeFactor: settings.fontSize / 18.0, fontFamily: settings.fontFamily),
+            textTheme: TextTheme(
+              bodyLarge: TextStyle(
+                fontSize: 16 * (settings.fontSize / 18.0),
+                color: Colors.white,
+              ),
+              bodyMedium: TextStyle(
+                fontSize: 14 * (settings.fontSize / 18.0),
+                color: Colors.white,
+              ),
+              bodySmall: TextStyle(
+                fontSize: 12 * (settings.fontSize / 18.0),
+                color: Colors.white,
+              ),
+              headlineLarge: TextStyle(
+                fontSize: 32 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              headlineMedium: TextStyle(
+                fontSize: 28 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              headlineSmall: TextStyle(
+                fontSize: 24 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              titleLarge: TextStyle(
+                fontSize: 22 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              titleMedium: TextStyle(
+                fontSize: 16 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              titleSmall: TextStyle(
+                fontSize: 14 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              labelLarge: TextStyle(
+                fontSize: 14 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              labelMedium: TextStyle(
+                fontSize: 12 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              labelSmall: TextStyle(
+                fontSize: 11 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ).apply(fontFamily: settings.fontFamily),
             scaffoldBackgroundColor: Colors.transparent,
           ),
-          localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           supportedLocales: const [
             Locale('ar', 'AE'), // Arabic
           ],

@@ -21,7 +21,7 @@ void main() {
     await tester.pumpWidget(const MyApp());
 
     // Verify that Recite tab is present and selected.
-    expect(find.text('تلاوة (عشوائي)'), findsOneWidget);
+    expect(find.text('تلاوة'), findsOneWidget);
     expect(find.text('لم يتم اختيار ثمن بعد'), findsOneWidget);
 
     // Tap the shuffle button and trigger a frame.
@@ -43,6 +43,13 @@ void main() {
 
     // PageView preloads some images
     expect(find.byType(Image), findsWidgets);
+
+    // Tap the Learn2 (text) tab
+    await tester.tap(find.byIcon(Icons.text_snippet));
+    await tester.pump();
+
+    // Verify Learn2 page is shown
+    expect(find.text('إحفظ نص : 1-0'), findsOneWidget);
 
     // Tap the Settings tab
     await tester.tap(find.byIcon(Icons.settings));

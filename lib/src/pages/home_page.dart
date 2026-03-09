@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:mushaf_hifd/src/pages/recite_page.dart';
 import 'package:mushaf_hifd/src/pages/learn_page.dart';
+import 'package:mushaf_hifd/src/pages/learn2_page.dart';
 import 'package:mushaf_hifd/src/pages/settings_page.dart';
 
 /// The root widget that hosts the bottom navigation bar and switches
-/// between the three primary screens of the application.
+/// between the primary screens of the application (recite, image
+/// learning, text learning, settings).
 class MainHomePage extends StatefulWidget {
   const MainHomePage({super.key});
 
@@ -18,6 +20,7 @@ class _MainHomePageState extends State<MainHomePage> {
   static const List<Widget> _pages = <Widget>[
     RecitePage(),
     LearnPage(),
+    Learn2Page(),
     SettingsPage(),
   ];
 
@@ -60,6 +63,10 @@ class _MainHomePageState extends State<MainHomePage> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.menu_book),
                 label: 'تعلم',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.text_snippet),
+                label: 'تعلم نص',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings),

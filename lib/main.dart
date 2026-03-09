@@ -5,7 +5,42 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final fontFamily = prefs.getString('font_family') ?? 'Andalus';
+  final fontSize = prefs.getDouble('font_size') ?? 18.0;
+  themeSettingsNotifier.value = ThemeSettings(
+    fontFamily: fontFamily,
+    fontSize: fontSize,
+  );
   runApp(const MyApp());
+}
+
+class ThemeSettings {
+  final String fontFamily;
+  final double fontSize;
+
+  ThemeSettings({required this.fontFamily, required this.fontSize});
+
+  ThemeSettings copyWith({String? fontFamily, double? fontSize}) {
+    return ThemeSettings(
+      fontFamily: fontFamily ?? this.fontFamily,
+      fontSize: fontSize ?? this.fontSize,
+    );
+  }
+}
+
+final themeSettingsNotifier = ValueNotifier<ThemeSettings>(
+  ThemeSettings(fontFamily: 'Andalus', fontSize: 18.0),
+);
+
+Future<void> _updateSettings(String fontFamily, double fontSize) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('font_family', fontFamily);
+  await prefs.setDouble('font_size', fontSize);
+  themeSettingsNotifier.value = ThemeSettings(
+    fontFamily: fontFamily,
+    fontSize: fontSize,
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,30 +48,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'حفظ القرآن',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        fontFamily: 'Andalus',
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFF64FFDA), // Teal accent
-          secondary: Color(0xFF1DE9B6),
-          surface: Color(0xFF1E1E2C), // Deep card background
-        ),
-        useMaterial3: true,
-        scaffoldBackgroundColor:
-            Colors.transparent, // Handled by Container gradients
-      ),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('ar', 'AE'), // Arabic
-      ],
-      home: const MainHomePage(),
-      debugShowCheckedModeBanner: false,
+    return ValueListenableBuilder<ThemeSettings>(
+      valueListenable: themeSettingsNotifier,
+      builder: (context, settings, _) {
+        return MaterialApp(
+          title: 'حفظ القرآن',
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            fontFamily: settings.fontFamily,
+            colorScheme: const ColorScheme.dark(
+              primary: Color(0xFF64FFDA), // Teal accent
+              secondary: Color(0xFF1DE9B6),
+              surface: Color(0xFF1E1E2C), // Deep card background
+            ),
+            useMaterial3: true,
+            textTheme: const TextTheme().apply(
+              bodyColor: Colors.white,
+              displayColor: Colors.white,
+              fontSizeFactor: settings.fontSize / 18.0,
+              fontFamily: settings.fontFamily,
+            ),
+            scaffoldBackgroundColor: Colors.transparent,
+          ),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('ar', 'AE'), // Arabic
+          ],
+          home: const MainHomePage(),
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }
@@ -653,63 +698,159 @@ class SettingsPage extends StatelessWidget {
           centerTitle: true,
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
-                const Icon(
-                  Icons.info_outline,
-                  size: 80,
-                  color: Color(0xFF64FFDA),
+          child: ValueListenableBuilder<ThemeSettings>(
+            valueListenable: themeSettingsNotifier,
+            builder: (context, settings, _) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'تخصيص الخط',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF64FFDA),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSettingCard(
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading: const Icon(
+                              Icons.font_download,
+                              color: Color(0xFF1DE9B6),
+                            ),
+                            title: const Text('نوع الخط'),
+                            trailing: DropdownButton<String>(
+                              value: settings.fontFamily,
+                              dropdownColor: const Color(0xFF1E1E2C),
+                              underline: Container(),
+                              items: ['Andalus', 'System'].map((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(
+                                    value == 'System' ? 'خط النظام' : value,
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  _updateSettings(newValue, settings.fontSize);
+                                }
+                              },
+                            ),
+                          ),
+                          const Divider(color: Colors.white10),
+                          ListTile(
+                            leading: const Icon(
+                              Icons.format_size,
+                              color: Color(0xFF1DE9B6),
+                            ),
+                            title: const Text('حجم الخط'),
+                            subtitle: Slider(
+                              value: settings.fontSize,
+                              min: 14,
+                              max: 30,
+                              divisions: 8,
+                              activeColor: const Color(0xFF64FFDA),
+                              label: settings.fontSize.round().toString(),
+                              onChanged: (double value) {
+                                _updateSettings(settings.fontFamily, value);
+                              },
+                            ),
+                            trailing: Text(
+                              settings.fontSize.round().toString(),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    const Text(
+                      'حول التطبيق',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF64FFDA),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildSettingCard(
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 20),
+                          const Icon(
+                            Icons.info_outline,
+                            size: 60,
+                            color: Color(0xFF64FFDA),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'مصحف الحفظ - ورش مثمن',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'تطبيق صمم خصيصاً لمساعدتك على حفظ القرآن الكريم وتسجيل ما تحفظه بسهولة.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          const Divider(color: Colors.white10),
+                          const ListTile(
+                            leading: Icon(
+                              Icons.copyright,
+                              color: Color(0xFF1DE9B6),
+                            ),
+                            title: Text('حقوق النشر'),
+                            subtitle: Text(
+                              'جميع الحقوق محفوظة للمطور محمد نور © 2026',
+                              style: TextStyle(color: Colors.white54),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'الإصدار 1.0.0',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white54, fontSize: 12),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
-                const Text(
-                  'مصحف الحفظ - ورش مثمن',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'تطبيق صمم خصيصاً لمساعدتك على حفظ القرآن الكريم وتسجيل ما تحفظه بسهولة.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white70,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 48),
-                const Divider(color: Colors.white24, thickness: 1),
-                const SizedBox(height: 24),
-                const ListTile(
-                  leading: Icon(Icons.copyright, color: Color(0xFF1DE9B6)),
-                  title: Text(
-                    'حقوق النشر',
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                  subtitle: Text(
-                    'جميع الحقوق محفوظة للمطور محمد نور ©  2026',
-                    style: TextStyle(color: Colors.white54),
-                  ),
-                ),
-                const Spacer(),
-                const Text(
-                  'الإصدار 1.0.0',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white54, fontSize: 14),
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSettingCard({required Widget child}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withAlpha(20)),
+      ),
+      child: child,
     );
   }
 }

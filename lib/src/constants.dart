@@ -166,10 +166,7 @@ const List<String> kThomuns = [
   '20-5.png',
   '20-6.png',
   '20-7.png',
-  '20-8.png',
-];
-
-/// A constant list of all thomun text filenames.  It mirrors
+  '20-8.png',];/// A constant list of all thomun text filenames.  It mirrors
 /// [kThomuns] but uses the `.txt` extension and omits the
 /// special `1-0-1` image which has no text equivalent.
 List<String> kThomunsTxt = [

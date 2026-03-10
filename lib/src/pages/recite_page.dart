@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/constants.dart';
 
@@ -11,35 +12,53 @@ class RecitePage extends StatefulWidget {
 }
 
 class _RecitePageState extends State<RecitePage> {
-  String? _currentThomun;
+  int? _currentThomunIndex;
   final Random _random = Random();
+  String? _thomunText;
 
   /// when true we limit picks to the thomuns the user has marked as
   /// learned.  The toggle is exposed in the app bar.
   bool _onlyLearned = false;
 
   Future<void> _generateRandomThomun() async {
-    List<String> pool = kThomuns;
+    List<int> pool = List<int>.generate(kThomunsTxt.length, (i) => i);
 
     if (_onlyLearned) {
       final prefs = await SharedPreferences.getInstance();
-      final learnedList = prefs.getStringList('learned_thomuns') ?? [];
+      final learnedList = prefs.getStringList('learned_thomuns_txt') ?? [];
       if (learnedList.isNotEmpty) {
-        // map saved indices back to filenames, ignoring any invalid values
+        // map saved indices to their int values
         final filtered = learnedList
             .map(int.tryParse)
             .whereType<int>()
-            .where((i) => i >= 0 && i < kThomuns.length)
-            .map((i) => kThomuns[i])
+            .where((i) => i >= 0 && i < kThomunsTxt.length)
             .toList();
         if (filtered.isNotEmpty) pool = filtered;
       }
     }
 
-    setState(() {
-      int randomIndex = _random.nextInt(pool.length);
-      _currentThomun = pool[randomIndex];
-    });
+    int randomIndex = _random.nextInt(pool.length);
+    int selectedIndex = pool[randomIndex];
+
+    // Load the text content
+    try {
+      final text = await rootBundle.loadString(
+        'lib/thomuns_txt/${kThomunsTxt[selectedIndex]}',
+      );
+      if (mounted) {
+        setState(() {
+          _currentThomunIndex = selectedIndex;
+          _thomunText = text;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _currentThomunIndex = selectedIndex;
+          _thomunText = null;
+        });
+      }
+    }
   }
 
   @override
@@ -58,8 +77,8 @@ class _RecitePageState extends State<RecitePage> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           title: Text(
-            _currentThomun != null
-                ? 'تلاوة: ${_currentThomun!.replaceAll('.png', '')}'
+            _currentThomunIndex != null
+                ? 'تلاوة: ${kThomunsTxt[_currentThomunIndex!].replaceAll('.txt', '')}'
                 : 'إمتحن حفظك',
             style: const TextStyle(
               fontWeight: FontWeight.w600,
@@ -86,17 +105,28 @@ class _RecitePageState extends State<RecitePage> {
           child: Column(
             children: <Widget>[
               Expanded(
-                child: _currentThomun != null
-                    ? Hero(
-                        tag: 'thomun_image',
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 500),
-                          child: Image.asset(
-                            'lib/thomuns/$_currentThomun',
-                            key: ValueKey<String>(_currentThomun!),
-                            fit: BoxFit.contain,
-                            width: double.infinity,
-                            height: double.infinity,
+                child: _currentThomunIndex != null && _thomunText != null
+                    ? Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: Card(
+                          elevation: 8,
+                          shadowColor: Colors.black.withOpacity(0.3),
+                          color: Colors.white.withAlpha(10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(5),
+                            child: SingleChildScrollView(
+                              child: Text(
+                                _thomunText!,
+                                textAlign: TextAlign.justify,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  height: 2.5,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       )
@@ -107,15 +137,13 @@ class _RecitePageState extends State<RecitePage> {
                             Icon(
                               Icons.auto_stories,
                               size: 80,
-                              color: Colors.white.withAlpha(26), // 0.1 opacity
+                              color: Colors.white.withAlpha(26),
                             ),
                             const SizedBox(height: 16),
                             Text(
                               'لم يتم اختيار ثمن بعد',
                               style: TextStyle(
-                                color: Colors.white.withAlpha(
-                                  128,
-                                ), // 0.5 opacity
+                                color: Colors.white.withAlpha(128),
                                 fontSize: 18,
                               ),
                             ),

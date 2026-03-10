@@ -40,6 +40,26 @@ class MyApp extends StatelessWidget {
               surface: Color(0xFF1E1E2C), // Deep card background
             ),
             useMaterial3: true,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              shadowColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              titleTextStyle: TextStyle(
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.2,
+                color: Colors.white,
+              ),
+              iconTheme: IconThemeData(color: Colors.white),
+            ),
+            cardTheme: CardThemeData(
+              color: Colors.white.withAlpha(10),
+              shadowColor: Colors.black.withOpacity(0.3),
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
             textTheme: TextTheme(
               bodyLarge: TextStyle(
                 fontSize: 16 * (settings.fontSize / 18.0),

@@ -44,7 +44,13 @@ class _LearnPageState extends State<LearnPage> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('current_thomun_index', _currentIndex);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم حفظ الصفحة الحالية بنجاح'), backgroundColor: Color(0xFF1DE9B6), duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('تم حفظ الصفحة الحالية بنجاح'),
+          backgroundColor: Color(0xFF1DE9B6),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -57,7 +63,10 @@ class _LearnPageState extends State<LearnPage> {
         _learnedThomuns.add(_currentIndex);
       }
     });
-    await prefs.setStringList('learned_thomuns', _learnedThomuns.map((e) => e.toString()).toList());
+    await prefs.setStringList(
+      'learned_thomuns',
+      _learnedThomuns.map((e) => e.toString()).toList(),
+    );
   }
 
   @override
@@ -70,14 +79,24 @@ class _LearnPageState extends State<LearnPage> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF232537), Color(0xFF12121D)]),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF232537), Color(0xFF12121D)],
+        ),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: Text('إحفظ : ${kThomuns[_currentIndex].replaceAll('.png', '')}', style: const TextStyle(fontWeight: FontWeight.w600, letterSpacing: 1.2)),
+          title: Text(
+            'إحفظ : ${kThomuns[_currentIndex].replaceAll('.png', '')}',
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.2,
+            ),
+          ),
           centerTitle: true,
           actions: [
             IconButton(
@@ -101,39 +120,79 @@ class _LearnPageState extends State<LearnPage> {
                   },
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Hero(
-                        tag: 'thomun_image_$index',
-                        child: Image.asset('lib/thomuns/${kThomuns[index]}', fit: BoxFit.contain, width: double.infinity, height: double.infinity),
+                      padding: const EdgeInsets.all(6.0),
+                      child: Card(
+                        elevation: 8,
+                        shadowColor: Colors.black.withOpacity(0.3),
+                        color: Colors.white.withAlpha(10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Hero(
+                            tag: 'thomun_image_$index',
+                            child: Image.asset(
+                              'lib/thomuns/${kThomuns[index]}',
+                              fit: BoxFit.contain,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
+                          ),
+                        ),
                       ),
                     );
                   },
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6.0,
+                  vertical: 2.0,
+                ),
                 child: Row(
                   children: [
                     InkWell(
                       onTap: _toggleLearnedStatus,
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
-                          color: _learnedThomuns.contains(_currentIndex) ? const Color(0xFF64FFDA).withAlpha(50) : Colors.grey.withAlpha(50),
-                          border: Border.all(color: _learnedThomuns.contains(_currentIndex) ? const Color(0xFF64FFDA) : Colors.grey),
+                          color: _learnedThomuns.contains(_currentIndex)
+                              ? const Color(0xFF64FFDA).withAlpha(50)
+                              : Colors.grey.withAlpha(50),
+                          border: Border.all(
+                            color: _learnedThomuns.contains(_currentIndex)
+                                ? const Color(0xFF64FFDA)
+                                : Colors.grey,
+                          ),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          _learnedThomuns.contains(_currentIndex) ? 'تم الحفظ' : 'قيد الحفظ',
-                          style: TextStyle(color: _learnedThomuns.contains(_currentIndex) ? const Color(0xFF64FFDA) : Colors.white70, fontWeight: FontWeight.bold, fontSize: 12),
+                          _learnedThomuns.contains(_currentIndex)
+                              ? 'تم الحفظ'
+                              : 'قيد الحفظ',
+                          style: TextStyle(
+                            color: _learnedThomuns.contains(_currentIndex)
+                                ? const Color(0xFF64FFDA)
+                                : Colors.white70,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       '${_currentIndex + 1} / ${kThomuns.length}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF64FFDA), fontSize: 12),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF64FFDA),
+                        fontSize: 12,
+                      ),
                     ),
                     Expanded(
                       child: Slider(

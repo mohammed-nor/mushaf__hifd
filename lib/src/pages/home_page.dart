@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mushaf_hifd/src/pages/recite_page.dart';
-import 'package:mushaf_hifd/src/pages/learn_page.dart';
 import 'package:mushaf_hifd/src/pages/learn2_page.dart';
 import 'package:mushaf_hifd/src/pages/settings_page.dart';
 
 /// The root widget that hosts the bottom navigation bar and switches
-/// between the primary screens of the application (recite, image
-/// learning, text learning, settings).
+/// between the primary screens of the application (recite, text
+/// learning, settings).
 class MainHomePage extends StatefulWidget {
   const MainHomePage({super.key});
 
@@ -19,7 +18,6 @@ class _MainHomePageState extends State<MainHomePage> {
 
   static const List<Widget> _pages = <Widget>[
     RecitePage(),
-    LearnPage(),
     Learn2Page(),
     SettingsPage(),
   ];
@@ -43,39 +41,31 @@ class _MainHomePageState extends State<MainHomePage> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: _pages[_selectedIndex],
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(77), // 0.3 opacity
-                blurRadius: 10,
-                offset: const Offset(0, -2),
-              ),
-            ],
-          ),
-          child: BottomNavigationBar(
-            backgroundColor: const Color(0xFF1E1E2C),
-            selectedItemColor: const Color(0xFF64FFDA),
-            unselectedItemColor: Colors.grey[500],
-            elevation: 0,
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(icon: Icon(Icons.mic), label: 'تلاوة'),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.menu_book),
-                label: 'تعلم',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.text_snippet),
-                label: 'تعلم نص',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: 'الإعدادات',
-              ),
-            ],
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-          ),
+        bottomNavigationBar: NavigationBar(
+          backgroundColor: const Color(0xFF1E1E2C).withOpacity(0.95),
+          elevation: 8,
+          shadowColor: Colors.black.withOpacity(0.5),
+          surfaceTintColor: const Color(0xFF64FFDA).withOpacity(0.1),
+          indicatorColor: const Color(0xFF64FFDA).withOpacity(0.2),
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: _onItemTapped,
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.mic_outlined),
+              selectedIcon: Icon(Icons.mic, color: Color(0xFF64FFDA)),
+              label: 'تلاوة',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.text_snippet_outlined),
+              selectedIcon: Icon(Icons.text_snippet, color: Color(0xFF64FFDA)),
+              label: 'تعلم نص',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.settings_outlined),
+              selectedIcon: Icon(Icons.settings, color: Color(0xFF64FFDA)),
+              label: 'الإعدادات',
+            ),
+          ],
         ),
       ),
     );

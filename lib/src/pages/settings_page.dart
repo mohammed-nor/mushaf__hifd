@@ -188,10 +188,18 @@ class SettingsPage extends StatelessWidget {
 
   Widget _buildSettingCard({required Widget child}) {
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white.withAlpha(12),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withAlpha(20)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: child,
     );

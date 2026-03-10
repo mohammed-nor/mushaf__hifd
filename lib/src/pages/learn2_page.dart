@@ -142,13 +142,22 @@ class _Learn2PageState extends State<Learn2Page> {
                               child: Text('خطأ في تحميل النص'),
                             );
                           }
-                          return SingleChildScrollView(
-                            child: Text(
-                              snapshot.data ?? '',
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                color: Colors.white,
+                          return Card(
+                            elevation: 8,
+                            shadowColor: Colors.black.withOpacity(0.3),
+                            color: Colors.white.withAlpha(10),
+                            margin: const EdgeInsets.all(3),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(5),
+                              child: SingleChildScrollView(
+                                child: Text(
+                                  snapshot.data ?? '',
+                                  textAlign: TextAlign.justify,
+                                  style: const TextStyle(height: 2.5),
+                                ),
                               ),
                             ),
                           );

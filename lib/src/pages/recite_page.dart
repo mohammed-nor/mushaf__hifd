@@ -144,28 +144,29 @@ class _RecitePageState extends State<RecitePage> {
     for (final match in matches) {
       // Add text before match
       if (match.start > lastIndex) {
-        spans.add(TextSpan(
-          text: text.substring(lastIndex, match.start),
-          style: baseStyle,
-        ));
+        spans.add(
+          TextSpan(
+            text: text.substring(lastIndex, match.start),
+            style: baseStyle,
+          ),
+        );
       }
       // Add colored bracket
-      spans.add(TextSpan(
-        text: match.group(0),
-        style: baseStyle.copyWith(
-          color: const Color(0xFF1DE9B6),
-          fontWeight: FontWeight.bold,
+      spans.add(
+        TextSpan(
+          text: match.group(0),
+          style: baseStyle.copyWith(
+            color: const Color(0xFF1DE9B6),
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ));
+      );
       lastIndex = match.end;
     }
 
     // Add remaining text
     if (lastIndex < text.length) {
-      spans.add(TextSpan(
-        text: text.substring(lastIndex),
-        style: baseStyle,
-      ));
+      spans.add(TextSpan(text: text.substring(lastIndex), style: baseStyle));
     }
 
     return RichText(
@@ -282,8 +283,12 @@ class _RecitePageState extends State<RecitePage> {
                                 padding: const EdgeInsets.all(5),
                                 child: SingleChildScrollView(
                                   child: _buildTextWithGreenBrackets(
-                                    _thomunText!.replaceAll('(', '﴿').replaceAll(')', '﴾'),
-                                    Theme.of(context).textTheme.titleLarge!.copyWith(
+                                    _thomunText!
+                                        .replaceAll('(', '﴿')
+                                        .replaceAll(')', '﴾'),
+                                    Theme.of(
+                                      context,
+                                    ).textTheme.titleLarge!.copyWith(
                                       height: 1.9,
                                       fontWeight: FontWeight.normal,
                                     ),

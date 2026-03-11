@@ -86,7 +86,17 @@ class _Learn2PageState extends State<Learn2Page> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Text('إحفظ نص : ${kThomunsTxt[_currentIndex].replaceAll('.txt', '')}', style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: const Color(0xFF64FFDA))),
+              title: Text(
+                () {
+                  final filename = kThomunsTxt[_currentIndex].replaceAll('.txt', '');
+                  final parts = filename.split('-');
+                  if (parts.length == 2) {
+                    return 'تلاوة الثمن ${parts[1]} من الحزب ${parts[0]}';
+                  }
+                  return 'إحفظ الفاتحة';
+                }(),
+                style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: const Color(0xFF64FFDA)),
+              ),
               centerTitle: true,
               actions: [
                 IconButton(

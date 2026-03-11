@@ -16,11 +16,7 @@ class MainHomePage extends StatefulWidget {
 class _MainHomePageState extends State<MainHomePage> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[
-    RecitePage(),
-    Learn2Page(),
-    SettingsPage(),
-  ];
+  static const List<Widget> _pages = <Widget>[RecitePage(), Learn2Page(), SettingsPage()];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -32,11 +28,7 @@ class _MainHomePageState extends State<MainHomePage> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1E1E2C), Color(0xFF12121D)],
-        ),
+        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1E1E2C), Color(0xFF12121D)]),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -53,12 +45,12 @@ class _MainHomePageState extends State<MainHomePage> {
             NavigationDestination(
               icon: Icon(Icons.mic_outlined),
               selectedIcon: Icon(Icons.mic, color: Color(0xFF64FFDA)),
-              label: 'تلاوة',
+              label: 'الإستظهار',
             ),
             NavigationDestination(
               icon: Icon(Icons.text_snippet_outlined),
               selectedIcon: Icon(Icons.text_snippet, color: Color(0xFF64FFDA)),
-              label: 'تعلم نص',
+              label: 'الحفظ و التلاوة',
             ),
             NavigationDestination(
               icon: Icon(Icons.settings_outlined),

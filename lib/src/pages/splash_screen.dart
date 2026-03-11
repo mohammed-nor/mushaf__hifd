@@ -12,8 +12,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
@@ -23,27 +22,18 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
 
     // Initialize animations
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
+    _animationController = AnimationController(duration: const Duration(milliseconds: 1500), vsync: this);
 
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
-    );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
 
     _animationController.forward();
 
     // Navigate to home page after splash duration
     Future.delayed(const Duration(seconds: 6), () {
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainHomePage()),
-        );
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const MainHomePage()));
       }
     });
   }
@@ -59,18 +49,12 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0F3460), Color(0xFF16213E)],
-          ),
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF0F3460), Color(0xFF16213E)]),
         ),
         child: Stack(
           children: [
             // Islamic geometric pattern background (subtle)
-            Positioned.fill(
-              child: CustomPaint(painter: IslamicPatternPainter()),
-            ),
+            Positioned.fill(child: CustomPaint(painter: IslamicPatternPainter())),
             // Main content
             Center(
               child: SingleChildScrollView(
@@ -92,15 +76,7 @@ class _SplashScreenState extends State<SplashScreen>
                               height: 200,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(
-                                      0xFF64FFDA,
-                                    ).withOpacity(0.3),
-                                    blurRadius: 40,
-                                    spreadRadius: 10,
-                                  ),
-                                ],
+                                boxShadow: [BoxShadow(color: const Color(0xFF64FFDA).withOpacity(0.3), blurRadius: 40, spreadRadius: 10)],
                               ),
                             ),
                             // Islamic decorative circle
@@ -109,17 +85,11 @@ class _SplashScreenState extends State<SplashScreen>
                               height: 180,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(0xFF64FFDA),
-                                  width: 2,
-                                ),
+                                border: Border.all(color: const Color(0xFF64FFDA), width: 2),
                                 gradient: LinearGradient(
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
-                                  colors: [
-                                    const Color(0xFF64FFDA).withOpacity(0.2),
-                                    const Color(0xFF1DE9B6).withOpacity(0.2),
-                                  ],
+                                  colors: [const Color(0xFF64FFDA).withOpacity(0.2), const Color(0xFF1DE9B6).withOpacity(0.2)],
                                 ),
                               ),
                             ),
@@ -127,26 +97,13 @@ class _SplashScreenState extends State<SplashScreen>
                             Container(
                               width: 140,
                               height: 140,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: const Color(0xFF64FFDA).withOpacity(0.1),
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  'assets/splash/splash.png',
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF64FFDA).withOpacity(0.1)),
+                              child: Center(child: Image.asset('assets/splash/splash.png', width: 100, height: 100, fit: BoxFit.contain)),
                             ),
                             // Islamic star at top
                             Positioned(
                               top: 0,
-                              child: CustomPaint(
-                                size: const Size(30, 30),
-                                painter: IslamicStarPainter(),
-                              ),
+                              child: CustomPaint(size: const Size(30, 30), painter: IslamicStarPainter()),
                             ),
                           ],
                         ),
@@ -161,19 +118,8 @@ class _SplashScreenState extends State<SplashScreen>
                           Text(
                             'القرآن الكريم - مصحف الحفظ',
                             style:
-                                Theme.of(
-                                  context,
-                                ).textTheme.headlineLarge?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
-                                ) ??
-                                const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 1,
-                                ),
+                                Theme.of(context).textTheme.headlineLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1) ??
+                                const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 1),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 28),
@@ -181,9 +127,7 @@ class _SplashScreenState extends State<SplashScreen>
                             width: 60,
                             height: 1,
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF64FFDA), Color(0xFF1DE9B6)],
-                              ),
+                              gradient: const LinearGradient(colors: [Color(0xFF64FFDA), Color(0xFF1DE9B6)]),
                               borderRadius: BorderRadius.circular(1),
                             ),
                           ),
@@ -199,15 +143,8 @@ class _SplashScreenState extends State<SplashScreen>
                         child: Text(
                           'اللَّهُ نَزَّلَ أَحْسَنَ الْحَدِيثِ كِتَابًا مُّتَشَابِهًا مَّثَانِيَ',
                           style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: const Color(0xFF64FFDA),
-                                letterSpacing: 1,
-                              ) ??
-                              const TextStyle(
-                                color: Color(0xFF64FFDA),
-                                fontSize: 20,
-                                letterSpacing: 1,
-                              ),
+                              Theme.of(context).textTheme.bodyLarge?.copyWith(color: const Color(0xFF64FFDA), letterSpacing: 1) ??
+                              const TextStyle(color: Color(0xFF64FFDA), fontSize: 20, letterSpacing: 1),
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -221,22 +158,10 @@ class _SplashScreenState extends State<SplashScreen>
                         children: [
                           Text(
                             'تطوير',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.white70,
-                                  letterSpacing: 1,
-                                ) ??
-                                const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                  letterSpacing: 1,
-                                ),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white70, letterSpacing: 1) ?? const TextStyle(color: Colors.white70, fontSize: 12, letterSpacing: 1),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            'جميع الحقوق محفوظة للمطور محمد نور © 2026',
-                            style: TextStyle(color: Colors.white54),
-                          ),
+                          Text('جميع الحقوق محفوظة للمطور محمد نور © 2026', style: TextStyle(color: Colors.white54)),
                           const SizedBox(height: 18),
                         ],
                       ),

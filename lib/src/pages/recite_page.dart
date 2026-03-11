@@ -71,19 +71,54 @@ class _RecitePageState extends State<RecitePage> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               title: Text(
-                _currentThomunIndex != null ? 'تلاوة: ${kThomunsTxt[_currentThomunIndex!].replaceAll('.txt', '')}' : 'إمتحن حفظك',
+                _currentThomunIndex != null
+                    ? () {
+                        final filename = kThomunsTxt[_currentThomunIndex!].replaceAll('.txt', '');
+                        final parts = filename.split('-');
+                        if (parts.length == 2) {
+                          return 'تلاوة الثمن ${parts[1]} من الحزب ${parts[0]}';
+                        }
+                        return 'تلاوة: $filename';
+                      }()
+                    : 'إمتحن حفظك',
                 style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: const Color(0xFF64FFDA)),
               ),
               centerTitle: true,
               actions: [
-                IconButton(
-                  icon: Icon(_onlyLearned ? Icons.check_box : Icons.check_box_outline_blank, color: _onlyLearned ? const Color(0xFF64FFDA) : Colors.white),
-                  tooltip: 'اختر من الحفظ فقط',
-                  onPressed: () {
-                    setState(() {
-                      _onlyLearned = !_onlyLearned;
-                    });
-                  },
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _onlyLearned = !_onlyLearned;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _onlyLearned ? const Color(0xFF64FFDA).withOpacity(0.1) : Colors.transparent,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: _onlyLearned ? const Color(0xFF64FFDA) : Colors.white30, width: 1.5),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          /*                        Icon(
+                            _onlyLearned ? Icons.check_box : Icons.check_box_outline_blank,
+                            color: _onlyLearned ? const Color(0xFF64FFDA) : Colors.white70,
+                            size: 24,
+                          ),
+                          const SizedBox(width: 8), */
+                          Text(
+                            'من المحفوظ',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.labelMedium?.copyWith(color: _onlyLearned ? const Color(0xFF64FFDA) : Colors.white70, fontWeight: _onlyLearned ? FontWeight.w600 : FontWeight.w500),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -154,7 +189,7 @@ class _RecitePageState extends State<RecitePage> {
                             //const Icon(Icons.shuffle, size: 28, color: Color(0xFF12121D)),
                             //const SizedBox(width: 12),
                             Text(
-                              _onlyLearned ? 'من المحفوظات' : 'اختيار ثمن عشوائي',
+                              _onlyLearned ? 'اختيار من المحفوظات' : 'اختيار ثمن عشوائي',
                               style: Theme.of(context).textTheme.headlineSmall!.copyWith(fontWeight: FontWeight.bold, color: const Color(0xFF12121D), height: settings.lineSpacing),
                             ),
                           ],

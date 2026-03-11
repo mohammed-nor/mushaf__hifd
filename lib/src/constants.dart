@@ -6,7 +6,6 @@
 /// Keeping it here prevents duplication and keeps the main file lean.
 const List<String> kThomuns = [
   '1-0-1.png',
-  '1-0.png',
   '1-1.png',
   '1-2.png',
   '1-3.png',
@@ -166,12 +165,14 @@ const List<String> kThomuns = [
   '20-5.png',
   '20-6.png',
   '20-7.png',
-  '20-8.png',];/// A constant list of all thomun text filenames.  It mirrors
+  '20-8.png',
+];
+
+/// A constant list of all thomun text filenames.  It mirrors
 /// [kThomuns] but uses the `.txt` extension and omits the
 /// special `1-0-1` image which has no text equivalent.
 List<String> kThomunsTxt = [
   '1-0-1.txt',
-  '1-0.txt',
   '1-1.txt',
   '1-2.txt',
   '1-3.txt',

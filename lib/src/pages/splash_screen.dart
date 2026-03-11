@@ -12,7 +12,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
@@ -22,18 +23,27 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.initState();
 
     // Initialize animations
-    _animationController = AnimationController(duration: const Duration(milliseconds: 1500), vsync: this);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
 
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeIn));
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+    );
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOut));
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
 
     _animationController.forward();
 
     // Navigate to home page after splash duration
     Future.delayed(const Duration(seconds: 6), () {
       if (mounted) {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => const MainHomePage()));
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const MainHomePage()),
+        );
       }
     });
   }
@@ -49,126 +59,227 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF0F3460), Color(0xFF16213E)]),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0F3460), Color(0xFF16213E)],
+          ),
         ),
         child: Stack(
           children: [
             // Islamic geometric pattern background (subtle)
-            Positioned.fill(child: CustomPaint(painter: IslamicPatternPainter())),
+            Positioned.fill(
+              child: CustomPaint(painter: IslamicPatternPainter()),
+            ),
             // Main content
-            Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                  children: [
-                    // Animated icon with Islamic star decoration
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: ScaleTransition(
-                        scale: _scaleAnimation,
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            // Outer glow circle
-                            Container(
-                              width: 200,
-                              height: 200,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                boxShadow: [BoxShadow(color: const Color(0xFF64FFDA).withOpacity(0.3), blurRadius: 40, spreadRadius: 10)],
-                              ),
-                            ),
-                            // Islamic decorative circle
-                            Container(
-                              width: 180,
-                              height: 180,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: const Color(0xFF64FFDA), width: 2),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [const Color(0xFF64FFDA).withOpacity(0.2), const Color(0xFF1DE9B6).withOpacity(0.2)],
-                                ),
-                              ),
-                            ),
-                            // Central icon (Quran/Islamic symbol)
-                            Container(
-                              width: 140,
-                              height: 140,
-                              decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF64FFDA).withOpacity(0.1)),
-                              child: Center(child: Image.asset('assets/splash/splash.png', width: 100, height: 100, fit: BoxFit.contain)),
-                            ),
-                            // Islamic star at top
-                            Positioned(
-                              top: 0,
-                              child: CustomPaint(size: const Size(30, 30), painter: IslamicStarPainter()),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 80),
-                    // App title
-                    FadeTransition(
-                      opacity: _fadeAnimation,
+            Column(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: SingleChildScrollView(
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'القرآن الكريم - مصحف الحفظ',
-                            style:
-                                Theme.of(context).textTheme.headlineLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1) ??
-                                const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 1),
-                            textAlign: TextAlign.center,
+                          // Animated icon with Islamic star decoration
+                          FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: ScaleTransition(
+                              scale: _scaleAnimation,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  // Outer glow circle
+                                  Container(
+                                    width: 200,
+                                    height: 200,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(
+                                            0xFF64FFDA,
+                                          ).withOpacity(0.3),
+                                          blurRadius: 40,
+                                          spreadRadius: 10,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  // Islamic decorative circle
+                                  Container(
+                                    width: 180,
+                                    height: 180,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: const Color(0xFF64FFDA),
+                                        width: 2,
+                                      ),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          const Color(
+                                            0xFF64FFDA,
+                                          ).withOpacity(0.2),
+                                          const Color(
+                                            0xFF1DE9B6,
+                                          ).withOpacity(0.2),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  // Central icon (Quran/Islamic symbol)
+                                  Container(
+                                    width: 140,
+                                    height: 140,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(
+                                        0xFF64FFDA,
+                                      ).withOpacity(0.1),
+                                    ),
+                                    child: Center(
+                                      child: Image.asset(
+                                        'assets/splash/splash.png',
+                                        width: 100,
+                                        height: 100,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                  // Islamic star at top
+                                  Positioned(
+                                    top: 0,
+                                    child: CustomPaint(
+                                      size: const Size(30, 30),
+                                      painter: IslamicStarPainter(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 80),
+                          // App title
+                          FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Column(
+                              children: [
+                                Text(
+                                  'القرآن الكريم - مصحف الحفظ',
+                                  style:
+                                      Theme.of(
+                                        context,
+                                      ).textTheme.headlineLarge?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
+                                      ) ??
+                                      const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 28),
+                                Container(
+                                  width: 60,
+                                  height: 1,
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF64FFDA),
+                                        Color(0xFF1DE9B6),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(1),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 28),
-                          Container(
-                            width: 60,
-                            height: 1,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(colors: [Color(0xFF64FFDA), Color(0xFF1DE9B6)]),
-                              borderRadius: BorderRadius.circular(1),
+                          // Islamic slogan
+                          FadeTransition(
+                            opacity: _fadeAnimation,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 32,
+                              ),
+                              child: Text(
+                                'اللَّهُ نَزَّلَ أَحْسَنَ الْحَدِيثِ كِتَابًا مُّتَشَابِهًا مَّثَانِيَ',
+                                style:
+                                    Theme.of(
+                                      context,
+                                    ).textTheme.bodyLarge?.copyWith(
+                                      color: const Color(0xFF64FFDA),
+                                      letterSpacing: 1,
+                                    ) ??
+                                    const TextStyle(
+                                      color: Color(0xFF64FFDA),
+                                      fontSize: 20,
+                                      letterSpacing: 1,
+                                    ),
+                                textAlign: TextAlign.center,
+                              ),
                             ),
                           ),
+                          const SizedBox(height: 100),
+                          // Spacer to push developer credit to bottom
                         ],
                       ),
                     ),
-                    const SizedBox(height: 28),
-                    // Islamic slogan
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32),
-                        child: Text(
-                          'اللَّهُ نَزَّلَ أَحْسَنَ الْحَدِيثِ كِتَابًا مُّتَشَابِهًا مَّثَانِيَ',
-                          style:
-                              Theme.of(context).textTheme.bodyLarge?.copyWith(color: const Color(0xFF64FFDA), letterSpacing: 1) ??
-                              const TextStyle(color: Color(0xFF64FFDA), fontSize: 20, letterSpacing: 1),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 100),
-                    // Spacer to push developer credit to bottom
-                    // Developer credit
-                    FadeTransition(
-                      opacity: _fadeAnimation,
-                      child: Column(
-                        children: [
-                          Text(
-                            'تطوير',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white70, letterSpacing: 1) ?? const TextStyle(color: Colors.white70, fontSize: 12, letterSpacing: 1),
-                          ),
-                          const SizedBox(height: 8),
-                          Text('جميع الحقوق محفوظة للمطور محمد نور © 2026', style: TextStyle(color: Colors.white54)),
-                          const SizedBox(height: 18),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                // Developer credit bottom bar
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.1),
+                    border: Border(
+                      top: BorderSide(
+                        color: const Color(0xFF64FFDA).withOpacity(0.1),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'تطوير',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: Colors.white70,
+                                letterSpacing: 1,
+                              ) ??
+                              const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                letterSpacing: 1,
+                              ),
+                          textDirection: TextDirection.rtl,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'جميع الحقوق محفوظة للمطور محمد نور © 2026',
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 12,
+                          ),
+                          textDirection: TextDirection.rtl,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

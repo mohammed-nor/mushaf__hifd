@@ -19,6 +19,7 @@ class _Learn2PageState extends State<Learn2Page> {
   int _currentIndex = 0;
   late PageController _pageController;
   Set<int> _learnedThomuns = {};
+  Set<int> _revisedThomuns = {};
 
   @override
   void initState() {
@@ -31,11 +32,13 @@ class _Learn2PageState extends State<Learn2Page> {
     final prefs = await SharedPreferences.getInstance();
     final savedIndex = prefs.getInt('current_thomun_txt_index') ?? 0;
     final learnedList = prefs.getStringList('learned_thomuns_txt') ?? [];
+    final revisedList = prefs.getStringList('revised_thomuns_txt') ?? [];
 
     if (mounted) {
       setState(() {
         _currentIndex = savedIndex;
         _learnedThomuns = learnedList.map((e) => int.tryParse(e) ?? 0).toSet();
+        _revisedThomuns = revisedList.map((e) => int.tryParse(e) ?? 0).toSet();
       });
       if (_pageController.hasClients) {
         _pageController.jumpToPage(_currentIndex);
@@ -50,7 +53,13 @@ class _Learn2PageState extends State<Learn2Page> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('current_thomun_txt_index', _currentIndex);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم حفظ الصفحة الحالية بنجاح'), backgroundColor: Color(0xFF1DE9B6), duration: Duration(seconds: 2)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('تم حفظ الصفحة الحالية بنجاح'),
+          backgroundColor: Color(0xFF1DE9B6),
+          duration: Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -63,7 +72,50 @@ class _Learn2PageState extends State<Learn2Page> {
         _learnedThomuns.add(_currentIndex);
       }
     });
-    await prefs.setStringList('learned_thomuns_txt', _learnedThomuns.map((e) => e.toString()).toList());
+    await prefs.setStringList(
+      'learned_thomuns_txt',
+      _learnedThomuns.map((e) => e.toString()).toList(),
+    );
+  }
+
+  Widget _buildTextWithGreenBrackets(String text, TextStyle baseStyle) {
+    final spans = <TextSpan>[];
+    int lastIndex = 0;
+
+    final regExp = RegExp(r'[﴿﴾0-9]');
+    final matches = regExp.allMatches(text);
+
+    for (final match in matches) {
+      // Add text before match
+      if (match.start > lastIndex) {
+        spans.add(TextSpan(
+          text: text.substring(lastIndex, match.start),
+          style: baseStyle,
+        ));
+      }
+      // Add colored bracket
+      spans.add(TextSpan(
+        text: match.group(0),
+        style: baseStyle.copyWith(
+          color: const Color(0xFF1DE9B6),
+          fontWeight: FontWeight.bold,
+        ),
+      ));
+      lastIndex = match.end;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(lastIndex),
+        style: baseStyle,
+      ));
+    }
+
+    return RichText(
+      textAlign: TextAlign.justify,
+      text: TextSpan(children: spans),
+    );
   }
 
   @override
@@ -79,7 +131,11 @@ class _Learn2PageState extends State<Learn2Page> {
       builder: (context, settings, _) {
         return Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF232537), Color(0xFF12121D)]),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF232537), Color(0xFF12121D)],
+            ),
           ),
           child: Scaffold(
             backgroundColor: Colors.transparent,
@@ -88,19 +144,27 @@ class _Learn2PageState extends State<Learn2Page> {
               elevation: 0,
               title: Text(
                 () {
-                  final filename = kThomunsTxt[_currentIndex].replaceAll('.txt', '');
+                  final filename = kThomunsTxt[_currentIndex].replaceAll(
+                    '.txt',
+                    '',
+                  );
                   final parts = filename.split('-');
                   if (parts.length == 2) {
                     return 'تلاوة الثمن ${parts[1]} من الحزب ${parts[0]}';
                   }
                   return 'إحفظ الفاتحة';
                 }(),
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(color: const Color(0xFF64FFDA)),
+                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                  color: const Color(0xFF64FFDA),
+                ),
               ),
               centerTitle: true,
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.bookmark_add, color: Color(0xFF64FFDA)),
+                  icon: const Icon(
+                    Icons.bookmark_add,
+                    color: Color(0xFF64FFDA),
+                  ),
                   onPressed: _saveCurrentPage,
                   tooltip: 'حفظ الصفحة الحالية',
                 ),
@@ -122,27 +186,38 @@ class _Learn2PageState extends State<Learn2Page> {
                         return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: FutureBuilder<String>(
-                            future: rootBundle.loadString('lib/thomuns_txt/${kThomunsTxt[index]}'),
+                            future: rootBundle.loadString(
+                              'lib/thomuns_txt/${kThomunsTxt[index]}',
+                            ),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(child: CircularProgressIndicator());
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
                               }
                               if (snapshot.hasError) {
-                                return const Center(child: Text('خطأ في تحميل النص'));
+                                return const Center(
+                                  child: Text('خطأ في تحميل النص'),
+                                );
                               }
                               return Card(
                                 elevation: 8,
                                 shadowColor: Colors.black.withOpacity(0.3),
                                 color: Colors.white.withAlpha(10),
                                 margin: const EdgeInsets.all(3),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
                                   child: SingleChildScrollView(
-                                    child: Text(
-                                      snapshot.data ?? '',
-                                      textAlign: TextAlign.justify,
-                                      style: Theme.of(context).textTheme.titleLarge!.copyWith(height: settings.lineSpacing, fontWeight: FontWeight.normal),
+                                    child: _buildTextWithGreenBrackets(
+                                      (snapshot.data ?? '').replaceAll('(', '﴿').replaceAll(')', '﴾'),
+                                      Theme.of(context).textTheme.titleLarge!.copyWith(
+                                        height: settings.lineSpacing,
+                                        fontWeight: FontWeight.normal,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -154,31 +229,55 @@ class _Learn2PageState extends State<Learn2Page> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 8.0,
+                    ),
                     child: Row(
                       children: [
                         InkWell(
                           onTap: _toggleLearnedStatus,
                           borderRadius: BorderRadius.circular(12),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
-                              color: _learnedThomuns.contains(_currentIndex) ? const Color(0xFF64FFDA).withAlpha(50) : Colors.grey.withAlpha(50),
-                              border: Border.all(color: _learnedThomuns.contains(_currentIndex) ? const Color(0xFF64FFDA) : Colors.grey),
+                              color: _learnedThomuns.contains(_currentIndex)
+                                  ? const Color(0xFF64FFDA).withAlpha(50)
+                                  : Colors.grey.withAlpha(50),
+                              border: Border.all(
+                                color: _learnedThomuns.contains(_currentIndex)
+                                    ? const Color(0xFF64FFDA)
+                                    : Colors.grey,
+                              ),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              _learnedThomuns.contains(_currentIndex) ? 'تم الحفظ' : 'قيد الحفظ',
-                              style: Theme.of(
-                                context,
-                              ).textTheme.labelMedium!.copyWith(color: _learnedThomuns.contains(_currentIndex) ? const Color(0xFF64FFDA) : Colors.white70, fontWeight: FontWeight.bold),
+                              _learnedThomuns.contains(_currentIndex)
+                                  ? 'تم الحفظ'
+                                  : 'قيد الحفظ',
+                              style: Theme.of(context).textTheme.labelMedium!
+                                  .copyWith(
+                                    color:
+                                        _learnedThomuns.contains(_currentIndex)
+                                        ? const Color(0xFF64FFDA)
+                                        : Colors.white70,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         ),
+
                         const SizedBox(width: 8),
                         Text(
                           '${_currentIndex + 1} / ${kThomunsTxt.length}',
-                          style: Theme.of(context).textTheme.labelMedium!.copyWith(fontWeight: FontWeight.bold, color: const Color(0xFF64FFDA)),
+                          style: Theme.of(context).textTheme.labelMedium!
+                              .copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF64FFDA),
+                              ),
                         ),
                         Expanded(
                           child: Slider(
@@ -195,6 +294,49 @@ class _Learn2PageState extends State<Learn2Page> {
                             },
                           ),
                         ),
+                        const SizedBox(width: 8),
+                        if (_revisedThomuns.contains(_currentIndex))
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1DE9B6).withAlpha(50),
+                              border: Border.all(
+                                color: const Color(0xFF1DE9B6),
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'مراجع',
+                              style: Theme.of(context).textTheme.labelMedium!
+                                  .copyWith(
+                                    color: const Color(0xFF1DE9B6),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withAlpha(50),
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'لم يراجع',
+                              style: Theme.of(context).textTheme.labelMedium!
+                                  .copyWith(
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
+                          ),
                       ],
                     ),
                   ),

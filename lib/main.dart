@@ -14,7 +14,11 @@ void main() async {
   final fontFamily = prefs.getString('font_family') ?? 'Andalus';
   final fontSize = prefs.getDouble('font_size') ?? 18.0;
   final lineSpacing = prefs.getDouble('line_spacing') ?? 1.5;
-  themeSettingsNotifier.value = ThemeSettings(fontFamily: fontFamily, fontSize: fontSize, lineSpacing: lineSpacing);
+  themeSettingsNotifier.value = ThemeSettings(
+    fontFamily: fontFamily,
+    fontSize: fontSize,
+    lineSpacing: lineSpacing,
+  );
 
   runApp(const MyApp());
 }
@@ -43,32 +47,87 @@ class MyApp extends StatelessWidget {
               elevation: 0,
               shadowColor: Colors.transparent,
               surfaceTintColor: Colors.transparent,
-              titleTextStyle: TextStyle(fontWeight: FontWeight.w600, letterSpacing: 1.2, color: Colors.white),
+              titleTextStyle: TextStyle(
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.2,
+                color: Colors.white,
+              ),
               iconTheme: IconThemeData(color: Colors.white),
             ),
             cardTheme: CardThemeData(
               color: Colors.white.withAlpha(10),
               shadowColor: Colors.black.withOpacity(0.3),
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
             textTheme: TextTheme(
-              bodyLarge: TextStyle(fontSize: 16 * (settings.fontSize / 18.0), color: Colors.white),
-              bodyMedium: TextStyle(fontSize: 14 * (settings.fontSize / 18.0), color: Colors.white),
-              bodySmall: TextStyle(fontSize: 12 * (settings.fontSize / 18.0), color: Colors.white),
-              headlineLarge: TextStyle(fontSize: 32 * (settings.fontSize / 18.0), color: Colors.white, fontWeight: FontWeight.bold),
-              headlineMedium: TextStyle(fontSize: 28 * (settings.fontSize / 18.0), color: Colors.white, fontWeight: FontWeight.bold),
-              headlineSmall: TextStyle(fontSize: 24 * (settings.fontSize / 18.0), color: Colors.white, fontWeight: FontWeight.bold),
-              titleLarge: TextStyle(fontSize: 22 * (settings.fontSize / 18.0), color: Colors.white, fontWeight: FontWeight.bold),
-              titleMedium: TextStyle(fontSize: 16 * (settings.fontSize / 18.0), color: Colors.white, fontWeight: FontWeight.bold),
-              titleSmall: TextStyle(fontSize: 14 * (settings.fontSize / 18.0), color: Colors.white, fontWeight: FontWeight.bold),
-              labelLarge: TextStyle(fontSize: 14 * (settings.fontSize / 18.0), color: Colors.white, fontWeight: FontWeight.bold),
-              labelMedium: TextStyle(fontSize: 12 * (settings.fontSize / 18.0), color: Colors.white, fontWeight: FontWeight.bold),
-              labelSmall: TextStyle(fontSize: 11 * (settings.fontSize / 18.0), color: Colors.white, fontWeight: FontWeight.bold),
+              bodyLarge: TextStyle(
+                fontSize: 16 * (settings.fontSize / 18.0),
+                color: Colors.white,
+              ),
+              bodyMedium: TextStyle(
+                fontSize: 14 * (settings.fontSize / 18.0),
+                color: Colors.white,
+              ),
+              bodySmall: TextStyle(
+                fontSize: 12 * (settings.fontSize / 18.0),
+                color: Colors.white,
+              ),
+              headlineLarge: TextStyle(
+                fontSize: 30 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              headlineMedium: TextStyle(
+                fontSize: 27 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              headlineSmall: TextStyle(
+                fontSize: 24 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              titleLarge: TextStyle(
+                fontSize: 20 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              titleMedium: TextStyle(
+                fontSize: 17 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              titleSmall: TextStyle(
+                fontSize: 14 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              labelLarge: TextStyle(
+                fontSize: 14 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              labelMedium: TextStyle(
+                fontSize: 12 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+              labelSmall: TextStyle(
+                fontSize: 11 * (settings.fontSize / 18.0),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ).apply(fontFamily: settings.fontFamily),
             scaffoldBackgroundColor: Colors.transparent,
           ),
-          localizationsDelegates: const [GlobalMaterialLocalizations.delegate, GlobalWidgetsLocalizations.delegate, GlobalCupertinoLocalizations.delegate],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           supportedLocales: const [
             Locale('ar', 'AE'), // Arabic
           ],

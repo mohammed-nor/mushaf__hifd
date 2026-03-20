@@ -187,7 +187,7 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 80),
+                          SizedBox(height: ResponsiveUtils.getResponsiveHeight(context, 0.10)),
                           // App title
                           FadeTransition(
                             opacity: _fadeAnimation,
@@ -234,7 +234,7 @@ class _SplashScreenState extends State<SplashScreen>
                                       ),
                                   textAlign: TextAlign.center,
                                 ),
-                                const SizedBox(height: 28),
+                                SizedBox(height: ResponsiveUtils.getResponsiveHeight(context, 0.035)),
                                 Container(
                                   width: ResponsiveUtils.getResponsiveWidth(
                                     context,
@@ -254,7 +254,7 @@ class _SplashScreenState extends State<SplashScreen>
                               ],
                             ),
                           ),
-                          const SizedBox(height: 28),
+                          SizedBox(height: ResponsiveUtils.getResponsiveHeight(context, 0.035)),
                           // Islamic slogan
                           FadeTransition(
                             opacity: _fadeAnimation,
@@ -280,7 +280,7 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 100),
+                          SizedBox(height: ResponsiveUtils.getResponsiveHeight(context, 0.12)),
                           // Spacer to push developer credit to bottom
                         ],
                       ),

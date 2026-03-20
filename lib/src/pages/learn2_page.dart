@@ -57,7 +57,7 @@ class _Learn2PageState extends State<Learn2Page> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('تم حفظ الصفحة الحالية بنجاح'),
-          backgroundColor: Color(0xFF1DE9B6),
+          backgroundColor: Color(0xFF1ABC9C),
           duration: Duration(seconds: 2),
         ),
       );
@@ -132,11 +132,13 @@ class _Learn2PageState extends State<Learn2Page> {
       valueListenable: themeSettingsNotifier,
       builder: (context, settings, _) {
         return Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFF232537), Color(0xFF12121D)],
+              colors: settings.isDarkMode
+                  ? const [Color(0xFF232537), Color(0xFF12121D)]
+                  : [Colors.grey[50]!, Colors.grey[100]!],
             ),
           ),
           child: Scaffold(
@@ -165,7 +167,7 @@ class _Learn2PageState extends State<Learn2Page> {
                 IconButton(
                   icon: const Icon(
                     Icons.bookmark_add,
-                    color: Color(0xFF64FFDA),
+                    color: Color(0xFF1ABC9C),
                   ),
                   onPressed: _saveCurrentPage,
                   tooltip: 'حفظ الصفحة الحالية',
@@ -207,7 +209,7 @@ class _Learn2PageState extends State<Learn2Page> {
                                 elevation: 8,
                                 shadowColor: Colors.black.withOpacity(0.3),
                                 color: Colors.white.withAlpha(10),
-                                margin: const EdgeInsets.all(3),
+                                margin: const EdgeInsets.all(0),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
@@ -251,7 +253,7 @@ class _Learn2PageState extends State<Learn2Page> {
                             ),
                             decoration: BoxDecoration(
                               color: _learnedThomuns.contains(_currentIndex)
-                                  ? const Color(0xFF64FFDA).withAlpha(50)
+                                  ? const Color(0xFF1ABC9C).withAlpha(50)
                                   : Colors.grey.withAlpha(50),
                               border: Border.all(
                                 color: _learnedThomuns.contains(_currentIndex)
@@ -268,8 +270,10 @@ class _Learn2PageState extends State<Learn2Page> {
                                   .copyWith(
                                     color:
                                         _learnedThomuns.contains(_currentIndex)
-                                        ? const Color(0xFF64FFDA)
-                                        : Colors.white70,
+                                        ? const Color(0xFF1ABC9C)
+                                        : (settings.isDarkMode
+                                              ? Colors.white70
+                                              : Colors.black54),
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
@@ -287,7 +291,7 @@ class _Learn2PageState extends State<Learn2Page> {
                           style: Theme.of(context).textTheme.labelMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF64FFDA),
+                                color: const Color(0xFF1ABC9C),
                               ),
                         ),
                         Expanded(
@@ -295,7 +299,7 @@ class _Learn2PageState extends State<Learn2Page> {
                             value: _currentIndex.toDouble(),
                             min: 0,
                             max: (kThomunsTxt.length - 1).toDouble(),
-                            activeColor: const Color(0xFF64FFDA),
+                            activeColor: const Color(0xFF1ABC9C),
                             inactiveColor: Colors.grey.withAlpha(77),
                             onChanged: (value) {
                               setState(() {
@@ -318,7 +322,7 @@ class _Learn2PageState extends State<Learn2Page> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1DE9B6).withAlpha(50),
+                              color: const Color(0xFF1ABC9C).withAlpha(50),
                               border: Border.all(
                                 color: const Color(0xFF1DE9B6),
                               ),
@@ -328,7 +332,7 @@ class _Learn2PageState extends State<Learn2Page> {
                               'مراجع',
                               style: Theme.of(context).textTheme.labelMedium!
                                   .copyWith(
-                                    color: const Color(0xFF1DE9B6),
+                                    color: const Color(0xFF1ABC9C),
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
@@ -348,7 +352,9 @@ class _Learn2PageState extends State<Learn2Page> {
                               'لم يراجع',
                               style: Theme.of(context).textTheme.labelMedium!
                                   .copyWith(
-                                    color: Colors.white70,
+                                    color: settings.isDarkMode
+                                        ? Colors.white70
+                                        : Colors.black54,
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),

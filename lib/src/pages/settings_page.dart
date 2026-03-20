@@ -37,32 +37,34 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF1E1E2C), Color(0xFF12121D)],
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text(
-            'الإعدادات',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall!.copyWith(color: Color(0xFF64FFDA)),
+    return ValueListenableBuilder<ThemeSettings>(
+      valueListenable: themeSettingsNotifier,
+      builder: (context, settings, _) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: settings.isDarkMode
+                  ? const [Color(0xFF1E1E2C), Color(0xFF12121D)]
+                  : [Colors.grey[50]!, Colors.grey[100]!],
+            ),
           ),
-          centerTitle: true,
-        ),
-        body: SafeArea(
-          child: ValueListenableBuilder<ThemeSettings>(
-            valueListenable: themeSettingsNotifier,
-            builder: (context, settings, _) {
-              return SingleChildScrollView(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(
+                'الإعدادات',
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall!.copyWith(color: Color(0xFF1ABC9C)),
+              ),
+              centerTitle: true,
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -73,12 +75,33 @@ class _SettingsPageState extends State<SettingsPage> {
                           .copyWith(color: const Color(0xFF64FFDA)),
                     ), */
                     _buildSettingCard(
+                      settings: settings,
                       child: Column(
                         children: [
                           ListTile(
                             leading: const Icon(
+                              Icons.brightness_4,
+                              color: Color(0xFF1ABC9C),
+                            ),
+                            title: const Text('المظهر'),
+                            trailing: Switch(
+                              value: !settings.isDarkMode,
+                              onChanged: (bool value) {
+                                updateThemeMode(!value);
+                              },
+                              activeColor: const Color(0xFF64FFDA),
+                              inactiveThumbColor: Colors.grey,
+                            ),
+                          ),
+                          Divider(
+                            color: settings.isDarkMode
+                                ? Colors.white10
+                                : Colors.black12,
+                          ),
+                          ListTile(
+                            leading: const Icon(
                               Icons.font_download,
-                              color: Color(0xFF1DE9B6),
+                              color: Color(0xFF1ABC9C),
                             ),
                             title: const Text('نوع الخط'),
                             trailing: DropdownButton<String>(
@@ -108,8 +131,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                       value: value,
                                       child: Text(
                                         displayNames[value] ?? value,
-                                        style: const TextStyle(
-                                          color: Colors.white,
+                                        style: TextStyle(
+                                          color: settings.isDarkMode
+                                              ? Colors.white70
+                                              : Colors.black54,
                                         ),
                                       ),
                                     );
@@ -125,11 +150,15 @@ class _SettingsPageState extends State<SettingsPage> {
                               },
                             ),
                           ),
-                          const Divider(color: Colors.white10),
+                          Divider(
+                            color: settings.isDarkMode
+                                ? Colors.white10
+                                : Colors.black12,
+                          ),
                           ListTile(
                             leading: const Icon(
                               Icons.format_size,
-                              color: Color(0xFF1DE9B6),
+                              color: Color(0xFF1ABC9C),
                             ),
                             title: const Text('حجم الخط'),
                             subtitle: Slider(
@@ -155,11 +184,15 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                           ),
-                          const Divider(color: Colors.white10),
+                          Divider(
+                            color: settings.isDarkMode
+                                ? Colors.white10
+                                : Colors.black12,
+                          ),
                           ListTile(
                             leading: const Icon(
                               Icons.line_weight,
-                              color: Color(0xFF1DE9B6),
+                              color: Color(0xFF1ABC9C),
                             ),
                             title: const Text('تباعد الأسطر'),
                             subtitle: Slider(
@@ -188,82 +221,156 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveHeight(
+                        context,
+                        0.04,
+                      ),
+                    ),
 
                     /*  Text(
                       'حول التطبيق',
                       style: Theme.of(context).textTheme.headlineSmall!
                           .copyWith(color: const Color(0xFF64FFDA)),
                     ), */
-                    _buildProgressCard(context),
-                    const SizedBox(height: 32),
-                    const SizedBox(height: 16),
+                    _buildProgressCard(context, settings),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveHeight(
+                        context,
+                        0.04,
+                      ),
+                    ),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveHeight(
+                        context,
+                        0.02,
+                      ),
+                    ),
                     _buildSettingCard(
+                      settings: settings,
                       child: Column(
                         children: [
-                          const SizedBox(height: 20),
+                          SizedBox(
+                            height: ResponsiveUtils.getResponsiveHeight(
+                              context,
+                              0.025,
+                            ),
+                          ),
                           const Icon(
                             Icons.info_outline,
                             size: 60,
                             color: Color(0xFF64FFDA),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(
+                            height: ResponsiveUtils.getResponsiveHeight(
+                              context,
+                              0.02,
+                            ),
+                          ),
                           Text(
                             'مصحف الحفظ - ورش مثمن',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.titleLarge!
-                                .copyWith(color: Colors.white),
+                                .copyWith(
+                                  color: settings.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.black54,
+                                ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: ResponsiveUtils.getResponsiveHeight(
+                              context,
+                              0.01,
+                            ),
+                          ),
                           Text(
                             'تطبيق صمم خصيصاً لمساعدتك على حفظ القرآن الكريم وتسجيل ما تحفظه بسهولة.',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodyMedium!
-                                .copyWith(color: Colors.white70),
+                                .copyWith(
+                                  color: settings.isDarkMode
+                                      ? Colors.white70
+                                      : Colors.black54,
+                                ),
                           ),
-                          const SizedBox(height: 8),
-                          const Divider(color: Colors.white10),
-                          const SizedBox(height: 8),
-                          const ListTile(
-                            leading: Icon(
+                          SizedBox(
+                            height: ResponsiveUtils.getResponsiveHeight(
+                              context,
+                              0.01,
+                            ),
+                          ),
+                          Divider(
+                            color: settings.isDarkMode
+                                ? Colors.white10
+                                : Colors.black12,
+                          ),
+                          SizedBox(
+                            height: ResponsiveUtils.getResponsiveHeight(
+                              context,
+                              0.01,
+                            ),
+                          ),
+                          ListTile(
+                            leading: const Icon(
                               Icons.copyright,
                               color: Color(0xFF1DE9B6),
                               size: 35,
                             ),
-                            title: Text('حقوق النشر'),
+                            title: const Text('حقوق النشر'),
                             subtitle: Text(
                               'جميع الحقوق محفوظة © 2026',
-                              style: TextStyle(color: Colors.white54),
+                              style: TextStyle(
+                                color: settings.isDarkMode
+                                    ? Colors.white54
+                                    : Colors.black45,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    _buildDeveloperCard(context),
-                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveHeight(
+                        context,
+                        0.03,
+                      ),
+                    ),
+                    _buildDeveloperCard(context, settings),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveHeight(
+                        context,
+                        0.02,
+                      ),
+                    ),
                   ],
                 ),
-              );
-            },
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildSettingCard({required Widget child}) {
+  Widget _buildSettingCard({
+    required Widget child,
+    required ThemeSettings settings,
+  }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(12),
+        color: Colors.white.withAlpha(10),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withAlpha(20)),
+        border: Border.all(
+          color: settings.isDarkMode
+              ? Colors.white.withAlpha(20)
+              : Colors.black.withAlpha(10),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 3,
+            //offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -271,7 +378,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildProgressCard(BuildContext context) {
+  Widget _buildProgressCard(BuildContext context, ThemeSettings settings) {
     final total = kThomunsTxt.length;
     final learned = _learnedThomuns.length;
     final revised = _revisedThomuns.length;
@@ -284,6 +391,7 @@ class _SettingsPageState extends State<SettingsPage> {
         : '0.0';
 
     return _buildSettingCard(
+      settings: settings,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -304,25 +412,29 @@ class _SettingsPageState extends State<SettingsPage> {
                   context,
                   label: 'نسبة الحفظ',
                   value: '$advancement%',
-                  color: const Color(0xFF64FFDA),
+                  color: const Color(0xFF1ABC9C),
+                  isDarkMode: settings.isDarkMode,
                 ),
                 _buildStatWidget(
                   context,
                   label: 'الأحزاب المحفوظة',
                   value: '${learned / 8}',
-                  color: const Color(0xFF64FFDA),
+                  color: const Color(0xFF1ABC9C),
+                  isDarkMode: settings.isDarkMode,
                 ),
                 _buildStatWidget(
                   context,
                   label: 'محفوظ ومراجع',
                   value: '$learnedAndRevised',
-                  color: const Color(0xFF1DE9B6),
+                  color: const Color(0xFF1ABC9C),
+                  isDarkMode: settings.isDarkMode,
                 ),
                 _buildStatWidget(
                   context,
                   label: 'محفوظ فقط',
                   value: '$learnedOnly',
                   color: Colors.orange,
+                  isDarkMode: settings.isDarkMode,
                 ),
               ],
             ),
@@ -330,9 +442,9 @@ class _SettingsPageState extends State<SettingsPage> {
             // Progress dots chart
             Text(
               'خريطة الحفظ (8 ثمن في كل صف)',
-              style: Theme.of(
-                context,
-              ).textTheme.labelMedium!.copyWith(color: Colors.white70),
+              style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                color: settings.isDarkMode ? Colors.white70 : Colors.black54,
+              ),
             ),
             const SizedBox(height: 12),
             _buildProgressDotsChart(),
@@ -347,6 +459,7 @@ class _SettingsPageState extends State<SettingsPage> {
     required String label,
     required String value,
     required Color color,
+    required bool isDarkMode,
   }) {
     return Column(
       children: [
@@ -359,9 +472,9 @@ class _SettingsPageState extends State<SettingsPage> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: Theme.of(
-            context,
-          ).textTheme.labelSmall!.copyWith(color: Colors.white70),
+          style: Theme.of(context).textTheme.labelSmall!.copyWith(
+            color: isDarkMode ? Colors.white70 : Colors.black54,
+          ),
         ),
       ],
     );
@@ -390,7 +503,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   'الحزب ${rowIndex + 1}',
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF64FFDA),
+                    color: Color(0xFF1ABC9C),
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
@@ -416,7 +529,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     Color dotColor;
                     if (isRevised && isLearned) {
                       dotColor = const Color(
-                        0xFF1DE9B6,
+                        0xFF1ABC9C,
                       ); // Green: revised and learned
                     } else if (isLearned) {
                       dotColor = Colors.orange; // Orange: learned only
@@ -445,8 +558,9 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildDeveloperCard(BuildContext context) {
+  Widget _buildDeveloperCard(BuildContext context, ThemeSettings settings) {
     return _buildSettingCard(
+      settings: settings,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -466,17 +580,17 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 16),
             Text(
               'Mohammed Nor',
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium!.copyWith(color: Colors.white),
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                color: settings.isDarkMode ? Colors.white : Colors.black87,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Phys/Chem Teacher - Phd in Chemistry - Apps developer\nLaboratory of Research and Development in Engineering Sciences (LRDES)\nUAE University, Tanger - Morocco',
               textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall!.copyWith(color: Colors.white70),
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: settings.isDarkMode ? Colors.white70 : Colors.black54,
+              ),
             ),
             const SizedBox(height: 20),
             Row(
@@ -504,9 +618,9 @@ class _SettingsPageState extends State<SettingsPage> {
             Text(
               'الإصدار 3.0.0',
               textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall!.copyWith(color: Colors.white54),
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                color: settings.isDarkMode ? Colors.white54 : Colors.black45,
+              ),
             ),
           ],
         ),
@@ -527,12 +641,12 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF64FFDA), width: 1.5),
+            border: Border.all(color: const Color(0xFF1ABC9C), width: 1.5),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [
-              Icon(icon, color: const Color(0xFF64FFDA), size: 28),
+              Icon(icon, color: const Color(0xFF1ABC9C), size: 28),
               const SizedBox(height: 6),
               Text(
                 label,

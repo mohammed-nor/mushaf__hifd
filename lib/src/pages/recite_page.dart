@@ -157,7 +157,7 @@ class _RecitePageState extends State<RecitePage> {
         TextSpan(
           text: match.group(0),
           style: baseStyle.copyWith(
-            color: const Color(0xFF1DE9B6),
+            color: const Color(0xFF1ABC9C),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -176,17 +176,81 @@ class _RecitePageState extends State<RecitePage> {
     );
   }
 
+  Widget _buildThomunHintContainer(
+    String text,
+    String label,
+    ThemeSettings settings,
+  ) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+        decoration: BoxDecoration(
+          color: Colors.white.withAlpha(8),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+            color: const Color(0xFF1ABC9C).withAlpha(100),
+            width: 0.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 8,
+                color: Color(0xFF1ABC9C),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 3),
+            Expanded(
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 8.5,
+                  color: settings.isDarkMode ? Colors.white70 : Colors.black54,
+                ),
+                textDirection: TextDirection.rtl,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<String> _getThomunStartText(int index) async {
+    try {
+      final text = await rootBundle.loadString(
+        'lib/thomuns_txt/${kThomunsTxt[index]}',
+      );
+      // Get first 50 characters or until first line break
+      final lines = text.split('\n');
+      final firstLine = lines.first.trim();
+      if (firstLine.length > 60) {
+        return firstLine.substring(0, 60) + '...';
+      }
+      return firstLine;
+    } catch (e) {
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ThemeSettings>(
       valueListenable: themeSettingsNotifier,
       builder: (context, settings, _) {
         return Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFF232537), Color(0xFF12121D)],
+              colors: settings.isDarkMode
+                  ? const [Color(0xFF232537), Color(0xFF12121D)]
+                  : [Colors.grey[50]!, Colors.grey[100]!],
             ),
           ),
           child: Scaffold(
@@ -207,7 +271,7 @@ class _RecitePageState extends State<RecitePage> {
                       }()
                     : 'إمتحن حفظك',
                 style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  color: const Color(0xFF64FFDA),
+                  color: const Color(0xFF1ABC9C),
                 ),
               ),
               centerTitle: true,
@@ -234,7 +298,9 @@ class _RecitePageState extends State<RecitePage> {
                         border: Border.all(
                           color: _onlyLearned
                               ? const Color(0xFF64FFDA)
-                              : Colors.white30,
+                              : (settings.isDarkMode
+                                    ? Colors.white30
+                                    : Colors.black26),
                           width: 1.5,
                         ),
                       ),
@@ -253,7 +319,9 @@ class _RecitePageState extends State<RecitePage> {
                                 ?.copyWith(
                                   color: _onlyLearned
                                       ? const Color(0xFF64FFDA)
-                                      : Colors.white70,
+                                      : (settings.isDarkMode
+                                            ? Colors.white70
+                                            : Colors.black54),
                                   fontWeight: _onlyLearned
                                       ? FontWeight.w600
                                       : FontWeight.w500,
@@ -272,7 +340,7 @@ class _RecitePageState extends State<RecitePage> {
                   Expanded(
                     child: _currentThomunIndex != null && _thomunText != null
                         ? Padding(
-                            padding: const EdgeInsets.all(6.0),
+                            padding: const EdgeInsets.all(0),
                             child: Card(
                               elevation: 8,
                               shadowColor: Colors.black.withOpacity(0.3),
@@ -320,6 +388,46 @@ class _RecitePageState extends State<RecitePage> {
                             ),
                           ),
                   ),
+                  if (_currentThomunIndex != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 3,
+                      ),
+                      child: Row(
+                        children: [
+                          if (_currentThomunIndex! > 0)
+                            FutureBuilder<String>(
+                              future: _getThomunStartText(
+                                _currentThomunIndex! - 1,
+                              ),
+                              builder: (context, snapshot) {
+                                return _buildThomunHintContainer(
+                                  snapshot.data ?? '',
+                                  'السابق',
+                                  settings,
+                                );
+                              },
+                            ),
+                          if (_currentThomunIndex! > 0 &&
+                              _currentThomunIndex! < kThomunsTxt.length - 1)
+                            const SizedBox(width: 4),
+                          if (_currentThomunIndex! < kThomunsTxt.length - 1)
+                            FutureBuilder<String>(
+                              future: _getThomunStartText(
+                                _currentThomunIndex! + 1,
+                              ),
+                              builder: (context, snapshot) {
+                                return _buildThomunHintContainer(
+                                  snapshot.data ?? '',
+                                  'التالي',
+                                  settings,
+                                );
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
                   Padding(
                     padding: const EdgeInsets.only(
                       left: 6,
@@ -342,7 +450,7 @@ class _RecitePageState extends State<RecitePage> {
                                     0xFF64FFDA,
                                   ).withAlpha(77), // 0.3 opacity
                                   blurRadius: 3,
-                                  offset: const Offset(0, 2),
+                                  //offset: const Offset(0, 2),
                                 ),
                               ],
                             ),

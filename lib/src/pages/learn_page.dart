@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
+import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 
 class LearnPage extends StatefulWidget {
   const LearnPage({super.key});
@@ -78,146 +79,163 @@ class _LearnPageState extends State<LearnPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF232537), Color(0xFF12121D)],
-        ),
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: Text(
-            'إحفظ : ${kThomunsTxt}',
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.2,
+    return ValueListenableBuilder<ThemeSettings>(
+      valueListenable: themeSettingsNotifier,
+      builder: (context, settings, _) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: settings.isDarkMode
+                  ? const [Color(0xFF232537), Color(0xFF12121D)]
+                  : [Colors.grey[50]!, Colors.grey[100]!],
             ),
           ),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.bookmark_add, color: Color(0xFF64FFDA)),
-              onPressed: _saveCurrentPage,
-              tooltip: 'حفظ الصفحة الحالية',
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              title: Text(
+                'إحفظ : ${kThomunsTxt}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.bookmark_add,
+                    color: Color(0xFF64FFDA),
+                  ),
+                  onPressed: _saveCurrentPage,
+                  tooltip: 'حفظ الصفحة الحالية',
+                ),
+              ],
             ),
-          ],
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: kThomunsTxt.length,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(6.0),
-                      child: Card(
-                        elevation: 8,
-                        shadowColor: Colors.black.withOpacity(0.3),
-                        color: Colors.white.withAlpha(10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: Hero(
-                            tag: 'thomun_image_$index',
-                            child: Image.asset(
-                              'lib/thomuns/${kThomunsTxt[index]}',
-                              fit: BoxFit.contain,
-                              width: double.infinity,
-                              height: double.infinity,
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: kThomunsTxt.length,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: Card(
+                            elevation: 8,
+                            shadowColor: Colors.black.withOpacity(0.3),
+                            color: Colors.white.withAlpha(10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Hero(
+                                tag: 'thomun_image_$index',
+                                child: Image.asset(
+                                  'lib/thomuns/${kThomunsTxt[index]}',
+                                  fit: BoxFit.contain,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6.0,
+                      vertical: 2.0,
+                    ),
+                    child: Row(
+                      children: [
+                        InkWell(
+                          onTap: _toggleLearnedStatus,
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _learnedThomuns.contains(_currentIndex)
+                                  ? const Color(0xFF64FFDA).withAlpha(50)
+                                  : Colors.grey.withAlpha(50),
+                              border: Border.all(
+                                color: _learnedThomuns.contains(_currentIndex)
+                                    ? const Color(0xFF64FFDA)
+                                    : Colors.grey,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              _learnedThomuns.contains(_currentIndex)
+                                  ? 'تم الحفظ'
+                                  : 'قيد الحفظ',
+                              style: Theme.of(context).textTheme.labelMedium!
+                                  .copyWith(
+                                    color:
+                                        _learnedThomuns.contains(_currentIndex)
+                                        ? const Color(0xFF64FFDA)
+                                        : (settings.isDarkMode
+                                              ? Colors.white70
+                                              : Colors.black54),
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6.0,
-                  vertical: 2.0,
-                ),
-                child: Row(
-                  children: [
-                    InkWell(
-                      onTap: _toggleLearnedStatus,
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _learnedThomuns.contains(_currentIndex)
-                              ? const Color(0xFF64FFDA).withAlpha(50)
-                              : Colors.grey.withAlpha(50),
-                          border: Border.all(
-                            color: _learnedThomuns.contains(_currentIndex)
-                                ? const Color(0xFF64FFDA)
-                                : Colors.grey,
+                        SizedBox(
+                          width: ResponsiveUtils.getResponsiveWidth(
+                            context,
+                            0.016,
                           ),
-                          borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Text(
-                          _learnedThomuns.contains(_currentIndex)
-                              ? 'تم الحفظ'
-                              : 'قيد الحفظ',
+                        Text(
+                          '${_currentIndex + 1} / ${kThomunsTxt.length}',
                           style: Theme.of(context).textTheme.labelMedium!
                               .copyWith(
-                                color: _learnedThomuns.contains(_currentIndex)
-                                    ? const Color(0xFF64FFDA)
-                                    : Colors.white70,
                                 fontWeight: FontWeight.bold,
+                                color: const Color(0xFF64FFDA),
                               ),
                         ),
-                      ),
+                        Expanded(
+                          child: Slider(
+                            value: _currentIndex.toDouble(),
+                            min: 0,
+                            max: (kThomunsTxt.length - 1).toDouble(),
+                            activeColor: const Color(0xFF64FFDA),
+                            inactiveColor: Colors.grey.withAlpha(77),
+                            onChanged: (value) {
+                              setState(() {
+                                _currentIndex = value.toInt();
+                              });
+                              _pageController.jumpToPage(_currentIndex);
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      width: ResponsiveUtils.getResponsiveWidth(context, 0.016),
-                    ),
-                    Text(
-                      '${_currentIndex + 1} / ${kThomunsTxt.length}',
-                      style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF64FFDA),
-                      ),
-                    ),
-                    Expanded(
-                      child: Slider(
-                        value: _currentIndex.toDouble(),
-                        min: 0,
-                        max: (kThomunsTxt.length - 1).toDouble(),
-                        activeColor: const Color(0xFF64FFDA),
-                        inactiveColor: Colors.grey.withAlpha(77),
-                        onChanged: (value) {
-                          setState(() {
-                            _currentIndex = value.toInt();
-                          });
-                          _pageController.jumpToPage(_currentIndex);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

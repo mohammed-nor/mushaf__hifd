@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'home_page.dart';
 
 /// A beautiful splash screen with Islamic theme styling.
@@ -90,8 +91,14 @@ class _SplashScreenState extends State<SplashScreen>
                                 children: [
                                   // Outer glow circle
                                   Container(
-                                    width: 200,
-                                    height: 200,
+                                    width: ResponsiveUtils.getResponsiveWidth(
+                                      context,
+                                      0.4,
+                                    ),
+                                    height: ResponsiveUtils.getResponsiveWidth(
+                                      context,
+                                      0.4,
+                                    ),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       boxShadow: [
@@ -107,8 +114,14 @@ class _SplashScreenState extends State<SplashScreen>
                                   ),
                                   // Islamic decorative circle
                                   Container(
-                                    width: 180,
-                                    height: 180,
+                                    width: ResponsiveUtils.getResponsiveWidth(
+                                      context,
+                                      0.36,
+                                    ),
+                                    height: ResponsiveUtils.getResponsiveWidth(
+                                      context,
+                                      0.36,
+                                    ),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       border: Border.all(
@@ -131,8 +144,14 @@ class _SplashScreenState extends State<SplashScreen>
                                   ),
                                   // Central icon (Quran/Islamic symbol)
                                   Container(
-                                    width: 140,
-                                    height: 140,
+                                    width: ResponsiveUtils.getResponsiveWidth(
+                                      context,
+                                      0.28,
+                                    ),
+                                    height: ResponsiveUtils.getResponsiveWidth(
+                                      context,
+                                      0.28,
+                                    ),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: const Color(
@@ -142,8 +161,16 @@ class _SplashScreenState extends State<SplashScreen>
                                     child: Center(
                                       child: Image.asset(
                                         'assets/splash/splash.png',
-                                        width: 100,
-                                        height: 100,
+                                        width:
+                                            ResponsiveUtils.getResponsiveWidth(
+                                              context,
+                                              0.2,
+                                            ),
+                                        height:
+                                            ResponsiveUtils.getResponsiveWidth(
+                                              context,
+                                              0.2,
+                                            ),
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -167,7 +194,7 @@ class _SplashScreenState extends State<SplashScreen>
                             child: Column(
                               children: [
                                 Text(
-                                  'القرآن الكريم - مصحف الحفظ',
+                                  'القرآن الكريم',
                                   style:
                                       Theme.of(
                                         context,
@@ -184,9 +211,35 @@ class _SplashScreenState extends State<SplashScreen>
                                       ),
                                   textAlign: TextAlign.center,
                                 ),
+                                Text(
+                                  'مصحف ورش للحفظ',
+                                  style:
+                                      Theme.of(
+                                        context,
+                                      ).textTheme.headlineMedium?.copyWith(
+                                        color: const Color.fromARGB(
+                                          162,
+                                          231,
+                                          231,
+                                          231,
+                                        ),
+                                        fontWeight: FontWeight.normal,
+                                        letterSpacing: 1,
+                                      ) ??
+                                      const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
                                 const SizedBox(height: 28),
                                 Container(
-                                  width: 60,
+                                  width: ResponsiveUtils.getResponsiveWidth(
+                                    context,
+                                    0.12,
+                                  ),
                                   height: 1,
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
@@ -249,33 +302,15 @@ class _SplashScreenState extends State<SplashScreen>
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: FadeTransition(
                     opacity: _fadeAnimation,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'تطوير',
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: Colors.white70,
-                                letterSpacing: 1,
-                              ) ??
-                              const TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                                letterSpacing: 1,
-                              ),
-                          textDirection: TextDirection.rtl,
+                    child: Center(
+                      child: Text(
+                        'جميع الحقوق محفوظة للمطور محمد نور © 2026',
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 12,
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'جميع الحقوق محفوظة للمطور محمد نور © 2026',
-                          style: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 12,
-                          ),
-                          textDirection: TextDirection.rtl,
-                        ),
-                      ],
+                        textDirection: TextDirection.rtl,
+                      ),
                     ),
                   ),
                 ),

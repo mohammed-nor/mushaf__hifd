@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
+import 'package:mushaf_hifd/src/utils/responsive.dart';
 
 class RecitePage extends StatefulWidget {
   const RecitePage({super.key});
@@ -321,10 +322,10 @@ class _RecitePageState extends State<RecitePage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(
-                      left: 24,
-                      right: 24,
-                      bottom: 32,
-                      top: 16,
+                      left: 6,
+                      right: 6,
+                      bottom: 6,
+                      top: 4,
                     ),
                     child: Row(
                       children: [
@@ -334,14 +335,14 @@ class _RecitePageState extends State<RecitePage> {
                               gradient: const LinearGradient(
                                 colors: [Color(0xFF64FFDA), Color(0xFF1DE9B6)],
                               ),
-                              borderRadius: BorderRadius.circular(30),
+                              borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
                                   color: const Color(
                                     0xFF64FFDA,
                                   ).withAlpha(77), // 0.3 opacity
-                                  blurRadius: 15,
-                                  offset: const Offset(0, 8),
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
@@ -351,10 +352,10 @@ class _RecitePageState extends State<RecitePage> {
                                 backgroundColor: Colors.transparent,
                                 shadowColor: Colors.transparent,
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 18,
+                                  vertical: 2,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(1),
                                 ),
                               ),
                               child: Row(
@@ -379,41 +380,39 @@ class _RecitePageState extends State<RecitePage> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Container(
-                          decoration: BoxDecoration(
-                            color:
-                                _currentThomunIndex != null &&
-                                    _revisedThomuns.contains(
-                                      _currentThomunIndex,
-                                    )
-                                ? const Color(0xFF1DE9B6).withAlpha(50)
-                                : Colors.grey.withAlpha(50),
-                            border: Border.all(
+
+                        Center(
+                          child: /*Container(
+                            decoration: BoxDecoration(
                               color:
                                   _currentThomunIndex != null &&
                                       _revisedThomuns.contains(
                                         _currentThomunIndex,
                                       )
-                                  ? const Color(0xFF1DE9B6)
-                                  : Colors.grey,
-                              width: 2,
+                                  ? const Color(0xFF1DE9B6).withAlpha(50)
+                                  : Colors.grey.withAlpha(50),
+                              border: Border.all(
+                                color:
+                                    _currentThomunIndex != null &&
+                                        _revisedThomuns.contains(
+                                          _currentThomunIndex,
+                                        )
+                                    ? const Color(0xFF1DE9B6)
+                                    : Colors.grey,
+                                //width: 2,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: ElevatedButton(
+                            child: */ ElevatedButton(
                             onPressed: _currentThomunIndex != null
                                 ? _toggleRevisedStatus
                                 : null,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               shadowColor: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 14,
-                              ),
+
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                             ),
                             child: Icon(
@@ -430,10 +429,11 @@ class _RecitePageState extends State<RecitePage> {
                                       )
                                   ? const Color(0xFF1DE9B6)
                                   : Colors.grey,
-                              size: 28,
+                              size: 35,
                             ),
                           ),
                         ),
+                        /* ), */
                       ],
                     ),
                   ),

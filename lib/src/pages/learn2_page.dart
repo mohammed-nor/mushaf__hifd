@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
+import 'package:mushaf_hifd/src/utils/responsive.dart';
 
 /// A companion to [LearnPage] that displays the text versions of the
 /// thomuns instead of the image assets.  The UI and persistence logic is
@@ -235,8 +236,8 @@ class _Learn2PageState extends State<Learn2Page> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 8.0,
+                      horizontal: 7.0,
+                      vertical: 2.0,
                     ),
                     child: Row(
                       children: [
@@ -275,7 +276,12 @@ class _Learn2PageState extends State<Learn2Page> {
                           ),
                         ),
 
-                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: ResponsiveUtils.getResponsiveWidth(
+                            context,
+                            0.016,
+                          ),
+                        ),
                         Text(
                           '${_currentIndex + 1} / ${kThomunsTxt.length}',
                           style: Theme.of(context).textTheme.labelMedium!
@@ -299,7 +305,12 @@ class _Learn2PageState extends State<Learn2Page> {
                             },
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(
+                          width: ResponsiveUtils.getResponsiveWidth(
+                            context,
+                            0.016,
+                          ),
+                        ),
                         if (_revisedThomuns.contains(_currentIndex))
                           Container(
                             padding: const EdgeInsets.symmetric(

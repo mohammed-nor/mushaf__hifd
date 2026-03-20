@@ -16,7 +16,11 @@ class MainHomePage extends StatefulWidget {
 class _MainHomePageState extends State<MainHomePage> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = <Widget>[RecitePage(), Learn2Page(), SettingsPage()];
+  static const List<Widget> _pages = <Widget>[
+    RecitePage(),
+    Learn2Page(),
+    SettingsPage(),
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -28,13 +32,18 @@ class _MainHomePageState extends State<MainHomePage> {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1E1E2C), Color(0xFF12121D)]),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1E1E2C), Color(0xFF12121D)],
+        ),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         body: _pages[_selectedIndex],
         bottomNavigationBar: NavigationBar(
           backgroundColor: const Color(0xFF1E1E2C).withOpacity(0.95),
+          height: MediaQuery.of(context).size.height * 0.08,
           elevation: 8,
           shadowColor: Colors.black.withOpacity(0.5),
           surfaceTintColor: const Color(0xFF64FFDA).withOpacity(0.1),

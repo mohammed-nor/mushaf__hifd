@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
-import 'package:mushaf_hifd/src/utils/responsive.dart';
 
 class RecitePage extends StatefulWidget {
   const RecitePage({super.key});
@@ -157,7 +156,7 @@ class _RecitePageState extends State<RecitePage> {
         TextSpan(
           text: match.group(0),
           style: baseStyle.copyWith(
-            color: const Color(0xFF1ABC9C),
+            color: kLightsColor,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -179,17 +178,20 @@ class _RecitePageState extends State<RecitePage> {
   Widget _buildThomunHintContainer(
     String text,
     String label,
-    ThemeSettings settings,
-  ) {
+    ThemeSettings settings, {
+    bool isRevised = false,
+  }) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
         decoration: BoxDecoration(
-          color: Colors.white.withAlpha(8),
+          color: isRevised
+              ? kLightsColor.withAlpha(80)
+              : kLightBackground.withAlpha(8),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: const Color(0xFF1ABC9C).withAlpha(100),
-            width: 0.5,
+            color: isRevised ? kLightsColor : kLightsColor.withAlpha(100),
+            width: isRevised ? 1.5 : 0.5,
           ),
         ),
         child: Row(
@@ -198,7 +200,7 @@ class _RecitePageState extends State<RecitePage> {
               label,
               style: const TextStyle(
                 fontSize: 8,
-                color: Color(0xFF1ABC9C),
+                color: kLightsColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -210,7 +212,9 @@ class _RecitePageState extends State<RecitePage> {
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 8.5,
-                  color: settings.isDarkMode ? Colors.white70 : Colors.black54,
+                  color: settings.isDarkMode
+                      ? kLightBackground
+                      : Colors.black54,
                 ),
                 textDirection: TextDirection.rtl,
               ),
@@ -230,7 +234,7 @@ class _RecitePageState extends State<RecitePage> {
       final lines = text.split('\n');
       final firstLine = lines.first.trim();
       if (firstLine.length > 60) {
-        return firstLine.substring(0, 60) + '...';
+        return '${firstLine.substring(0, 60)}...';
       }
       return firstLine;
     } catch (e) {
@@ -249,8 +253,8 @@ class _RecitePageState extends State<RecitePage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: settings.isDarkMode
-                  ? const [Color(0xFF232537), Color(0xFF12121D)]
-                  : [Colors.grey[50]!, Colors.grey[100]!],
+                  ? const [kDarkBackgroundAlt, kDarkBackgroundVariant]
+                  : [Colors.grey[50]!, kLightBackground],
             ),
           ),
           child: Scaffold(
@@ -270,9 +274,9 @@ class _RecitePageState extends State<RecitePage> {
                         return 'تلاوة: $filename';
                       }()
                     : 'إمتحن حفظك',
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  color: const Color(0xFF1ABC9C),
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall!.copyWith(color: kLightsColor),
               ),
               centerTitle: true,
               actions: [
@@ -292,14 +296,14 @@ class _RecitePageState extends State<RecitePage> {
                       ),
                       decoration: BoxDecoration(
                         color: _onlyLearned
-                            ? const Color(0xFF64FFDA).withOpacity(0.1)
+                            ? kLightsColor.withValues(alpha: 0.1)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _onlyLearned
-                              ? const Color(0xFF64FFDA)
+                              ? kLightsColor
                               : (settings.isDarkMode
-                                    ? Colors.white30
+                                    ? kLightBackground
                                     : Colors.black26),
                           width: 1.5,
                         ),
@@ -309,7 +313,7 @@ class _RecitePageState extends State<RecitePage> {
                         children: [
                           /*                        Icon(
                             _onlyLearned ? Icons.check_box : Icons.check_box_outline_blank,
-                            color: _onlyLearned ? const Color(0xFF64FFDA) : Colors.white70,
+                            color: _onlyLearned ? kSecondaryTeal : kLightBackground,
                             size: 24,
                           ),
                           const SizedBox(width: 8), */
@@ -318,9 +322,9 @@ class _RecitePageState extends State<RecitePage> {
                             style: Theme.of(context).textTheme.labelMedium
                                 ?.copyWith(
                                   color: _onlyLearned
-                                      ? const Color(0xFF64FFDA)
+                                      ? kLightsColor
                                       : (settings.isDarkMode
-                                            ? Colors.white70
+                                            ? kLightBackground
                                             : Colors.black54),
                                   fontWeight: _onlyLearned
                                       ? FontWeight.w600
@@ -343,13 +347,19 @@ class _RecitePageState extends State<RecitePage> {
                             padding: const EdgeInsets.all(0),
                             child: Card(
                               elevation: 8,
-                              shadowColor: Colors.black.withOpacity(0.3),
-                              color: Colors.white.withAlpha(10),
+                              //shadowColor: Colors.black.withValues(alpha: 0.3),
+                              color: kLightBackground.withAlpha(0),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
+                                side: BorderSide(
+                                  color: settings.isDarkMode
+                                      ? kLightBackground.withAlpha(20)
+                                      : Colors.black.withAlpha(10),
+                                  width: 2,
+                                ),
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.all(5),
+                                padding: const EdgeInsets.all(4),
                                 child: SingleChildScrollView(
                                   child: _buildTextWithGreenBrackets(
                                     _thomunText!
@@ -373,14 +383,14 @@ class _RecitePageState extends State<RecitePage> {
                                 Icon(
                                   Icons.auto_stories,
                                   size: 80,
-                                  color: Colors.white.withAlpha(26),
+                                  color: kLightBackground.withAlpha(26),
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
                                   'لم يتم اختيار ثمن بعد',
                                   style: Theme.of(context).textTheme.bodyLarge!
                                       .copyWith(
-                                        color: Colors.white.withAlpha(128),
+                                        color: kLightBackground.withAlpha(128),
                                         height: settings.lineSpacing,
                                       ),
                                 ),
@@ -406,6 +416,9 @@ class _RecitePageState extends State<RecitePage> {
                                   snapshot.data ?? '',
                                   'السابق',
                                   settings,
+                                  isRevised: _revisedThomuns.contains(
+                                    _currentThomunIndex! - 1,
+                                  ),
                                 );
                               },
                             ),
@@ -422,6 +435,9 @@ class _RecitePageState extends State<RecitePage> {
                                   snapshot.data ?? '',
                                   'التالي',
                                   settings,
+                                  isRevised: _revisedThomuns.contains(
+                                    _currentThomunIndex! + 1,
+                                  ),
                                 );
                               },
                             ),
@@ -441,15 +457,13 @@ class _RecitePageState extends State<RecitePage> {
                           child: Container(
                             decoration: BoxDecoration(
                               gradient: const LinearGradient(
-                                colors: [Color(0xFF64FFDA), Color(0xFF1DE9B6)],
+                                colors: [kLightsColor, kLightsColor],
                               ),
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(
-                                    0xFF64FFDA,
-                                  ).withAlpha(77), // 0.3 opacity
-                                  blurRadius: 3,
+                                  color: kLightsColor.withAlpha(77),
+                                  blurRadius: 3, // 0.3 opacity
                                   //offset: const Offset(0, 2),
                                 ),
                               ],
@@ -479,7 +493,7 @@ class _RecitePageState extends State<RecitePage> {
                                         .headlineSmall!
                                         .copyWith(
                                           fontWeight: FontWeight.bold,
-                                          color: const Color(0xFF12121D),
+                                          color: kDarkBackgroundVariant,
                                           height: settings.lineSpacing,
                                         ),
                                   ),
@@ -497,7 +511,7 @@ class _RecitePageState extends State<RecitePage> {
                                       _revisedThomuns.contains(
                                         _currentThomunIndex,
                                       )
-                                  ? const Color(0xFF1DE9B6).withAlpha(50)
+                                  ? kLightsColor.withAlpha(50)
                                   : Colors.grey.withAlpha(50),
                               border: Border.all(
                                 color:
@@ -505,7 +519,7 @@ class _RecitePageState extends State<RecitePage> {
                                         _revisedThomuns.contains(
                                           _currentThomunIndex,
                                         )
-                                    ? const Color(0xFF1DE9B6)
+                                    ? kLightsColor
                                     : Colors.grey,
                                 //width: 2,
                               ),
@@ -535,7 +549,7 @@ class _RecitePageState extends State<RecitePage> {
                                       _revisedThomuns.contains(
                                         _currentThomunIndex,
                                       )
-                                  ? const Color(0xFF1DE9B6)
+                                  ? kLightsColor
                                   : Colors.grey,
                               size: 35,
                             ),

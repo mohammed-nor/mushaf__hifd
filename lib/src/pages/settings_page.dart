@@ -46,8 +46,8 @@ class _SettingsPageState extends State<SettingsPage> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: settings.isDarkMode
-                  ? const [Color(0xFF1E1E2C), Color(0xFF12121D)]
-                  : [Colors.grey[50]!, Colors.grey[100]!],
+                  ? const [kDarkBackground, kDarkBackgroundVariant]
+                  : [Colors.grey[50]!, kLightBackground],
             ),
           ),
           child: Scaffold(
@@ -59,20 +59,20 @@ class _SettingsPageState extends State<SettingsPage> {
                 'الإعدادات',
                 style: Theme.of(
                   context,
-                ).textTheme.headlineSmall!.copyWith(color: Color(0xFF1ABC9C)),
+                ).textTheme.headlineSmall!.copyWith(color: kPrimaryTeal),
               ),
               centerTitle: true,
             ),
             body: SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.all(4.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     /* Text(
                       'تخصيص الخط',
                       style: Theme.of(context).textTheme.headlineSmall!
-                          .copyWith(color: const Color(0xFF64FFDA)),
+                          .copyWith(color: kLightsColor)),
                     ), */
                     _buildSettingCard(
                       settings: settings,
@@ -81,7 +81,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ListTile(
                             leading: const Icon(
                               Icons.brightness_4,
-                              color: Color(0xFF1ABC9C),
+                              color: kPrimaryTeal,
                             ),
                             title: const Text('المظهر'),
                             trailing: Switch(
@@ -89,24 +89,24 @@ class _SettingsPageState extends State<SettingsPage> {
                               onChanged: (bool value) {
                                 updateThemeMode(!value);
                               },
-                              activeColor: const Color(0xFF64FFDA),
+                              activeThumbColor: kLightsColor,
                               inactiveThumbColor: Colors.grey,
                             ),
                           ),
                           Divider(
                             color: settings.isDarkMode
-                                ? Colors.white10
+                                ? kLightBackground.withAlpha(20)
                                 : Colors.black12,
                           ),
                           ListTile(
                             leading: const Icon(
                               Icons.font_download,
-                              color: Color(0xFF1ABC9C),
+                              color: kPrimaryTeal,
                             ),
                             title: const Text('نوع الخط'),
                             trailing: DropdownButton<String>(
                               value: settings.fontFamily,
-                              dropdownColor: const Color(0xFF1E1E2C),
+                              dropdownColor: kDarkBackground,
                               underline: Container(),
                               items:
                                   [
@@ -133,7 +133,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                         displayNames[value] ?? value,
                                         style: TextStyle(
                                           color: settings.isDarkMode
-                                              ? Colors.white70
+                                              ? kLightBackground
                                               : Colors.black54,
                                         ),
                                       ),
@@ -152,13 +152,13 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           Divider(
                             color: settings.isDarkMode
-                                ? Colors.white10
+                                ? kLightBackground.withAlpha(20)
                                 : Colors.black12,
                           ),
                           ListTile(
                             leading: const Icon(
                               Icons.format_size,
-                              color: Color(0xFF1ABC9C),
+                              color: kPrimaryTeal,
                             ),
                             title: const Text('حجم الخط'),
                             subtitle: Slider(
@@ -166,7 +166,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               min: 14,
                               max: 30,
                               divisions: 16,
-                              activeColor: const Color(0xFF64FFDA),
+                              activeColor: kLightsColor,
                               label: settings.fontSize.round().toString(),
                               onChanged: (double value) {
                                 updateThemeSettings(
@@ -186,13 +186,13 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           Divider(
                             color: settings.isDarkMode
-                                ? Colors.white10
+                                ? kLightBackground.withAlpha(20)
                                 : Colors.black12,
                           ),
                           ListTile(
                             leading: const Icon(
                               Icons.line_weight,
-                              color: Color(0xFF1ABC9C),
+                              color: kPrimaryTeal,
                             ),
                             title: const Text('تباعد الأسطر'),
                             subtitle: Slider(
@@ -200,7 +200,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               min: 1.0,
                               max: 2.0,
                               divisions: 20,
-                              activeColor: const Color(0xFF64FFDA),
+                              activeColor: kLightsColor,
                               label: settings.lineSpacing.toStringAsFixed(1),
                               onChanged: (double value) {
                                 updateThemeSettings(
@@ -224,28 +224,23 @@ class _SettingsPageState extends State<SettingsPage> {
                     SizedBox(
                       height: ResponsiveUtils.getResponsiveHeight(
                         context,
-                        0.04,
+                        0.03,
                       ),
                     ),
 
                     /*  Text(
                       'حول التطبيق',
                       style: Theme.of(context).textTheme.headlineSmall!
-                          .copyWith(color: const Color(0xFF64FFDA)),
+                          .copyWith(color: kSecondaryTeal),
                     ), */
                     _buildProgressCard(context, settings),
                     SizedBox(
                       height: ResponsiveUtils.getResponsiveHeight(
                         context,
-                        0.04,
+                        0.03,
                       ),
                     ),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveHeight(
-                        context,
-                        0.02,
-                      ),
-                    ),
+
                     _buildSettingCard(
                       settings: settings,
                       child: Column(
@@ -259,7 +254,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           const Icon(
                             Icons.info_outline,
                             size: 60,
-                            color: Color(0xFF64FFDA),
+                            color: kPrimaryTeal,
                           ),
                           SizedBox(
                             height: ResponsiveUtils.getResponsiveHeight(
@@ -273,7 +268,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             style: Theme.of(context).textTheme.titleLarge!
                                 .copyWith(
                                   color: settings.isDarkMode
-                                      ? Colors.white70
+                                      ? kLightBackground
                                       : Colors.black54,
                                 ),
                           ),
@@ -289,7 +284,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             style: Theme.of(context).textTheme.bodyMedium!
                                 .copyWith(
                                   color: settings.isDarkMode
-                                      ? Colors.white70
+                                      ? kLightBackground
                                       : Colors.black54,
                                 ),
                           ),
@@ -301,7 +296,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ),
                           Divider(
                             color: settings.isDarkMode
-                                ? Colors.white10
+                                ? kLightBackground.withAlpha(20)
                                 : Colors.black12,
                           ),
                           SizedBox(
@@ -313,7 +308,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           ListTile(
                             leading: const Icon(
                               Icons.copyright,
-                              color: Color(0xFF1DE9B6),
+                              color: kPrimaryTeal,
                               size: 35,
                             ),
                             title: const Text('حقوق النشر'),
@@ -321,7 +316,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               'جميع الحقوق محفوظة © 2026',
                               style: TextStyle(
                                 color: settings.isDarkMode
-                                    ? Colors.white54
+                                    ? kLightBackground
                                     : Colors.black45,
                               ),
                             ),
@@ -359,16 +354,16 @@ class _SettingsPageState extends State<SettingsPage> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(10),
+        color: kLightBackground.withAlpha(10),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: settings.isDarkMode
-              ? Colors.white.withAlpha(20)
+              ? kLightBackground.withAlpha(20)
               : Colors.black.withAlpha(10),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.0),
             blurRadius: 3,
             //offset: const Offset(0, 3),
           ),
@@ -381,7 +376,6 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _buildProgressCard(BuildContext context, ThemeSettings settings) {
     final total = kThomunsTxt.length;
     final learned = _learnedThomuns.length;
-    final revised = _revisedThomuns.length;
     final learnedAndRevised = _learnedThomuns
         .intersection(_revisedThomuns)
         .length;
@@ -401,8 +395,9 @@ class _SettingsPageState extends State<SettingsPage> {
               'تقدم الحفظ',
               style: Theme.of(
                 context,
-              ).textTheme.titleLarge!.copyWith(color: const Color(0xFF64FFDA)),
+              ).textTheme.titleLarge!.copyWith(color: kLightsColor),
             ),
+
             const SizedBox(height: 16),
             // Advancement statistics
             Row(
@@ -412,28 +407,28 @@ class _SettingsPageState extends State<SettingsPage> {
                   context,
                   label: 'نسبة الحفظ',
                   value: '$advancement%',
-                  color: const Color(0xFF1ABC9C),
+                  color: kPrimaryTeal,
                   isDarkMode: settings.isDarkMode,
                 ),
                 _buildStatWidget(
                   context,
                   label: 'الأحزاب المحفوظة',
                   value: '${learned / 8}',
-                  color: const Color(0xFF1ABC9C),
+                  color: kPrimaryTeal,
                   isDarkMode: settings.isDarkMode,
                 ),
                 _buildStatWidget(
                   context,
                   label: 'محفوظ ومراجع',
                   value: '$learnedAndRevised',
-                  color: const Color(0xFF1ABC9C),
+                  color: kPrimaryTeal,
                   isDarkMode: settings.isDarkMode,
                 ),
                 _buildStatWidget(
                   context,
                   label: 'محفوظ فقط',
                   value: '$learnedOnly',
-                  color: Colors.orange,
+                  color: kOrangeAccent,
                   isDarkMode: settings.isDarkMode,
                 ),
               ],
@@ -443,7 +438,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Text(
               'خريطة الحفظ (8 ثمن في كل صف)',
               style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                color: settings.isDarkMode ? Colors.white70 : Colors.black54,
+                color: settings.isDarkMode ? kLightBackground : Colors.black54,
               ),
             ),
             const SizedBox(height: 12),
@@ -473,7 +468,7 @@ class _SettingsPageState extends State<SettingsPage> {
         Text(
           label,
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
-            color: isDarkMode ? Colors.white70 : Colors.black54,
+            color: isDarkMode ? kLightBackground : Colors.black54,
           ),
         ),
       ],
@@ -503,7 +498,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   'الحزب ${rowIndex + 1}',
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF1ABC9C),
+                    color: kPrimaryTeal,
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
@@ -528,11 +523,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     Color dotColor;
                     if (isRevised && isLearned) {
-                      dotColor = const Color(
-                        0xFF1ABC9C,
-                      ); // Green: revised and learned
+                      dotColor = kPrimaryTeal; // Green: revised and learned
                     } else if (isLearned) {
-                      dotColor = Colors.orange; // Orange: learned only
+                      dotColor = kOrangeAccent; // Orange: learned only
                     } else {
                       dotColor = Colors.grey.withAlpha(
                         128,
@@ -570,28 +563,33 @@ class _SettingsPageState extends State<SettingsPage> {
               'المطور',
               style: Theme.of(
                 context,
-              ).textTheme.titleLarge!.copyWith(color: const Color(0xFF64FFDA)),
+              ).textTheme.titleLarge!.copyWith(color: kLightsColor),
             ),
+
             const SizedBox(height: 20),
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/devloper/NOR_MOHAMMED.png'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'NOR Mohammed\nNOR It! team',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: settings.isDarkMode
+                        ? kLightBackground
+                        : Colors.black87,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
+                const SizedBox(width: 16),
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: AssetImage(
+                    'assets/devloper/NOR_MOHAMMED.png',
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              'Mohammed Nor',
-              style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                color: settings.isDarkMode ? Colors.white : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Phys/Chem Teacher - Phd in Chemistry - Apps developer\nLaboratory of Research and Development in Engineering Sciences (LRDES)\nUAE University, Tanger - Morocco',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                color: settings.isDarkMode ? Colors.white70 : Colors.black54,
-              ),
-            ),
+
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -600,7 +598,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: Icons.email,
                   label: 'البريد',
                   onPressed: () {
-                    _launchEmail('nour1608@gmail.com');
+                    _launchEmail('nor.it.services@gmail.com');
                   },
                 ),
                 const SizedBox(width: 26),
@@ -616,10 +614,10 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 20),
 
             Text(
-              'الإصدار 3.0.0',
+              'الإصدار 1.0.0',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                color: settings.isDarkMode ? Colors.white54 : Colors.black45,
+                color: settings.isDarkMode ? kLightBackground : Colors.black45,
               ),
             ),
           ],
@@ -641,17 +639,17 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFF1ABC9C), width: 1.5),
+            border: Border.all(color: kPrimaryTeal, width: 1.5),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [
-              Icon(icon, color: const Color(0xFF1ABC9C), size: 28),
+              Icon(icon, color: kPrimaryTeal, size: 28),
               const SizedBox(height: 6),
               Text(
                 label,
                 style: const TextStyle(
-                  color: Color(0xFF64FFDA),
+                  color: kSecondaryTeal,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),

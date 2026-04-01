@@ -57,7 +57,7 @@ class _Learn2PageState extends State<Learn2Page> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('تم حفظ الصفحة الحالية بنجاح'),
-          backgroundColor: Color(0xFF1ABC9C),
+          backgroundColor: kPrimaryTeal,
           duration: Duration(seconds: 2),
         ),
       );
@@ -101,7 +101,7 @@ class _Learn2PageState extends State<Learn2Page> {
         TextSpan(
           text: match.group(0),
           style: baseStyle.copyWith(
-            color: const Color(0xFF1DE9B6),
+            color: kPrimaryTeal,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -137,8 +137,8 @@ class _Learn2PageState extends State<Learn2Page> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: settings.isDarkMode
-                  ? const [Color(0xFF232537), Color(0xFF12121D)]
-                  : [Colors.grey[50]!, Colors.grey[100]!],
+                  ? const [kDarkBackgroundAlt, kDarkBackgroundVariant]
+                  : [Colors.grey[50]!, kLightBackground],
             ),
           ),
           child: Scaffold(
@@ -158,17 +158,14 @@ class _Learn2PageState extends State<Learn2Page> {
                   }
                   return 'إحفظ الفاتحة';
                 }(),
-                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                  color: const Color(0xFF64FFDA),
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineSmall!.copyWith(color: kLightsColor),
               ),
               centerTitle: true,
               actions: [
                 IconButton(
-                  icon: const Icon(
-                    Icons.bookmark_add,
-                    color: Color(0xFF1ABC9C),
-                  ),
+                  icon: const Icon(Icons.bookmark_add, color: kPrimaryTeal),
                   onPressed: _saveCurrentPage,
                   tooltip: 'حفظ الصفحة الحالية',
                 ),
@@ -188,7 +185,7 @@ class _Learn2PageState extends State<Learn2Page> {
                       },
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(4.0),
                           child: FutureBuilder<String>(
                             future: rootBundle.loadString(
                               'lib/thomuns_txt/${kThomunsTxt[index]}',
@@ -206,13 +203,20 @@ class _Learn2PageState extends State<Learn2Page> {
                                 );
                               }
                               return Card(
-                                elevation: 8,
-                                shadowColor: Colors.black.withOpacity(0.3),
-                                color: Colors.white.withAlpha(10),
+                                elevation: 2,
+                                //shadowColor: Colors.black.withValues(alpha: 0.3),
+                                color: kLightBackground.withAlpha(0),
                                 margin: const EdgeInsets.all(0),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
+                                  side: BorderSide(
+                                    color: settings.isDarkMode
+                                        ? kLightBackground.withAlpha(20)
+                                        : Colors.black.withAlpha(10),
+                                    width: 2,
+                                  ),
                                 ),
+
                                 child: Padding(
                                   padding: const EdgeInsets.all(5),
                                   child: SingleChildScrollView(
@@ -253,11 +257,11 @@ class _Learn2PageState extends State<Learn2Page> {
                             ),
                             decoration: BoxDecoration(
                               color: _learnedThomuns.contains(_currentIndex)
-                                  ? const Color(0xFF1ABC9C).withAlpha(50)
-                                  : Colors.grey.withAlpha(50),
+                                  ? kPrimaryTeal.withAlpha(10)
+                                  : Colors.grey.withAlpha(0),
                               border: Border.all(
                                 color: _learnedThomuns.contains(_currentIndex)
-                                    ? const Color(0xFF64FFDA)
+                                    ? kLightsColor
                                     : Colors.grey,
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -270,9 +274,9 @@ class _Learn2PageState extends State<Learn2Page> {
                                   .copyWith(
                                     color:
                                         _learnedThomuns.contains(_currentIndex)
-                                        ? const Color(0xFF1ABC9C)
+                                        ? kPrimaryTeal
                                         : (settings.isDarkMode
-                                              ? Colors.white70
+                                              ? kLightBackground
                                               : Colors.black54),
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -291,7 +295,7 @@ class _Learn2PageState extends State<Learn2Page> {
                           style: Theme.of(context).textTheme.labelMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF1ABC9C),
+                                color: kPrimaryTeal,
                               ),
                         ),
                         Expanded(
@@ -299,7 +303,7 @@ class _Learn2PageState extends State<Learn2Page> {
                             value: _currentIndex.toDouble(),
                             min: 0,
                             max: (kThomunsTxt.length - 1).toDouble(),
-                            activeColor: const Color(0xFF1ABC9C),
+                            activeColor: kPrimaryTeal,
                             inactiveColor: Colors.grey.withAlpha(77),
                             onChanged: (value) {
                               setState(() {
@@ -322,17 +326,15 @@ class _Learn2PageState extends State<Learn2Page> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1ABC9C).withAlpha(50),
-                              border: Border.all(
-                                color: const Color(0xFF1DE9B6),
-                              ),
+                              color: kPrimaryTeal.withAlpha(50),
+                              border: Border.all(color: kLightsColor),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               'مراجع',
                               style: Theme.of(context).textTheme.labelMedium!
                                   .copyWith(
-                                    color: const Color(0xFF1ABC9C),
+                                    color: kPrimaryTeal,
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
@@ -344,7 +346,7 @@ class _Learn2PageState extends State<Learn2Page> {
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.grey.withAlpha(50),
+                              color: Colors.grey.withAlpha(0),
                               border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -353,7 +355,7 @@ class _Learn2PageState extends State<Learn2Page> {
                               style: Theme.of(context).textTheme.labelMedium!
                                   .copyWith(
                                     color: settings.isDarkMode
-                                        ? Colors.white70
+                                        ? kLightBackground
                                         : Colors.black54,
                                     fontWeight: FontWeight.bold,
                                   ),

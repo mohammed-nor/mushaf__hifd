@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
+import 'package:flutter/material.dart';
 
 class LearnPage extends StatefulWidget {
   const LearnPage({super.key});
@@ -49,7 +49,7 @@ class _LearnPageState extends State<LearnPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('تم حفظ الصفحة الحالية بنجاح'),
-          backgroundColor: Color(0xFF1DE9B6),
+          backgroundColor: kLightsColor,
           duration: Duration(seconds: 2),
         ),
       );
@@ -88,8 +88,8 @@ class _LearnPageState extends State<LearnPage> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: settings.isDarkMode
-                  ? const [Color(0xFF232537), Color(0xFF12121D)]
-                  : [Colors.grey[50]!, Colors.grey[100]!],
+                  ? const [kDarkBackgroundAlt, kDarkBackgroundVariant]
+                  : [Colors.grey[50]!, kLightBackground],
             ),
           ),
           child: Scaffold(
@@ -98,7 +98,7 @@ class _LearnPageState extends State<LearnPage> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               title: Text(
-                'إحفظ : ${kThomunsTxt}',
+                'إحفظ : $kThomunsTxt',
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   letterSpacing: 1.2,
@@ -107,10 +107,7 @@ class _LearnPageState extends State<LearnPage> {
               centerTitle: true,
               actions: [
                 IconButton(
-                  icon: const Icon(
-                    Icons.bookmark_add,
-                    color: Color(0xFF64FFDA),
-                  ),
+                  icon: const Icon(Icons.bookmark_add, color: kLightsColor),
                   onPressed: _saveCurrentPage,
                   tooltip: 'حفظ الصفحة الحالية',
                 ),
@@ -133,8 +130,8 @@ class _LearnPageState extends State<LearnPage> {
                           padding: const EdgeInsets.all(6.0),
                           child: Card(
                             elevation: 8,
-                            shadowColor: Colors.black.withOpacity(0.3),
-                            color: Colors.white.withAlpha(10),
+                            shadowColor: Colors.black.withValues(alpha: .3),
+                            color: kLightBackground.withAlpha(10),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -172,11 +169,11 @@ class _LearnPageState extends State<LearnPage> {
                             ),
                             decoration: BoxDecoration(
                               color: _learnedThomuns.contains(_currentIndex)
-                                  ? const Color(0xFF64FFDA).withAlpha(50)
+                                  ? kLightsColor.withAlpha(50)
                                   : Colors.grey.withAlpha(50),
                               border: Border.all(
                                 color: _learnedThomuns.contains(_currentIndex)
-                                    ? const Color(0xFF64FFDA)
+                                    ? kSecondaryTeal
                                     : Colors.grey,
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -189,9 +186,9 @@ class _LearnPageState extends State<LearnPage> {
                                   .copyWith(
                                     color:
                                         _learnedThomuns.contains(_currentIndex)
-                                        ? const Color(0xFF64FFDA)
+                                        ? kLightsColor
                                         : (settings.isDarkMode
-                                              ? Colors.white70
+                                              ? kLightBackground
                                               : Colors.black54),
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -209,7 +206,7 @@ class _LearnPageState extends State<LearnPage> {
                           style: Theme.of(context).textTheme.labelMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: const Color(0xFF64FFDA),
+                                color: kLightsColor,
                               ),
                         ),
                         Expanded(
@@ -217,7 +214,7 @@ class _LearnPageState extends State<LearnPage> {
                             value: _currentIndex.toDouble(),
                             min: 0,
                             max: (kThomunsTxt.length - 1).toDouble(),
-                            activeColor: const Color(0xFF64FFDA),
+                            activeColor: kLightsColor,
                             inactiveColor: Colors.grey.withAlpha(77),
                             onChanged: (value) {
                               setState(() {

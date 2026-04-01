@@ -1,6 +1,6 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'home_page.dart';
 
@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF0F3460), Color(0xFF16213E)],
+            colors: [kDarkBackground, kDarkBackgroundVariant],
           ),
         ),
         child: Stack(
@@ -103,9 +103,9 @@ class _SplashScreenState extends State<SplashScreen>
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(
-                                            0xFF64FFDA,
-                                          ).withOpacity(0.3),
+                                          color: kLightsColor.withValues(
+                                            alpha: 0.3,
+                                          ),
                                           blurRadius: 40,
                                           spreadRadius: 10,
                                         ),
@@ -125,19 +125,15 @@ class _SplashScreenState extends State<SplashScreen>
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       border: Border.all(
-                                        color: const Color(0xFF64FFDA),
+                                        color: kLightsColor,
                                         width: 2,
                                       ),
                                       gradient: LinearGradient(
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          const Color(
-                                            0xFF64FFDA,
-                                          ).withOpacity(0.2),
-                                          const Color(
-                                            0xFF1DE9B6,
-                                          ).withOpacity(0.2),
+                                          kLightsColor.withValues(alpha: 0.2),
+                                          kLightsColor.withValues(alpha: 0.2),
                                         ],
                                       ),
                                     ),
@@ -155,8 +151,8 @@ class _SplashScreenState extends State<SplashScreen>
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: const Color(
-                                        0xFF64FFDA,
-                                      ).withOpacity(0.1),
+                                        0xFF1ABC9C,
+                                      ).withValues(alpha: 0.1),
                                     ),
                                     child: Center(
                                       child: Image.asset(
@@ -187,7 +183,12 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                           ),
-                          SizedBox(height: ResponsiveUtils.getResponsiveHeight(context, 0.10)),
+                          SizedBox(
+                            height: ResponsiveUtils.getResponsiveHeight(
+                              context,
+                              0.10,
+                            ),
+                          ),
                           // App title
                           FadeTransition(
                             opacity: _fadeAnimation,
@@ -199,12 +200,12 @@ class _SplashScreenState extends State<SplashScreen>
                                       Theme.of(
                                         context,
                                       ).textTheme.headlineLarge?.copyWith(
-                                        color: Colors.white,
+                                        color: kLightBackground,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 1,
                                       ) ??
                                       const TextStyle(
-                                        color: Colors.white,
+                                        color: kLightBackground,
                                         fontSize: 32,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 1,
@@ -227,14 +228,19 @@ class _SplashScreenState extends State<SplashScreen>
                                         letterSpacing: 1,
                                       ) ??
                                       const TextStyle(
-                                        color: Colors.white,
+                                        color: kLightBackground,
                                         fontSize: 32,
                                         fontWeight: FontWeight.bold,
                                         letterSpacing: 1,
                                       ),
                                   textAlign: TextAlign.center,
                                 ),
-                                SizedBox(height: ResponsiveUtils.getResponsiveHeight(context, 0.035)),
+                                SizedBox(
+                                  height: ResponsiveUtils.getResponsiveHeight(
+                                    context,
+                                    0.035,
+                                  ),
+                                ),
                                 Container(
                                   width: ResponsiveUtils.getResponsiveWidth(
                                     context,
@@ -243,10 +249,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   height: 1,
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
-                                      colors: [
-                                        Color(0xFF64FFDA),
-                                        Color(0xFF1DE9B6),
-                                      ],
+                                      colors: [kLightsColor, kLightsColor],
                                     ),
                                     borderRadius: BorderRadius.circular(1),
                                   ),
@@ -254,7 +257,12 @@ class _SplashScreenState extends State<SplashScreen>
                               ],
                             ),
                           ),
-                          SizedBox(height: ResponsiveUtils.getResponsiveHeight(context, 0.035)),
+                          SizedBox(
+                            height: ResponsiveUtils.getResponsiveHeight(
+                              context,
+                              0.035,
+                            ),
+                          ),
                           // Islamic slogan
                           FadeTransition(
                             opacity: _fadeAnimation,
@@ -268,11 +276,11 @@ class _SplashScreenState extends State<SplashScreen>
                                     Theme.of(
                                       context,
                                     ).textTheme.bodyLarge?.copyWith(
-                                      color: const Color(0xFF64FFDA),
+                                      color: kLightsColor,
                                       letterSpacing: 1,
                                     ) ??
                                     const TextStyle(
-                                      color: Color(0xFF64FFDA),
+                                      color: kLightsColor,
                                       fontSize: 20,
                                       letterSpacing: 1,
                                     ),
@@ -280,7 +288,12 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                           ),
-                          SizedBox(height: ResponsiveUtils.getResponsiveHeight(context, 0.12)),
+                          SizedBox(
+                            height: ResponsiveUtils.getResponsiveHeight(
+                              context,
+                              0.12,
+                            ),
+                          ),
                           // Spacer to push developer credit to bottom
                         ],
                       ),
@@ -291,10 +304,10 @@ class _SplashScreenState extends State<SplashScreen>
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     border: Border(
                       top: BorderSide(
-                        color: const Color(0xFF64FFDA).withOpacity(0.1),
+                        color: kLightsColor.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -304,9 +317,9 @@ class _SplashScreenState extends State<SplashScreen>
                     opacity: _fadeAnimation,
                     child: Center(
                       child: Text(
-                        'جميع الحقوق محفوظة للمطور محمد نور © 2026',
+                        'جميع الحقوق محفوظة للمطور  © 2026',
                         style: const TextStyle(
-                          color: Colors.white54,
+                          color: kLightBackground,
                           fontSize: 12,
                         ),
                         textDirection: TextDirection.rtl,
@@ -328,7 +341,7 @@ class IslamicPatternPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF64FFDA).withOpacity(0.03)
+      ..color = kLightsColor.withValues(alpha: 0.03)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
@@ -358,7 +371,7 @@ class IslamicStarPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF64FFDA)
+      ..color = kLightsColor
       ..style = PaintingStyle.fill;
 
     final center = Offset(size.width / 2, size.height / 2);

@@ -1,3 +1,46 @@
+import 'package:flutter/material.dart';
+
+// ============================================================================
+// UNIFIED COLOR SYSTEM - Used throughout the app for consistency
+// ============================================================================
+
+// PRIMARY TEAL COLORS (for text and accents)
+/// Primary light teal - used for main accent text and UI elements
+const Color kPrimaryTeal = Color(0xFF1ABC9C);
+
+/// Secondary Light cyan/teal - used for secondary accent text and highlights
+const Color kSecondaryTeal = Color(0xFF64FFDA);
+
+/// Dark teal - used for heading text and dark backgrounds in light mode
+const Color kDarkTeal = Color(0xFF0D7377);
+
+/// Tertiary teal - used as alternative teal accent
+const Color kTertiaryTeal = Color(0xFF14919B);
+
+// ORANGE COLOR (for text and accents)
+/// Orange accent color - used for highlighting and important elements
+const Color kOrangeAccent = Color(0xFFFF9500);
+
+// BACKGROUND COLORS
+/// Dark background - used for dark mode background
+const Color kDarkBackground = Color(0xFF1E1E2C);
+
+/// Dark background variant - used for dark mode variations
+const Color kDarkBackgroundVariant = Color(0xFF12121D);
+
+/// Dark background alternative - used in specific components
+const Color kDarkBackgroundAlt = Color(0xFF232537);
+
+/// Light background - used for light mode background
+const Color kLightBackground = Color.fromARGB(255, 255, 255, 255);
+
+/// Light background variant - used for light mode surfaces
+const Color kLightBackgroundVariant = Color.fromARGB(255, 255, 255, 255);
+
+// LEGACY CONSTANT (for backward compatibility)
+@deprecated
+const Color kLightsColor = kPrimaryTeal;
+
 /// A constant list of all thomun text filenames.  It mirrors
 /// [kThomuns] but uses the `.txt` extension and omits the
 /// special `1-0-1` image which has no text equivalent.

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:mushaf_hifd/src/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'src/pages/splash_screen.dart';
 import 'src/theme/theme_settings.dart';
 
@@ -11,7 +11,7 @@ void main() async {
   // load persisted theme settings before the app starts so the
   // first frame uses the correct font/size.
   final prefs = await SharedPreferences.getInstance();
-  final fontFamily = prefs.getString('font_family') ?? 'Andalus';
+  final fontFamily = prefs.getString('font_family') ?? 'System';
   final fontSize = prefs.getDouble('font_size') ?? 18.0;
   final lineSpacing = prefs.getDouble('line_spacing') ?? 1.5;
   final isDarkMode = prefs.getBool('is_dark_mode') ?? true;
@@ -33,9 +33,9 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.dark,
       fontFamily: settings.fontFamily,
       colorScheme: const ColorScheme.dark(
-        primary: Color(0xFF64FFDA),
-        secondary: Color(0xFF1DE9B6),
-        surface: Color(0xFF1E1E2C),
+        primary: kPrimaryTeal,
+        secondary: kSecondaryTeal,
+        surface: kDarkBackground,
       ),
       useMaterial3: true,
       appBarTheme: const AppBarTheme(
@@ -46,42 +46,47 @@ class MyApp extends StatelessWidget {
         titleTextStyle: TextStyle(
           fontWeight: FontWeight.w600,
           letterSpacing: 1.2,
-          color: Colors.white,
+          color: kLightBackground,
         ),
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: kLightBackground),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white.withAlpha(10),
-        shadowColor: Colors.black.withOpacity(0.3),
+        color: kLightBackground.withAlpha(10),
+        shadowColor: const Color.fromARGB(
+          255,
+          169,
+          169,
+          169,
+        ).withValues(alpha: 0.1),
         elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       textTheme: TextTheme(
         bodyLarge: TextStyle(
           fontSize: 16 * (settings.fontSize / 18.0),
-          color: Colors.white,
+          color: kLightBackground,
         ),
         bodyMedium: TextStyle(
           fontSize: 14 * (settings.fontSize / 18.0),
-          color: Colors.white,
+          color: kLightBackground,
         ),
         bodySmall: TextStyle(
           fontSize: 12 * (settings.fontSize / 18.0),
-          color: Colors.white,
+          color: kLightBackground,
         ),
         headlineLarge: TextStyle(
           fontSize: 30 * (settings.fontSize / 18.0),
-          color: Colors.white,
+          color: kLightBackground,
           fontWeight: FontWeight.bold,
         ),
         headlineMedium: TextStyle(
           fontSize: 27 * (settings.fontSize / 18.0),
-          color: Colors.white,
+          color: kLightBackground,
           fontWeight: FontWeight.bold,
         ),
         headlineSmall: TextStyle(
           fontSize: 24 * (settings.fontSize / 18.0),
-          color: Colors.white,
+          color: kLightBackground,
           fontWeight: FontWeight.bold,
         ),
         titleLarge: TextStyle(
@@ -124,27 +129,27 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.light,
       fontFamily: settings.fontFamily,
       colorScheme: const ColorScheme.light(
-        primary: Color(0xFF0D7377),
-        secondary: Color(0xFF14919B),
-        surface: Color(0xFFF5F5F5),
+        primary: kDarkTeal,
+        secondary: kTertiaryTeal,
+        surface: kLightBackgroundVariant,
       ),
       useMaterial3: true,
       appBarTheme: AppBarTheme(
-        backgroundColor: const Color(0xFFFFFFFF),
+        backgroundColor: kLightBackground,
         elevation: 2,
-        shadowColor: Colors.grey.withOpacity(0.3),
+        shadowColor: Colors.grey.withValues(alpha: 0.1),
         surfaceTintColor: Colors.transparent,
         titleTextStyle: TextStyle(
           fontWeight: FontWeight.w600,
           letterSpacing: 1.2,
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontSize: 20,
         ),
-        iconTheme: const IconThemeData(color: Color(0xFF0D7377)),
+        iconTheme: const IconThemeData(color: kDarkTeal),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
-        shadowColor: Colors.grey.withOpacity(0.2),
+        color: kLightBackground,
+        shadowColor: Colors.grey.withValues(alpha: 0),
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
@@ -163,54 +168,54 @@ class MyApp extends StatelessWidget {
         ),
         headlineLarge: TextStyle(
           fontSize: 30 * (settings.fontSize / 18.0),
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontWeight: FontWeight.bold,
         ),
         headlineMedium: TextStyle(
           fontSize: 27 * (settings.fontSize / 18.0),
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontWeight: FontWeight.bold,
         ),
         headlineSmall: TextStyle(
           fontSize: 24 * (settings.fontSize / 18.0),
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontWeight: FontWeight.bold,
         ),
         titleLarge: TextStyle(
           fontSize: 20 * (settings.fontSize / 18.0),
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontWeight: FontWeight.bold,
         ),
         titleMedium: TextStyle(
           fontSize: 17 * (settings.fontSize / 18.0),
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontWeight: FontWeight.bold,
         ),
         titleSmall: TextStyle(
           fontSize: 14 * (settings.fontSize / 18.0),
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontWeight: FontWeight.bold,
         ),
         labelLarge: TextStyle(
           fontSize: 14 * (settings.fontSize / 18.0),
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontWeight: FontWeight.bold,
         ),
         labelMedium: TextStyle(
           fontSize: 12 * (settings.fontSize / 18.0),
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontWeight: FontWeight.bold,
         ),
         labelSmall: TextStyle(
           fontSize: 11 * (settings.fontSize / 18.0),
-          color: const Color(0xFF0D7377),
+          color: kDarkTeal,
           fontWeight: FontWeight.bold,
         ),
       ).apply(fontFamily: settings.fontFamily),
-      scaffoldBackgroundColor: Colors.white,
+      scaffoldBackgroundColor: kLightBackground,
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: kLightBackground,
         border: OutlineInputBorder(
           borderSide: BorderSide(color: Colors.grey[300]!),
           borderRadius: BorderRadius.circular(8),

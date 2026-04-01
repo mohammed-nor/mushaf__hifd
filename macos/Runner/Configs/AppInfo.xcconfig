@@ -8,7 +8,7 @@
 PRODUCT_NAME = mushaf_hifd
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.mushafHifd
+PRODUCT_BUNDLE_IDENTIFIER = com.norit.mushafHifd
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.norit. All rights reserved.

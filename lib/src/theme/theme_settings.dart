@@ -38,7 +38,7 @@ class ThemeSettings {
 /// theme settings are updated.
 final themeSettingsNotifier = ValueNotifier<ThemeSettings>(
   ThemeSettings(
-    fontFamily: 'Andalus',
+    fontFamily: 'System',
     fontSize: 18.0,
     lineSpacing: 1.5,
     isDarkMode: true,

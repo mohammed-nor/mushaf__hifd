@@ -1,9 +1,13 @@
 import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+enum ReciteFilter { all, learned, notLearned }
 
 class RecitePage extends StatefulWidget {
   const RecitePage({super.key});
@@ -17,30 +21,74 @@ class _RecitePageState extends State<RecitePage> {
   final Random _random = Random();
   String? _thomunText;
 
-  /// when true we limit picks to the thomuns the user has marked as
-  /// learned.  The toggle is exposed in the app bar.
-  bool _onlyLearned = false;
+  /// Filter mode for picking random thomuns
+  ReciteFilter _filterMode = ReciteFilter.all;
 
   /// Track thomuns marked as revised
   Set<int> _revisedThomuns = {};
+
+  /// Time when the current thomun was selected
+  DateTime? _selectionTime;
+  Timer? _timer;
+  String _elapsedTime = '00:00';
 
   @override
   void initState() {
     super.initState();
     _loadSavedState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_selectionTime != null) {
+        final now = DateTime.now();
+        final diff = now.difference(_selectionTime!);
+        final d = diff.inDays;
+        final h = diff.inHours.remainder(24);
+        final m = diff.inMinutes.remainder(60);
+        final s = diff.inSeconds.remainder(60);
+
+        String timeStr = '';
+        if (d > 0) timeStr += '${d}ي ';
+        if (h > 0 || d > 0) timeStr += '${h.toString().padLeft(2, '0')}:';
+        timeStr +=
+            '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+
+        if (mounted && _elapsedTime != timeStr) {
+          setState(() {
+            _elapsedTime = timeStr;
+          });
+        }
+      }
+    });
   }
 
   Future<void> _loadSavedState() async {
     final prefs = await SharedPreferences.getInstance();
     final savedIndex = prefs.getInt('current_random_thomun_index');
-    final onlyLearned = prefs.getBool('recite_only_learned') ?? false;
+    final filterIndex = prefs.getInt('recite_filter_mode') ?? 0;
     final revisedList = prefs.getStringList('revised_thomuns_txt') ?? [];
+    final selectionTimeMillis = prefs.getInt('current_thomun_selection_time_millis');
 
     if (mounted) {
       setState(() {
         _currentThomunIndex = savedIndex;
-        _onlyLearned = onlyLearned;
+        _filterMode = ReciteFilter.values[filterIndex];
         _revisedThomuns = revisedList.map((e) => int.tryParse(e) ?? 0).toSet();
+        if (selectionTimeMillis != null) {
+          _selectionTime = DateTime.fromMillisecondsSinceEpoch(selectionTimeMillis);
+        } else if (_currentThomunIndex != null) {
+          // Fallback: if we have a thomun but no selection time, set it to now
+          _selectionTime = DateTime.now();
+        }
       });
 
       // Load the text for the saved thomun if it exists
@@ -84,23 +132,30 @@ class _RecitePageState extends State<RecitePage> {
 
   Future<void> _saveSavedState() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('recite_only_learned', _onlyLearned);
+    await prefs.setInt('recite_filter_mode', _filterMode.index);
   }
 
   Future<void> _generateRandomThomun() async {
     List<int> pool = List<int>.generate(kThomunsTxt.length, (i) => i);
 
-    if (_onlyLearned) {
+    if (_filterMode != ReciteFilter.all) {
       final prefs = await SharedPreferences.getInstance();
       final learnedList = prefs.getStringList('learned_thomuns_txt') ?? [];
-      if (learnedList.isNotEmpty) {
-        // map saved indices to their int values
-        final filtered = learnedList
-            .map(int.tryParse)
-            .whereType<int>()
-            .where((i) => i >= 0 && i < kThomunsTxt.length)
-            .toList();
-        if (filtered.isNotEmpty) pool = filtered;
+      final learnedIndices = learnedList
+          .map(int.tryParse)
+          .whereType<int>()
+          .where((i) => i >= 0 && i < kThomunsTxt.length)
+          .toSet();
+
+      if (_filterMode == ReciteFilter.learned) {
+        if (learnedIndices.isNotEmpty) {
+          pool = learnedIndices.toList();
+        }
+      } else if (_filterMode == ReciteFilter.notLearned) {
+        final notLearned = pool.where((i) => !learnedIndices.contains(i)).toList();
+        if (notLearned.isNotEmpty) {
+          pool = notLearned;
+        }
       }
     }
 
@@ -119,7 +174,14 @@ class _RecitePageState extends State<RecitePage> {
         });
         // Save the index
         final prefs = await SharedPreferences.getInstance();
+        final now = DateTime.now();
         await prefs.setInt('current_random_thomun_index', selectedIndex);
+        await prefs.setInt('current_thomun_selection_time_millis', now.millisecondsSinceEpoch);
+        if (mounted) {
+          setState(() {
+            _selectionTime = now;
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -129,7 +191,14 @@ class _RecitePageState extends State<RecitePage> {
         });
         // Save the index even if text failed to load
         final prefs = await SharedPreferences.getInstance();
+        final now = DateTime.now();
         await prefs.setInt('current_random_thomun_index', selectedIndex);
+        await prefs.setInt('current_thomun_selection_time_millis', now.millisecondsSinceEpoch);
+        if (mounted) {
+          setState(() {
+            _selectionTime = now;
+          });
+        }
       }
     }
   }
@@ -250,11 +319,9 @@ class _RecitePageState extends State<RecitePage> {
         return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: settings.isDarkMode
-                  ? const [kDarkBackgroundAlt, kDarkBackgroundVariant]
-                  : [Colors.grey[50]!, kLightBackground],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: settings.backgroundGradient,
             ),
           ),
           child: Scaffold(
@@ -262,22 +329,40 @@ class _RecitePageState extends State<RecitePage> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Text(
-                _currentThomunIndex != null
-                    ? () {
-                        final filename = kThomunsTxt[_currentThomunIndex!]
-                            .replaceAll('.txt', '');
-                        final parts = filename.split('-');
-                        if (parts.length == 2) {
-                          return 'تلاوة الثمن ${parts[1]} من الحزب ${parts[0]}';
-                        }
-                        return 'تلاوة: $filename';
-                      }()
-                    : 'إمتحن حفظك',
-                style: Theme.of(
-                  context,
-                ).textTheme.headlineSmall!.copyWith(color: kLightsColor),
-              ),
+              leading: _selectionTime == null
+                  ? null
+                  : Center(
+                    child: Container(
+                      margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: kPrimaryTeal.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: kPrimaryTeal.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Text(
+                        _elapsedTime,
+                        style: const TextStyle(
+                          color: kPrimaryTeal,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                    ),
+                  ),
+              leadingWidth: 80,
+              title: _currentThomunIndex == null
+                  ? Text(
+                    'إمتحن حفظك',
+                    style: TextStyle(color: settings.textColor),
+                  )
+                  : _buildRichTitle(_currentThomunIndex!, settings, 'تلاوة'),
               centerTitle: true,
               actions: [
                 Padding(
@@ -285,7 +370,10 @@ class _RecitePageState extends State<RecitePage> {
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _onlyLearned = !_onlyLearned;
+                        // Toggle between: all -> learned -> notLearned -> all
+                        int nextIndex =
+                            (_filterMode.index + 1) % ReciteFilter.values.length;
+                        _filterMode = ReciteFilter.values[nextIndex];
                       });
                       _saveSavedState();
                     },
@@ -295,41 +383,38 @@ class _RecitePageState extends State<RecitePage> {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: _onlyLearned
+                        color: _filterMode != ReciteFilter.all
                             ? kLightsColor.withValues(alpha: 0.1)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: _onlyLearned
+                          color: _filterMode != ReciteFilter.all
                               ? kLightsColor
                               : (settings.isDarkMode
-                                    ? kLightBackground
-                                    : Colors.black26),
+                                  ? kLightBackground.withValues(alpha: 0.5)
+                                  : Colors.black26),
                           width: 1.5,
                         ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          /*                        Icon(
-                            _onlyLearned ? Icons.check_box : Icons.check_box_outline_blank,
-                            color: _onlyLearned ? kSecondaryTeal : kLightBackground,
-                            size: 24,
-                          ),
-                          const SizedBox(width: 8), */
                           Text(
-                            'من المحفوظ',
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  color: _onlyLearned
-                                      ? kLightsColor
-                                      : (settings.isDarkMode
-                                            ? kLightBackground
-                                            : Colors.black54),
-                                  fontWeight: _onlyLearned
-                                      ? FontWeight.w600
-                                      : FontWeight.w500,
-                                ),
+                            _filterMode == ReciteFilter.all
+                                ? 'الكل'
+                                : (_filterMode == ReciteFilter.learned
+                                    ? 'من المحفوظ'
+                                    : 'غير المحفوظ'),
+                            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                              color: _filterMode != ReciteFilter.all
+                                  ? kLightsColor
+                                  : (settings.isDarkMode
+                                      ? kLightBackground
+                                      : Colors.black54),
+                              fontWeight: _filterMode != ReciteFilter.all
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
@@ -368,7 +453,8 @@ class _RecitePageState extends State<RecitePage> {
                                     Theme.of(
                                       context,
                                     ).textTheme.titleLarge!.copyWith(
-                                      height: 1.9,
+                                      color: settings.textColor,
+                                      height: settings.lineSpacing,
                                       fontWeight: FontWeight.normal,
                                     ),
                                   ),
@@ -383,14 +469,14 @@ class _RecitePageState extends State<RecitePage> {
                                 Icon(
                                   Icons.auto_stories,
                                   size: 80,
-                                  color: kLightBackground.withAlpha(26),
+                                  color: settings.textColor.withAlpha(26),
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
                                   'لم يتم اختيار ثمن بعد',
                                   style: Theme.of(context).textTheme.bodyLarge!
                                       .copyWith(
-                                        color: kLightBackground.withAlpha(128),
+                                        color: settings.textColor.withAlpha(128),
                                         height: settings.lineSpacing,
                                       ),
                                 ),
@@ -485,9 +571,11 @@ class _RecitePageState extends State<RecitePage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    _onlyLearned
-                                        ? 'اختيار من المحفوظات'
-                                        : 'اختيار ثمن عشوائي',
+                                    _filterMode == ReciteFilter.all
+                                        ? 'اختيار ثمن عشوائي'
+                                        : (_filterMode == ReciteFilter.learned
+                                            ? 'اختيار من المحفوظات'
+                                            : 'اختيار من غير المحفوظ'),
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall!
@@ -566,5 +654,55 @@ class _RecitePageState extends State<RecitePage> {
         );
       },
     );
+  }
+
+  Widget _buildRichTitle(int index, ThemeSettings settings, String prefix) {
+    final filename = kThomunsTxt[index].replaceAll('.txt', '');
+    final parts = filename.split('-');
+
+    TextStyle baseStyle = TextStyle(
+      color: settings.textColor,
+      fontWeight: FontWeight.w600,
+      fontSize: 16,
+    );
+
+    if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
+      try {
+        baseStyle =
+            GoogleFonts.getFont(settings.fontFamily, textStyle: baseStyle);
+      } catch (e) {
+        baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+      }
+    } else {
+      baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+    }
+
+    Widget mainTitle;
+    if (parts.length == 2) {
+      mainTitle = RichText(
+        text: TextSpan(
+          style: baseStyle,
+          children: [
+            TextSpan(text: '$prefix الثمن '),
+            TextSpan(
+              text: '(${parts[1]})',
+              style: const TextStyle(color: kPrimaryTeal),
+            ),
+            const TextSpan(text: ' الحزب '),
+            TextSpan(
+              text: '(${parts[0]})',
+              style: const TextStyle(color: kPrimaryTeal),
+            ),
+          ],
+        ),
+      );
+    } else {
+      mainTitle = Text(
+        filename,
+        style: baseStyle,
+      );
+    }
+
+    return mainTitle;
   }
 }

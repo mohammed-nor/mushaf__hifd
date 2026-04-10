@@ -16,7 +16,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.1+4
+version: 1.0.1+9
+
 
 environment:
   sdk: ^3.10.8
@@ -38,6 +39,14 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.5.4
   url_launcher: ^6.2.0
+  flutter_local_notifications: ^17.1.2
+  timezone: ^0.9.0
+  permission_handler: ^12.0.1
+  local_notifier: ^0.1.6
+  launch_at_startup: ^0.5.1
+  package_info_plus: ^9.0.1
+  wakelock_plus: ^1.5.1
+  google_fonts: ^8.0.2
 
 dev_dependencies:
   flutter_test:
@@ -72,23 +81,3 @@ flutter:
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
-
-  fonts:
-    - family: Andalus
-      fonts:
-        - asset: assets/fonts/andalus.ttf
-    - family: Cairo
-      fonts:
-        - asset: assets/fonts/cairo.ttf
-    - family: DroidArabicNaskh
-      fonts:
-        - asset: assets/fonts/droid_arabic_naskh.ttf
-    - family: Gara
-      fonts:
-        - asset: assets/fonts/gara.ttf
-    - family: TraditionalArabic
-      fonts:
-        - asset: assets/fonts/traditional_arabic.ttf
-    - family: AmiriQuran
-      fonts:
-        - asset: assets/fonts/amiri_quran.ttf

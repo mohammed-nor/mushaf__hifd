@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class LearnPage extends StatefulWidget {
   const LearnPage({super.key});
@@ -85,11 +86,9 @@ class _LearnPageState extends State<LearnPage> {
         return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: settings.isDarkMode
-                  ? const [kDarkBackgroundAlt, kDarkBackgroundVariant]
-                  : [Colors.grey[50]!, kLightBackground],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: settings.backgroundGradient,
             ),
           ),
           child: Scaffold(
@@ -97,13 +96,7 @@ class _LearnPageState extends State<LearnPage> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Text(
-                'إحفظ : $kThomunsTxt',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.2,
-                ),
-              ),
+              title: _buildRichTitle(_currentIndex, settings),
               centerTitle: true,
               actions: [
                 IconButton(
@@ -233,6 +226,52 @@ class _LearnPageState extends State<LearnPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildRichTitle(int index, ThemeSettings settings) {
+    final filename = kThomunsTxt[index].replaceAll('.txt', '');
+    final parts = filename.split('-');
+
+    TextStyle baseStyle = TextStyle(
+      color: settings.textColor,
+      fontWeight: FontWeight.w600,
+      fontSize: 18,
+    );
+
+    if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
+      try {
+        baseStyle =
+            GoogleFonts.getFont(settings.fontFamily, textStyle: baseStyle);
+      } catch (e) {
+        baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+      }
+    } else {
+      baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+    }
+
+    if (parts.length == 2) {
+      return RichText(
+        text: TextSpan(
+          style: baseStyle,
+          children: [
+            const TextSpan(text: ' الثمن '),
+            TextSpan(
+              text: '(${parts[1]})',
+              style: const TextStyle(color: kPrimaryTeal),
+            ),
+            const TextSpan(text: ' الحزب '),
+            TextSpan(
+              text: '(${parts[0]})',
+              style: const TextStyle(color: kPrimaryTeal),
+            ),
+          ],
+        ),
+      );
+    }
+    return Text(
+      filename,
+      style: baseStyle,
     );
   }
 }

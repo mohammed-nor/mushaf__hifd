@@ -40,20 +40,15 @@ class _MainHomePageState extends State<MainHomePage> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: settings.isDarkMode
-                  ? const [kDarkBackground, kDarkBackgroundVariant]
-                  : [Colors.grey[50]!, kLightBackground],
+              colors: settings.backgroundGradient,
             ),
           ),
           child: Scaffold(
             backgroundColor: Colors.transparent,
             body: _pages[_selectedIndex],
             bottomNavigationBar: NavigationBar(
-              backgroundColor: settings.isDarkMode
-                  ? kDarkBackground.withValues(alpha: 0.95)
-                  : kLightBackground.withValues(alpha: 0),
-              height: MediaQuery.of(context).size.height * 0.07,
-              elevation: 8,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
               shadowColor: Colors.black.withValues(alpha: 0),
               surfaceTintColor: settings.isDarkMode
                   ? kPrimaryTeal.withValues(alpha: 0.1)

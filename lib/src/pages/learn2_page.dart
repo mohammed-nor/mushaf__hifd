@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
+import 'package:mushaf_hifd/src/services/notification_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// A companion to [LearnPage] that displays the text versions of the
 /// thomuns instead of the image assets.  The UI and persistence logic is
@@ -79,6 +81,40 @@ class _Learn2PageState extends State<Learn2Page> {
     );
   }
 
+  Future<void> _toggleRevisedStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final notificationService = NotificationService.instance;
+
+    setState(() {
+      if (_revisedThomuns.contains(_currentIndex)) {
+        _revisedThomuns.remove(_currentIndex);
+      } else {
+        _revisedThomuns.add(_currentIndex);
+      }
+    });
+
+    await prefs.setStringList(
+      'revised_thomuns_txt',
+      _revisedThomuns.map((e) => e.toString()).toList(),
+    );
+
+    // Schedule or cancel notification based on revision status
+    if (_revisedThomuns.contains(_currentIndex)) {
+      await notificationService.scheduleRevisionReminder(_currentIndex);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تم جدولة تذكير المراجعة 📬'),
+            backgroundColor: kPrimaryTeal,
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } else {
+      await notificationService.cancelReminder(_currentIndex);
+    }
+  }
+
   Widget _buildTextWithGreenBrackets(String text, TextStyle baseStyle) {
     final spans = <TextSpan>[];
     int lastIndex = 0;
@@ -134,11 +170,9 @@ class _Learn2PageState extends State<Learn2Page> {
         return Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: settings.isDarkMode
-                  ? const [kDarkBackgroundAlt, kDarkBackgroundVariant]
-                  : [Colors.grey[50]!, kLightBackground],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: settings.backgroundGradient,
             ),
           ),
           child: Scaffold(
@@ -146,22 +180,7 @@ class _Learn2PageState extends State<Learn2Page> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Text(
-                () {
-                  final filename = kThomunsTxt[_currentIndex].replaceAll(
-                    '.txt',
-                    '',
-                  );
-                  final parts = filename.split('-');
-                  if (parts.length == 2) {
-                    return 'تلاوة الثمن ${parts[1]} من الحزب ${parts[0]}';
-                  }
-                  return 'إحفظ الفاتحة';
-                }(),
-                style: Theme.of(
-                  context,
-                ).textTheme.headlineSmall!.copyWith(color: kLightsColor),
-              ),
+              title: _buildRichTitle(_currentIndex, settings),
               centerTitle: true,
               actions: [
                 IconButton(
@@ -227,6 +246,7 @@ class _Learn2PageState extends State<Learn2Page> {
                                       Theme.of(
                                         context,
                                       ).textTheme.titleLarge!.copyWith(
+                                        color: settings.textColor,
                                         height: settings.lineSpacing,
                                         fontWeight: FontWeight.normal,
                                       ),
@@ -320,45 +340,53 @@ class _Learn2PageState extends State<Learn2Page> {
                           ),
                         ),
                         if (_revisedThomuns.contains(_currentIndex))
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: kPrimaryTeal.withAlpha(50),
-                              border: Border.all(color: kLightsColor),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'مراجع',
-                              style: Theme.of(context).textTheme.labelMedium!
-                                  .copyWith(
-                                    color: kPrimaryTeal,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          InkWell(
+                            onTap: _toggleRevisedStatus,
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: kPrimaryTeal.withAlpha(50),
+                                border: Border.all(color: kLightsColor),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'مراجع',
+                                style: Theme.of(context).textTheme.labelMedium!
+                                    .copyWith(
+                                      color: kPrimaryTeal,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
                             ),
                           )
                         else
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.withAlpha(0),
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              'لم يراجع',
-                              style: Theme.of(context).textTheme.labelMedium!
-                                  .copyWith(
-                                    color: settings.isDarkMode
-                                        ? kLightBackground
-                                        : Colors.black54,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          InkWell(
+                            onTap: _toggleRevisedStatus,
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.withAlpha(0),
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'لم يراجع',
+                                style: Theme.of(context).textTheme.labelMedium!
+                                    .copyWith(
+                                      color: settings.isDarkMode
+                                          ? kLightBackground
+                                          : Colors.black54,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
                             ),
                           ),
                       ],
@@ -370,6 +398,52 @@ class _Learn2PageState extends State<Learn2Page> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildRichTitle(int index, ThemeSettings settings) {
+    final filename = kThomunsTxt[index].replaceAll('.txt', '');
+    final parts = filename.split('-');
+
+    TextStyle baseStyle = TextStyle(
+      color: settings.textColor,
+      fontWeight: FontWeight.w600,
+      fontSize: 18,
+    );
+
+    if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
+      try {
+        baseStyle =
+            GoogleFonts.getFont(settings.fontFamily, textStyle: baseStyle);
+      } catch (e) {
+        baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+      }
+    } else {
+      baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+    }
+
+    if (parts.length == 2) {
+      return RichText(
+        text: TextSpan(
+          style: baseStyle,
+          children: [
+            const TextSpan(text: ' الثمن '),
+            TextSpan(
+              text: '(${parts[1]})',
+              style: const TextStyle(color: kPrimaryTeal),
+            ),
+            const TextSpan(text: ' الحزب '),
+            TextSpan(
+              text: '(${parts[0]})',
+              style: const TextStyle(color: kPrimaryTeal),
+            ),
+          ],
+        ),
+      );
+    }
+    return Text(
+      filename,
+      style: baseStyle,
     );
   }
 }

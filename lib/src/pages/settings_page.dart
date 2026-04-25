@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
@@ -77,16 +78,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     /* Text(
                       'تخصيص الخط',
                       style: Theme.of(context).textTheme.headlineSmall!
-                          .copyWith(color: kPrimaryTeal)),
+                          .copyWith(color: settings.primaryColor)),
                     ), */
                     _buildSettingCard(
                       settings: settings,
                       child: Column(
                         children: [
                           ListTile(
-                            leading: const Icon(
+                            leading: Icon(
                               Icons.brightness_4,
-                              color: kPrimaryTeal,
+                              color: settings.primaryColor,
                             ),
                             title: Text(
                               'المظهر',
@@ -97,8 +98,10 @@ class _SettingsPageState extends State<SettingsPage> {
                               onChanged: (bool value) {
                                 updateThemeMode(!value);
                               },
-                              activeTrackColor: kPrimaryTeal.withAlpha(100),
-                              activeThumbColor: kPrimaryTeal,
+                              activeTrackColor: settings.primaryColor.withAlpha(
+                                100,
+                              ),
+                              activeThumbColor: settings.primaryColor,
                               inactiveThumbColor: Colors.grey,
                             ),
                           ),
@@ -111,9 +114,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                   : Colors.black12,
                             ),
                             ListTile(
-                              leading: const Icon(
+                              leading: Icon(
                                 Icons.rocket_launch,
-                                color: kPrimaryTeal,
+                                color: settings.primaryColor,
                               ),
                               title: Text(
                                 'التشغيل التلقائي',
@@ -133,8 +136,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                 onChanged: (bool value) {
                                   updateAutostart(value);
                                 },
-                                activeTrackColor: kPrimaryTeal.withAlpha(100),
-                                activeThumbColor: kPrimaryTeal,
+                                activeTrackColor: settings.primaryColor
+                                    .withAlpha(100),
+                                activeThumbColor: settings.primaryColor,
                                 inactiveThumbColor: Colors.grey,
                               ),
                             ),
@@ -145,9 +149,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           ],
                           ListTile(
-                            leading: const Icon(
+                            leading: Icon(
                               Icons.light_mode,
-                              color: kPrimaryTeal,
+                              color: settings.primaryColor,
                             ),
                             title: Text(
                               'إبقاء الشاشة مضاءة',
@@ -167,8 +171,10 @@ class _SettingsPageState extends State<SettingsPage> {
                               onChanged: (bool value) {
                                 updateKeepScreenOn(value);
                               },
-                              activeTrackColor: kPrimaryTeal.withAlpha(100),
-                              activeThumbColor: kPrimaryTeal,
+                              activeTrackColor: settings.primaryColor.withAlpha(
+                                100,
+                              ),
+                              activeThumbColor: settings.primaryColor,
                               inactiveThumbColor: Colors.grey,
                             ),
                           ),
@@ -178,9 +184,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                 : Colors.black12,
                           ),
                           ListTile(
-                            leading: const Icon(
+                            leading: Icon(
                               Icons.font_download,
-                              color: kPrimaryTeal,
+                              color: settings.primaryColor,
                             ),
                             title: Text(
                               'نوع الخط',
@@ -265,9 +271,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                 : Colors.black12,
                           ),
                           ListTile(
-                            leading: const Icon(
+                            leading: Icon(
                               Icons.format_size,
-                              color: kPrimaryTeal,
+                              color: settings.primaryColor,
                             ),
                             title: Text(
                               'حجم الخط',
@@ -278,7 +284,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               min: 14,
                               max: 30,
                               divisions: 16,
-                              activeColor: kPrimaryTeal,
+                              activeColor: settings.primaryColor,
                               inactiveColor: Colors.grey.withAlpha(77),
                               label: settings.fontSize.round().toString(),
                               onChanged: (double value) {
@@ -304,9 +310,9 @@ class _SettingsPageState extends State<SettingsPage> {
                                 : Colors.black12,
                           ),
                           ListTile(
-                            leading: const Icon(
+                            leading: Icon(
                               Icons.line_weight,
-                              color: kPrimaryTeal,
+                              color: settings.primaryColor,
                             ),
                             title: Text(
                               'تباعد الأسطر',
@@ -317,7 +323,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               min: 1.0,
                               max: 2.0,
                               divisions: 20,
-                              activeColor: kPrimaryTeal,
+                              activeColor: settings.primaryColor,
                               inactiveColor: Colors.grey.withAlpha(77),
                               label: settings.lineSpacing.toStringAsFixed(1),
                               onChanged: (double value) {
@@ -348,6 +354,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         0.02,
                       ),
                     ),
+                    // ── Accent colour picker ─────────────────────────
+                    _buildAccentColorPicker(context, settings),
+                    SizedBox(
+                      height: ResponsiveUtils.getResponsiveHeight(
+                        context,
+                        0.02,
+                      ),
+                    ),
                     _buildTextColorPicker(context, settings),
                     SizedBox(
                       height: ResponsiveUtils.getResponsiveHeight(
@@ -358,9 +372,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     _buildSettingCard(
                       settings: settings,
                       child: ListTile(
-                        leading: const Icon(
+                        leading: Icon(
                           Icons.notifications,
-                          color: kPrimaryTeal,
+                          color: settings.primaryColor,
                         ),
                         title: const Text('تذكير كل 3 ساعات'),
                         subtitle: Text(
@@ -393,7 +407,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     content: Text(
                                       'تم تحديث التذكيرات — تبدأ من $timeString كل 3 ساعات',
                                     ),
-                                    backgroundColor: kPrimaryTeal,
+                                    backgroundColor: settings.primaryColor,
                                     duration: const Duration(seconds: 3),
                                   ),
                                 );
@@ -434,10 +448,10 @@ class _SettingsPageState extends State<SettingsPage> {
                               0.025,
                             ),
                           ),
-                          const Icon(
+                          Icon(
                             Icons.info_outline,
                             size: 60,
-                            color: kPrimaryTeal,
+                            color: settings.primaryColor,
                           ),
                           SizedBox(
                             height: ResponsiveUtils.getResponsiveHeight(
@@ -489,9 +503,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                           ),
                           ListTile(
-                            leading: const Icon(
+                            leading: Icon(
                               Icons.copyright,
-                              color: kPrimaryTeal,
+                              color: settings.primaryColor,
                               size: 35,
                             ),
                             title: const Text('حقوق النشر'),
@@ -583,20 +597,20 @@ class _SettingsPageState extends State<SettingsPage> {
               colors: [opt.start, opt.end],
             ),
             border: Border.all(
-              color: isSelected ? kPrimaryTeal : Colors.transparent,
+              color: isSelected ? settings.primaryColor : Colors.transparent,
               width: 3,
             ),
             boxShadow: [
               BoxShadow(
                 color: isSelected
-                    ? kPrimaryTeal.withAlpha(100)
+                    ? settings.primaryColor.withAlpha(100)
                     : Colors.black.withAlpha(40),
                 blurRadius: isSelected ? 8 : 3,
               ),
             ],
           ),
           child: isSelected
-              ? const Icon(Icons.check, color: kPrimaryTeal, size: 22)
+              ? Icon(Icons.check, color: settings.primaryColor, size: 22)
               : null,
         ),
       );
@@ -611,13 +625,13 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             Row(
               children: [
-                const Icon(Icons.palette, color: kPrimaryTeal, size: 22),
+                Icon(Icons.palette, color: settings.primaryColor, size: 22),
                 const SizedBox(width: 10),
                 Text(
                   'لون الخلفية',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium!.copyWith(color: kPrimaryTeal),
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: settings.primaryColor,
+                  ),
                 ),
               ],
             ),
@@ -685,6 +699,80 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget _buildAccentColorPicker(BuildContext context, ThemeSettings settings) {
+    final currentKey = settings.accentColor;
+
+    Widget colorBox(AccentColorOption opt, bool isSelected) {
+      return GestureDetector(
+        onTap: () {
+          updateAccentColor(opt.key);
+        },
+        child: Column(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: opt.color,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? opt.color : Colors.grey.withAlpha(100),
+                  width: isSelected ? 3 : 1,
+                ),
+                boxShadow: isSelected
+                    ? [BoxShadow(color: opt.color.withAlpha(80), blurRadius: 8)]
+                    : null,
+              ),
+              child: isSelected
+                  ? Icon(Icons.check, color: Colors.white, size: 20)
+                  : null,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              opt.label,
+              style: TextStyle(
+                fontSize: 10,
+                color: settings.textColor.withValues(alpha: 0.6),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return _buildSettingCard(
+      settings: settings,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.color_lens, color: settings.primaryColor, size: 22),
+                const SizedBox(width: 10),
+                Text(
+                  'لون التمييز الأساسي',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: settings.primaryColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 12,
+              runSpacing: 10,
+              children: kAccentColors
+                  .map((opt) => colorBox(opt, opt.key == currentKey))
+                  .toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTextColorPicker(BuildContext context, ThemeSettings settings) {
     final darkTextOptions = kTextColors.where((t) => t.isDark).toList();
     final lightTextOptions = kTextColors.where((t) => !t.isDark).toList();
@@ -709,13 +797,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: opt.color,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? kPrimaryTeal : Colors.grey.withAlpha(100),
+                  color: isSelected
+                      ? settings.primaryColor
+                      : Colors.grey.withAlpha(100),
                   width: isSelected ? 3 : 1,
                 ),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: kPrimaryTeal.withAlpha(80),
+                          color: settings.primaryColor.withAlpha(80),
                           blurRadius: 8,
                         ),
                       ]
@@ -753,13 +843,13 @@ class _SettingsPageState extends State<SettingsPage> {
           children: [
             Row(
               children: [
-                const Icon(Icons.text_format, color: kPrimaryTeal, size: 22),
+                Icon(Icons.text_format, color: settings.primaryColor, size: 22),
                 const SizedBox(width: 10),
                 Text(
                   'لون النص',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium!.copyWith(color: kPrimaryTeal),
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: settings.primaryColor,
+                  ),
                 ),
               ],
             ),
@@ -821,7 +911,7 @@ class _SettingsPageState extends State<SettingsPage> {
               'تقدم الحفظ',
               style: Theme.of(
                 context,
-              ).textTheme.titleLarge!.copyWith(color: kPrimaryTeal),
+              ).textTheme.titleLarge!.copyWith(color: settings.primaryColor),
             ),
 
             const SizedBox(height: 16),
@@ -833,21 +923,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   context,
                   label: 'نسبة الحفظ',
                   value: '$advancement%',
-                  color: kPrimaryTeal,
+                  color: settings.primaryColor,
                   labelColor: settings.textColor.withValues(alpha: 0.7),
                 ),
                 _buildStatWidget(
                   context,
                   label: 'الأحزاب المحفوظة',
                   value: '${learned / 8}',
-                  color: kPrimaryTeal,
+                  color: settings.primaryColor,
                   labelColor: settings.textColor.withValues(alpha: 0.7),
                 ),
                 _buildStatWidget(
                   context,
                   label: 'محفوظ ومراجع',
                   value: '$learnedAndRevised',
-                  color: kPrimaryTeal,
+                  color: settings.primaryColor,
                   labelColor: settings.textColor.withValues(alpha: 0.7),
                 ),
                 _buildStatWidget(
@@ -868,7 +958,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             const SizedBox(height: 12),
-            _buildProgressDotsChart(),
+            _buildProgressDotsChart(settings),
           ],
         ),
       ),
@@ -901,7 +991,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildProgressDotsChart() {
+  Widget _buildProgressDotsChart(ThemeSettings settings) {
     final int dotsPerRow = 8;
     final int totalRows = (kThomunsTxt.length / dotsPerRow).ceil();
 
@@ -922,9 +1012,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: ResponsiveUtils.getResponsiveWidth(context, 0.13),
                 child: Text(
                   'الحزب ${rowIndex + 1}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: kPrimaryTeal,
+                    color: settings.primaryColor,
                     fontWeight: FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
@@ -949,7 +1039,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
                     Color dotColor;
                     if (isRevised && isLearned) {
-                      dotColor = kPrimaryTeal; // Green: revised and learned
+                      dotColor =
+                          settings.primaryColor; // Green: revised and learned
                     } else if (isLearned) {
                       dotColor = kOrangeAccent; // Orange: learned only
                     } else {
@@ -986,10 +1077,10 @@ class _SettingsPageState extends State<SettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'المطور',
+              'المطوّر',
               style: Theme.of(
                 context,
-              ).textTheme.titleLarge!.copyWith(color: kPrimaryTeal),
+              ).textTheme.titleLarge!.copyWith(color: settings.primaryColor),
             ),
 
             const SizedBox(height: 20),
@@ -997,48 +1088,104 @@ class _SettingsPageState extends State<SettingsPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: const AssetImage(
+                    'assets/devloper/NOR_MOHAMMED.png',
+                  ),
+                ),
+                const SizedBox(width: 16),
                 Text(
-                  'NOR Mohammed\nNOR It! team',
+                  'محمد نور\nفريق NOR It!',
                   style: Theme.of(
                     context,
                   ).textTheme.titleMedium!.copyWith(color: settings.textColor),
-                  textAlign: TextAlign.left,
-                ),
-                const SizedBox(width: 16),
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage(
-                    'assets/devloper/NOR_MOHAMMED.png',
-                  ),
+                  textAlign: TextAlign.right,
                 ),
               ],
             ),
 
             const SizedBox(height: 20),
+
+            // ── Support message ──────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: settings.primaryColor.withAlpha(18),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: settings.primaryColor.withAlpha(40)),
+              ),
+              child: Text(
+                'إذا أعجبك التطبيق، ادعمنا بتقييم على متجر Google Play '
+                'ومشاركته مع أصدقائك وأحبابك. دعمكم يساعدنا على '
+                'تطوير المزيد من التطبيقات الإسلامية المجانية. '
+                'جزاكم الله خيراً 🤲',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  color: settings.textColor.withValues(alpha: 0.8),
+                  height: 1.6,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ── Action buttons ───────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildContactButton(
                   icon: Icons.email,
                   label: 'البريد',
+                  settings: settings,
                   onPressed: () {
                     _launchEmail('nor.it.services@gmail.com');
                   },
                 ),
-                const SizedBox(width: 26),
+                const SizedBox(width: 10),
                 _buildContactButton(
                   icon: Icons.code,
                   label: 'GitHub',
+                  settings: settings,
                   onPressed: () {
                     _launchURL('https://github.com/mohammed-nor/');
                   },
                 ),
+                const SizedBox(width: 10),
+                _buildContactButton(
+                  icon: Icons.store,
+                  label: 'تطبيقاتنا',
+                  settings: settings,
+                  onPressed: () {
+                    _launchURL(
+                      'https://play.google.com/store/apps/dev?id=6694339020319831911',
+                    );
+                  },
+                ),
+                const SizedBox(width: 10),
+                _buildContactButton(
+                  icon: Icons.share,
+                  label: 'شارك التطبيق',
+                  settings: settings,
+                  onPressed: () {
+                    SharePlus.instance.share(
+                      ShareParams(
+                        text:
+                            'مصحف الحفظ - ورش مثمن\n'
+                            'تطبيق رائع لحفظ القرآن الكريم ومتابعة تقدمك 📖\n\n'
+                            'حمّله الآن من متجر Google Play:\n'
+                            'https://play.google.com/store/apps/dev?id=6694339020319831911',
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
+
             const SizedBox(height: 20),
 
             Text(
-              'الإصدار 1.0.0',
+              'الإصدار 1.0.1',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
                 color: settings.textColor.withValues(alpha: 0.5),
@@ -1054,6 +1201,7 @@ class _SettingsPageState extends State<SettingsPage> {
     required IconData icon,
     required String label,
     required VoidCallback onPressed,
+    required ThemeSettings settings,
   }) {
     return Material(
       color: Colors.transparent,
@@ -1063,17 +1211,17 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            border: Border.all(color: kPrimaryTeal, width: 1.5),
+            border: Border.all(color: settings.primaryColor, width: 1.5),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [
-              Icon(icon, color: kPrimaryTeal, size: 28),
+              Icon(icon, color: settings.primaryColor, size: 28),
               const SizedBox(height: 6),
               Text(
                 label,
-                style: const TextStyle(
-                  color: kPrimaryTeal,
+                style: TextStyle(
+                  color: settings.primaryColor,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),

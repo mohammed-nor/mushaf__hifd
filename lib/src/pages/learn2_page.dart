@@ -57,10 +57,10 @@ class _Learn2PageState extends State<Learn2Page> {
     await prefs.setInt('current_thomun_txt_index', _currentIndex);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تم حفظ الصفحة الحالية بنجاح'),
-          backgroundColor: kPrimaryTeal,
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: const Text('تم حفظ الصفحة الحالية بنجاح'),
+          backgroundColor: Theme.of(context).primaryColor,
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -103,10 +103,10 @@ class _Learn2PageState extends State<Learn2Page> {
       await notificationService.scheduleRevisionReminder(_currentIndex);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('تم جدولة تذكير المراجعة 📬'),
-            backgroundColor: kPrimaryTeal,
-            duration: Duration(seconds: 2),
+          SnackBar(
+            content: const Text('تم جدولة تذكير المراجعة 📬'),
+            backgroundColor: Theme.of(context).primaryColor,
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -137,7 +137,7 @@ class _Learn2PageState extends State<Learn2Page> {
         TextSpan(
           text: match.group(0),
           style: baseStyle.copyWith(
-            color: kPrimaryTeal,
+            color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -184,7 +184,7 @@ class _Learn2PageState extends State<Learn2Page> {
               centerTitle: true,
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.bookmark_add, color: kPrimaryTeal),
+                  icon: Icon(Icons.bookmark_add, color: settings.primaryColor),
                   onPressed: _saveCurrentPage,
                   tooltip: 'حفظ الصفحة الحالية',
                 ),
@@ -277,11 +277,11 @@ class _Learn2PageState extends State<Learn2Page> {
                             ),
                             decoration: BoxDecoration(
                               color: _learnedThomuns.contains(_currentIndex)
-                                  ? kPrimaryTeal.withAlpha(10)
+                                  ? settings.primaryColor.withAlpha(10)
                                   : Colors.grey.withAlpha(0),
                               border: Border.all(
                                 color: _learnedThomuns.contains(_currentIndex)
-                                    ? kLightsColor
+                                    ? Theme.of(context).primaryColor
                                     : Colors.grey,
                               ),
                               borderRadius: BorderRadius.circular(12),
@@ -294,7 +294,7 @@ class _Learn2PageState extends State<Learn2Page> {
                                   .copyWith(
                                     color:
                                         _learnedThomuns.contains(_currentIndex)
-                                        ? kPrimaryTeal
+                                        ? settings.primaryColor
                                         : (settings.isDarkMode
                                               ? kLightBackground
                                               : Colors.black54),
@@ -315,7 +315,7 @@ class _Learn2PageState extends State<Learn2Page> {
                           style: Theme.of(context).textTheme.labelMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: kPrimaryTeal,
+                                color: settings.primaryColor,
                               ),
                         ),
                         Expanded(
@@ -323,7 +323,7 @@ class _Learn2PageState extends State<Learn2Page> {
                             value: _currentIndex.toDouble(),
                             min: 0,
                             max: (kThomunsTxt.length - 1).toDouble(),
-                            activeColor: kPrimaryTeal,
+                            activeColor: settings.primaryColor,
                             inactiveColor: Colors.grey.withAlpha(77),
                             onChanged: (value) {
                               setState(() {
@@ -349,15 +349,17 @@ class _Learn2PageState extends State<Learn2Page> {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: kPrimaryTeal.withAlpha(50),
-                                border: Border.all(color: kLightsColor),
+                                color: settings.primaryColor.withAlpha(50),
+                                border: Border.all(
+                                  color: Theme.of(context).primaryColor,
+                                ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
                                 'مراجع',
                                 style: Theme.of(context).textTheme.labelMedium!
                                     .copyWith(
-                                      color: kPrimaryTeal,
+                                      color: settings.primaryColor,
                                       fontWeight: FontWeight.bold,
                                     ),
                               ),
@@ -413,8 +415,10 @@ class _Learn2PageState extends State<Learn2Page> {
 
     if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
       try {
-        baseStyle =
-            GoogleFonts.getFont(settings.fontFamily, textStyle: baseStyle);
+        baseStyle = GoogleFonts.getFont(
+          settings.fontFamily,
+          textStyle: baseStyle,
+        );
       } catch (e) {
         baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
       }
@@ -430,20 +434,17 @@ class _Learn2PageState extends State<Learn2Page> {
             const TextSpan(text: ' الثمن '),
             TextSpan(
               text: '(${parts[1]})',
-              style: const TextStyle(color: kPrimaryTeal),
+              style: TextStyle(color: settings.primaryColor),
             ),
             const TextSpan(text: ' الحزب '),
             TextSpan(
               text: '(${parts[0]})',
-              style: const TextStyle(color: kPrimaryTeal),
+              style: TextStyle(color: settings.primaryColor),
             ),
           ],
         ),
       );
     }
-    return Text(
-      filename,
-      style: baseStyle,
-    );
+    return Text(filename, style: baseStyle);
   }
 }

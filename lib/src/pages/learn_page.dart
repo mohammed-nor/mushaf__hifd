@@ -48,10 +48,10 @@ class _LearnPageState extends State<LearnPage> {
     await prefs.setInt('current_thomun_index', _currentIndex);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('تم حفظ الصفحة الحالية بنجاح'),
-          backgroundColor: kLightsColor,
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: const Text('تم حفظ الصفحة الحالية بنجاح'),
+          backgroundColor: Theme.of(context).primaryColor,
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -100,7 +100,10 @@ class _LearnPageState extends State<LearnPage> {
               centerTitle: true,
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.bookmark_add, color: kLightsColor),
+                  icon: Icon(
+                    Icons.bookmark_add,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   onPressed: _saveCurrentPage,
                   tooltip: 'حفظ الصفحة الحالية',
                 ),
@@ -162,7 +165,7 @@ class _LearnPageState extends State<LearnPage> {
                             ),
                             decoration: BoxDecoration(
                               color: _learnedThomuns.contains(_currentIndex)
-                                  ? kLightsColor.withAlpha(50)
+                                  ? Theme.of(context).primaryColor.withAlpha(50)
                                   : Colors.grey.withAlpha(50),
                               border: Border.all(
                                 color: _learnedThomuns.contains(_currentIndex)
@@ -179,7 +182,7 @@ class _LearnPageState extends State<LearnPage> {
                                   .copyWith(
                                     color:
                                         _learnedThomuns.contains(_currentIndex)
-                                        ? kLightsColor
+                                        ? Theme.of(context).primaryColor
                                         : (settings.isDarkMode
                                               ? kLightBackground
                                               : Colors.black54),
@@ -199,7 +202,7 @@ class _LearnPageState extends State<LearnPage> {
                           style: Theme.of(context).textTheme.labelMedium!
                               .copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: kLightsColor,
+                                color: Theme.of(context).primaryColor,
                               ),
                         ),
                         Expanded(
@@ -207,7 +210,7 @@ class _LearnPageState extends State<LearnPage> {
                             value: _currentIndex.toDouble(),
                             min: 0,
                             max: (kThomunsTxt.length - 1).toDouble(),
-                            activeColor: kLightsColor,
+                            activeColor: Theme.of(context).primaryColor,
                             inactiveColor: Colors.grey.withAlpha(77),
                             onChanged: (value) {
                               setState(() {
@@ -241,8 +244,10 @@ class _LearnPageState extends State<LearnPage> {
 
     if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
       try {
-        baseStyle =
-            GoogleFonts.getFont(settings.fontFamily, textStyle: baseStyle);
+        baseStyle = GoogleFonts.getFont(
+          settings.fontFamily,
+          textStyle: baseStyle,
+        );
       } catch (e) {
         baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
       }
@@ -258,20 +263,17 @@ class _LearnPageState extends State<LearnPage> {
             const TextSpan(text: ' الثمن '),
             TextSpan(
               text: '(${parts[1]})',
-              style: const TextStyle(color: kPrimaryTeal),
+              style: TextStyle(color: Theme.of(context).primaryColor),
             ),
             const TextSpan(text: ' الحزب '),
             TextSpan(
               text: '(${parts[0]})',
-              style: const TextStyle(color: kPrimaryTeal),
+              style: TextStyle(color: Theme.of(context).primaryColor),
             ),
           ],
         ),
       );
     }
-    return Text(
-      filename,
-      style: baseStyle,
-    );
+    return Text(filename, style: baseStyle);
   }
 }

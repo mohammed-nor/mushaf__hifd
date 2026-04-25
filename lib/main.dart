@@ -45,6 +45,7 @@ void main() async {
   final lightBgTheme = prefs.getString('light_bg_theme') ?? 'light_white';
   final darkTextColor = prefs.getString('dark_text_color') ?? 'white';
   final lightTextColor = prefs.getString('light_text_color') ?? 'black';
+  final accentColor = prefs.getString('accent_color') ?? 'teal';
   final autostart = prefs.getBool('autostart') ?? false;
   final keepScreenOn = prefs.getBool('keep_screen_on') ?? false;
 
@@ -62,6 +63,7 @@ void main() async {
     lightBgTheme: lightBgTheme,
     darkTextColor: darkTextColor,
     lightTextColor: lightTextColor,
+    accentColor: accentColor,
     autostart: autostart,
     keepScreenOn: keepScreenOn,
   );
@@ -76,8 +78,8 @@ class MyApp extends StatelessWidget {
     return ThemeData(
       brightness: Brightness.dark,
       fontFamily: settings.fontFamily,
-      colorScheme: const ColorScheme.dark(
-        primary: kPrimaryTeal,
+      colorScheme: ColorScheme.dark(
+        primary: settings.primaryColor,
         secondary: kSecondaryTeal,
         surface: kDarkBackground,
       ),
@@ -202,8 +204,8 @@ class MyApp extends StatelessWidget {
     return ThemeData(
       brightness: Brightness.light,
       fontFamily: settings.fontFamily,
-      colorScheme: const ColorScheme.light(
-        primary: kDarkTeal,
+      colorScheme: ColorScheme.light(
+        primary: settings.primaryColor,
         secondary: kTertiaryTeal,
         surface: kLightBackgroundVariant,
       ),

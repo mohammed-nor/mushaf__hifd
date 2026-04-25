@@ -214,6 +214,37 @@ TextColorOption lightTextColorForKey(String key) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Accent color palette
+// ─────────────────────────────────────────────────────────────────────────────
+
+class AccentColorOption {
+  final String key;
+  final String label;
+  final Color color;
+  const AccentColorOption({
+    required this.key,
+    required this.label,
+    required this.color,
+  });
+}
+
+const List<AccentColorOption> kAccentColors = [
+  AccentColorOption(key: 'teal', label: 'تيل', color: Color(0xFF1ABC9C)),
+  AccentColorOption(key: 'blue', label: 'أزرق', color: Color(0xFF2196F3)),
+  AccentColorOption(key: 'purple', label: 'بنفسجي', color: Color(0xFF9C27B0)),
+  AccentColorOption(key: 'orange', label: 'برتقالي', color: Color(0xFFFF9800)),
+  AccentColorOption(key: 'red', label: 'أحمر', color: Color(0xFFF44336)),
+  AccentColorOption(key: 'green', label: 'أخضر', color: Color(0xFF4CAF50)),
+];
+
+AccentColorOption accentColorForKey(String key) {
+  return kAccentColors.firstWhere(
+    (a) => a.key == key,
+    orElse: () => kAccentColors.first,
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ThemeSettings model
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -226,6 +257,7 @@ class ThemeSettings {
   final String lightBgTheme;
   final String darkTextColor;
   final String lightTextColor;
+  final String accentColor;
   final bool autostart;
   final bool keepScreenOn;
 
@@ -238,6 +270,7 @@ class ThemeSettings {
     this.lightBgTheme = 'light_white',
     this.darkTextColor = 'white',
     this.lightTextColor = 'black',
+    this.accentColor = 'teal',
     this.autostart = false,
     this.keepScreenOn = false,
   });
@@ -251,6 +284,7 @@ class ThemeSettings {
     String? lightBgTheme,
     String? darkTextColor,
     String? lightTextColor,
+    String? accentColor,
     bool? autostart,
     bool? keepScreenOn,
   }) {
@@ -263,6 +297,7 @@ class ThemeSettings {
       lightBgTheme: lightBgTheme ?? this.lightBgTheme,
       darkTextColor: darkTextColor ?? this.darkTextColor,
       lightTextColor: lightTextColor ?? this.lightTextColor,
+      accentColor: accentColor ?? this.accentColor,
       autostart: autostart ?? this.autostart,
       keepScreenOn: keepScreenOn ?? this.keepScreenOn,
     );
@@ -281,6 +316,8 @@ class ThemeSettings {
       return lightTextColorForKey(lightTextColor).color;
     }
   }
+
+  Color get primaryColor => accentColorForKey(accentColor).color;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -325,6 +362,7 @@ Future<void> updateThemeSettings(
     lightBgTheme: current.lightBgTheme,
     darkTextColor: current.darkTextColor,
     lightTextColor: current.lightTextColor,
+    accentColor: current.accentColor,
   );
 }
 
@@ -366,6 +404,14 @@ Future<void> updateTextColor({
   themeSettingsNotifier.value = themeSettingsNotifier.value.copyWith(
     darkTextColor: darkTextColor,
     lightTextColor: lightTextColor,
+  );
+}
+
+Future<void> updateAccentColor(String accentColor) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('accent_color', accentColor);
+  themeSettingsNotifier.value = themeSettingsNotifier.value.copyWith(
+    accentColor: accentColor,
   );
 }
 

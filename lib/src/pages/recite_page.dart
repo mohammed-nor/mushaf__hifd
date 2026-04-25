@@ -76,7 +76,9 @@ class _RecitePageState extends State<RecitePage> {
     final savedIndex = prefs.getInt('current_random_thomun_index');
     final filterIndex = prefs.getInt('recite_filter_mode') ?? 0;
     final revisedList = prefs.getStringList('revised_thomuns_txt') ?? [];
-    final selectionTimeMillis = prefs.getInt('current_thomun_selection_time_millis');
+    final selectionTimeMillis = prefs.getInt(
+      'current_thomun_selection_time_millis',
+    );
 
     if (mounted) {
       setState(() {
@@ -84,7 +86,9 @@ class _RecitePageState extends State<RecitePage> {
         _filterMode = ReciteFilter.values[filterIndex];
         _revisedThomuns = revisedList.map((e) => int.tryParse(e) ?? 0).toSet();
         if (selectionTimeMillis != null) {
-          _selectionTime = DateTime.fromMillisecondsSinceEpoch(selectionTimeMillis);
+          _selectionTime = DateTime.fromMillisecondsSinceEpoch(
+            selectionTimeMillis,
+          );
         } else if (_currentThomunIndex != null) {
           // Fallback: if we have a thomun but no selection time, set it to now
           _selectionTime = DateTime.now();
@@ -152,7 +156,9 @@ class _RecitePageState extends State<RecitePage> {
           pool = learnedIndices.toList();
         }
       } else if (_filterMode == ReciteFilter.notLearned) {
-        final notLearned = pool.where((i) => !learnedIndices.contains(i)).toList();
+        final notLearned = pool
+            .where((i) => !learnedIndices.contains(i))
+            .toList();
         if (notLearned.isNotEmpty) {
           pool = notLearned;
         }
@@ -176,7 +182,10 @@ class _RecitePageState extends State<RecitePage> {
         final prefs = await SharedPreferences.getInstance();
         final now = DateTime.now();
         await prefs.setInt('current_random_thomun_index', selectedIndex);
-        await prefs.setInt('current_thomun_selection_time_millis', now.millisecondsSinceEpoch);
+        await prefs.setInt(
+          'current_thomun_selection_time_millis',
+          now.millisecondsSinceEpoch,
+        );
         if (mounted) {
           setState(() {
             _selectionTime = now;
@@ -193,7 +202,10 @@ class _RecitePageState extends State<RecitePage> {
         final prefs = await SharedPreferences.getInstance();
         final now = DateTime.now();
         await prefs.setInt('current_random_thomun_index', selectedIndex);
-        await prefs.setInt('current_thomun_selection_time_millis', now.millisecondsSinceEpoch);
+        await prefs.setInt(
+          'current_thomun_selection_time_millis',
+          now.millisecondsSinceEpoch,
+        );
         if (mounted) {
           setState(() {
             _selectionTime = now;
@@ -225,7 +237,7 @@ class _RecitePageState extends State<RecitePage> {
         TextSpan(
           text: match.group(0),
           style: baseStyle.copyWith(
-            color: kLightsColor,
+            color: Theme.of(context).primaryColor,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -255,11 +267,13 @@ class _RecitePageState extends State<RecitePage> {
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
         decoration: BoxDecoration(
           color: isRevised
-              ? kLightsColor.withAlpha(80)
+              ? Theme.of(context).primaryColor.withAlpha(80)
               : kLightBackground.withAlpha(8),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
-            color: isRevised ? kLightsColor : kLightsColor.withAlpha(100),
+            color: isRevised
+                ? Theme.of(context).primaryColor
+                : Theme.of(context).primaryColor.withAlpha(100),
             width: isRevised ? 1.5 : 0.5,
           ),
         ),
@@ -267,9 +281,9 @@ class _RecitePageState extends State<RecitePage> {
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 8,
-                color: kLightsColor,
+                color: Theme.of(context).primaryColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -332,36 +346,40 @@ class _RecitePageState extends State<RecitePage> {
               leading: _selectionTime == null
                   ? null
                   : Center(
-                    child: Container(
-                      margin: const EdgeInsets.only(right: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: kPrimaryTeal.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: kPrimaryTeal.withValues(alpha: 0.3),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 4,
                         ),
-                      ),
-                      child: Text(
-                        _elapsedTime,
-                        style: const TextStyle(
-                          color: kPrimaryTeal,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'monospace',
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            context,
+                          ).primaryColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: Theme.of(
+                              context,
+                            ).primaryColor.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Text(
+                          _elapsedTime,
+                          style: TextStyle(
+                            color: Theme.of(context).primaryColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'monospace',
+                          ),
                         ),
                       ),
                     ),
-                  ),
               leadingWidth: 80,
               title: _currentThomunIndex == null
                   ? Text(
-                    'إمتحن حفظك',
-                    style: TextStyle(color: settings.textColor),
-                  )
+                      'إمتحن حفظك',
+                      style: TextStyle(color: settings.textColor),
+                    )
                   : _buildRichTitle(_currentThomunIndex!, settings, 'تلاوة'),
               centerTitle: true,
               actions: [
@@ -372,7 +390,8 @@ class _RecitePageState extends State<RecitePage> {
                       setState(() {
                         // Toggle between: all -> learned -> notLearned -> all
                         int nextIndex =
-                            (_filterMode.index + 1) % ReciteFilter.values.length;
+                            (_filterMode.index + 1) %
+                            ReciteFilter.values.length;
                         _filterMode = ReciteFilter.values[nextIndex];
                       });
                       _saveSavedState();
@@ -384,15 +403,17 @@ class _RecitePageState extends State<RecitePage> {
                       ),
                       decoration: BoxDecoration(
                         color: _filterMode != ReciteFilter.all
-                            ? kLightsColor.withValues(alpha: 0.1)
+                            ? Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: 0.1)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _filterMode != ReciteFilter.all
-                              ? kLightsColor
+                              ? Theme.of(context).primaryColor
                               : (settings.isDarkMode
-                                  ? kLightBackground.withValues(alpha: 0.5)
-                                  : Colors.black26),
+                                    ? kLightBackground.withValues(alpha: 0.5)
+                                    : Colors.black26),
                           width: 1.5,
                         ),
                       ),
@@ -403,18 +424,19 @@ class _RecitePageState extends State<RecitePage> {
                             _filterMode == ReciteFilter.all
                                 ? 'الكل'
                                 : (_filterMode == ReciteFilter.learned
-                                    ? 'من المحفوظ'
-                                    : 'غير المحفوظ'),
-                            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                              color: _filterMode != ReciteFilter.all
-                                  ? kLightsColor
-                                  : (settings.isDarkMode
-                                      ? kLightBackground
-                                      : Colors.black54),
-                              fontWeight: _filterMode != ReciteFilter.all
-                                  ? FontWeight.w600
-                                  : FontWeight.w500,
-                            ),
+                                      ? 'من المحفوظ'
+                                      : 'غير المحفوظ'),
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: _filterMode != ReciteFilter.all
+                                      ? Theme.of(context).primaryColor
+                                      : (settings.isDarkMode
+                                            ? kLightBackground
+                                            : Colors.black54),
+                                  fontWeight: _filterMode != ReciteFilter.all
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                ),
                           ),
                         ],
                       ),
@@ -476,7 +498,9 @@ class _RecitePageState extends State<RecitePage> {
                                   'لم يتم اختيار ثمن بعد',
                                   style: Theme.of(context).textTheme.bodyLarge!
                                       .copyWith(
-                                        color: settings.textColor.withAlpha(128),
+                                        color: settings.textColor.withAlpha(
+                                          128,
+                                        ),
                                         height: settings.lineSpacing,
                                       ),
                                 ),
@@ -542,13 +566,18 @@ class _RecitePageState extends State<RecitePage> {
                         Expanded(
                           child: Container(
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [kLightsColor, kLightsColor],
+                              gradient: LinearGradient(
+                                colors: [
+                                  Theme.of(context).primaryColor,
+                                  Theme.of(context).primaryColor,
+                                ],
                               ),
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: kLightsColor.withAlpha(77),
+                                  color: Theme.of(
+                                    context,
+                                  ).primaryColor.withAlpha(77),
                                   blurRadius: 3, // 0.3 opacity
                                   //offset: const Offset(0, 2),
                                 ),
@@ -574,8 +603,8 @@ class _RecitePageState extends State<RecitePage> {
                                     _filterMode == ReciteFilter.all
                                         ? 'اختيار ثمن عشوائي'
                                         : (_filterMode == ReciteFilter.learned
-                                            ? 'اختيار من المحفوظات'
-                                            : 'اختيار من غير المحفوظ'),
+                                              ? 'اختيار من المحفوظات'
+                                              : 'اختيار من غير المحفوظ'),
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineSmall!
@@ -599,7 +628,7 @@ class _RecitePageState extends State<RecitePage> {
                                       _revisedThomuns.contains(
                                         _currentThomunIndex,
                                       )
-                                  ? kLightsColor.withAlpha(50)
+                                  ? Theme.of(context).primaryColor.withAlpha(50)
                                   : Colors.grey.withAlpha(50),
                               border: Border.all(
                                 color:
@@ -607,7 +636,7 @@ class _RecitePageState extends State<RecitePage> {
                                         _revisedThomuns.contains(
                                           _currentThomunIndex,
                                         )
-                                    ? kLightsColor
+                                    ? Theme.of(context).primaryColor
                                     : Colors.grey,
                                 //width: 2,
                               ),
@@ -637,7 +666,7 @@ class _RecitePageState extends State<RecitePage> {
                                       _revisedThomuns.contains(
                                         _currentThomunIndex,
                                       )
-                                  ? kLightsColor
+                                  ? Theme.of(context).primaryColor
                                   : Colors.grey,
                               size: 35,
                             ),
@@ -668,8 +697,10 @@ class _RecitePageState extends State<RecitePage> {
 
     if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
       try {
-        baseStyle =
-            GoogleFonts.getFont(settings.fontFamily, textStyle: baseStyle);
+        baseStyle = GoogleFonts.getFont(
+          settings.fontFamily,
+          textStyle: baseStyle,
+        );
       } catch (e) {
         baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
       }
@@ -686,21 +717,18 @@ class _RecitePageState extends State<RecitePage> {
             TextSpan(text: '$prefix الثمن '),
             TextSpan(
               text: '(${parts[1]})',
-              style: const TextStyle(color: kPrimaryTeal),
+              style: TextStyle(color: Theme.of(context).primaryColor),
             ),
             const TextSpan(text: ' الحزب '),
             TextSpan(
               text: '(${parts[0]})',
-              style: const TextStyle(color: kPrimaryTeal),
+              style: TextStyle(color: Theme.of(context).primaryColor),
             ),
           ],
         ),
       );
     } else {
-      mainTitle = Text(
-        filename,
-        style: baseStyle,
-      );
+      mainTitle = Text(filename, style: baseStyle);
     }
 
     return mainTitle;

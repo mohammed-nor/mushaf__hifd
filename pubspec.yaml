@@ -47,6 +47,7 @@ dependencies:
   package_info_plus: ^9.0.1
   wakelock_plus: ^1.5.1
   google_fonts: ^8.0.2
+  share_plus: ^11.0.0
 
 dev_dependencies:
   flutter_test:

@@ -74,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen>
               children: [
                 // Islamic geometric pattern background (subtle)
                 Positioned.fill(
-                  child: CustomPaint(painter: IslamicPatternPainter()),
+                  child: CustomPaint(painter: IslamicPatternPainter(Theme.of(context).primaryColor)),
                 ),
                 // Main content
                 Column(
@@ -95,21 +95,23 @@ class _SplashScreenState extends State<SplashScreen>
                                     children: [
                                       // Outer glow circle
                                       Container(
-                                        width: ResponsiveUtils.getResponsiveWidth(
-                                          context,
-                                          0.4,
-                                        ),
-                                        height: ResponsiveUtils.getResponsiveWidth(
-                                          context,
-                                          0.4,
-                                        ),
+                                        width:
+                                            ResponsiveUtils.getResponsiveWidth(
+                                              context,
+                                              0.4,
+                                            ),
+                                        height:
+                                            ResponsiveUtils.getResponsiveWidth(
+                                              context,
+                                              0.4,
+                                            ),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: kLightsColor.withValues(
-                                                alpha: 0.3,
-                                              ),
+                                              color: Theme.of(context)
+                                                  .primaryColor
+                                                  .withValues(alpha: 0.3),
                                               blurRadius: 40,
                                               spreadRadius: 10,
                                             ),
@@ -118,40 +120,48 @@ class _SplashScreenState extends State<SplashScreen>
                                       ),
                                       // Islamic decorative circle
                                       Container(
-                                        width: ResponsiveUtils.getResponsiveWidth(
-                                          context,
-                                          0.36,
-                                        ),
-                                        height: ResponsiveUtils.getResponsiveWidth(
-                                          context,
-                                          0.36,
-                                        ),
+                                        width:
+                                            ResponsiveUtils.getResponsiveWidth(
+                                              context,
+                                              0.36,
+                                            ),
+                                        height:
+                                            ResponsiveUtils.getResponsiveWidth(
+                                              context,
+                                              0.36,
+                                            ),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           border: Border.all(
-                                            color: kLightsColor,
+                                            color: Theme.of(
+                                              context,
+                                            ).primaryColor,
                                             width: 2,
                                           ),
                                           gradient: LinearGradient(
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
                                             colors: [
-                                              kLightsColor.withValues(alpha: 0.2),
-                                              kLightsColor.withValues(alpha: 0.2),
+                                              Theme.of(context).primaryColor
+                                                  .withValues(alpha: 0.2),
+                                              Theme.of(context).primaryColor
+                                                  .withValues(alpha: 0.2),
                                             ],
                                           ),
                                         ),
                                       ),
                                       // Central icon (Quran/Islamic symbol)
                                       Container(
-                                        width: ResponsiveUtils.getResponsiveWidth(
-                                          context,
-                                          0.28,
-                                        ),
-                                        height: ResponsiveUtils.getResponsiveWidth(
-                                          context,
-                                          0.28,
-                                        ),
+                                        width:
+                                            ResponsiveUtils.getResponsiveWidth(
+                                              context,
+                                              0.28,
+                                            ),
+                                        height:
+                                            ResponsiveUtils.getResponsiveWidth(
+                                              context,
+                                              0.28,
+                                            ),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           color: const Color(
@@ -180,7 +190,7 @@ class _SplashScreenState extends State<SplashScreen>
                                         top: 0,
                                         child: CustomPaint(
                                           size: const Size(30, 30),
-                                          painter: IslamicStarPainter(),
+                                          painter: IslamicStarPainter(Theme.of(context).primaryColor),
                                         ),
                                       ),
                                     ],
@@ -222,12 +232,16 @@ class _SplashScreenState extends State<SplashScreen>
                                           Theme.of(
                                             context,
                                           ).textTheme.headlineMedium?.copyWith(
-                                            color: settings.textColor.withAlpha(180),
+                                            color: settings.textColor.withAlpha(
+                                              180,
+                                            ),
                                             fontWeight: FontWeight.normal,
                                             letterSpacing: 1,
                                           ) ??
                                           TextStyle(
-                                            color: settings.textColor.withAlpha(180),
+                                            color: settings.textColor.withAlpha(
+                                              180,
+                                            ),
                                             fontSize: 32,
                                             fontWeight: FontWeight.bold,
                                             letterSpacing: 1,
@@ -235,10 +249,11 @@ class _SplashScreenState extends State<SplashScreen>
                                       textAlign: TextAlign.center,
                                     ),
                                     SizedBox(
-                                      height: ResponsiveUtils.getResponsiveHeight(
-                                        context,
-                                        0.035,
-                                      ),
+                                      height:
+                                          ResponsiveUtils.getResponsiveHeight(
+                                            context,
+                                            0.035,
+                                          ),
                                     ),
                                     Container(
                                       width: ResponsiveUtils.getResponsiveWidth(
@@ -247,8 +262,11 @@ class _SplashScreenState extends State<SplashScreen>
                                       ),
                                       height: 1,
                                       decoration: BoxDecoration(
-                                        gradient: const LinearGradient(
-                                          colors: [kLightsColor, kLightsColor],
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Theme.of(context).primaryColor,
+                                            Theme.of(context).primaryColor,
+                                          ],
                                         ),
                                         borderRadius: BorderRadius.circular(1),
                                       ),
@@ -275,11 +293,11 @@ class _SplashScreenState extends State<SplashScreen>
                                         Theme.of(
                                           context,
                                         ).textTheme.bodyLarge?.copyWith(
-                                          color: kLightsColor,
+                                          color: Theme.of(context).primaryColor,
                                           letterSpacing: 1,
                                         ) ??
-                                        const TextStyle(
-                                          color: kLightsColor,
+                                        TextStyle(
+                                          color: Theme.of(context).primaryColor,
                                           fontSize: 20,
                                           letterSpacing: 1,
                                         ),
@@ -306,7 +324,9 @@ class _SplashScreenState extends State<SplashScreen>
                         color: Colors.black.withValues(alpha: 0.1),
                         border: Border(
                           top: BorderSide(
-                            color: kLightsColor.withValues(alpha: 0.1),
+                            color: Theme.of(
+                              context,
+                            ).primaryColor.withValues(alpha: 0.1),
                             width: 1,
                           ),
                         ),
@@ -339,10 +359,14 @@ class _SplashScreenState extends State<SplashScreen>
 
 /// Custom painter for Islamic geometric pattern
 class IslamicPatternPainter extends CustomPainter {
+  final Color primaryColor;
+
+  IslamicPatternPainter(this.primaryColor);
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = kLightsColor.withValues(alpha: 0.03)
+      ..color = primaryColor.withValues(alpha: 0.03)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
@@ -369,10 +393,14 @@ class IslamicPatternPainter extends CustomPainter {
 
 /// Custom painter for Islamic star
 class IslamicStarPainter extends CustomPainter {
+  final Color primaryColor;
+
+  IslamicStarPainter(this.primaryColor);
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = kLightsColor
+      ..color = primaryColor
       ..style = PaintingStyle.fill;
 
     final center = Offset(size.width / 2, size.height / 2);

@@ -51,27 +51,36 @@ class _MainHomePageState extends State<MainHomePage> {
               elevation: 0,
               shadowColor: Colors.black.withValues(alpha: 0),
               surfaceTintColor: settings.isDarkMode
-                  ? kPrimaryTeal.withValues(alpha: 0.1)
+                  ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
                   : kDarkTeal.withValues(alpha: 0),
               indicatorColor: settings.isDarkMode
-                  ? kPrimaryTeal.withValues(alpha: 0.2)
+                  ? Theme.of(context).primaryColor.withValues(alpha: 0.2)
                   : kDarkTeal.withValues(alpha: 0.2),
               selectedIndex: _selectedIndex,
               onDestinationSelected: _onItemTapped,
-              destinations: const [
+              destinations: [
                 NavigationDestination(
-                  icon: Icon(Icons.mic_outlined),
-                  selectedIcon: Icon(Icons.mic, color: kPrimaryTeal),
+                  icon: const Icon(Icons.mic_outlined),
+                  selectedIcon: Icon(
+                    Icons.mic,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   label: 'الإستظهار',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.text_snippet_outlined),
-                  selectedIcon: Icon(Icons.text_snippet, color: kPrimaryTeal),
+                  icon: const Icon(Icons.text_snippet_outlined),
+                  selectedIcon: Icon(
+                    Icons.text_snippet,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   label: 'الحفظ و التلاوة',
                 ),
                 NavigationDestination(
-                  icon: Icon(Icons.settings_outlined),
-                  selectedIcon: Icon(Icons.settings, color: kPrimaryTeal),
+                  icon: const Icon(Icons.settings_outlined),
+                  selectedIcon: Icon(
+                    Icons.settings,
+                    color: Theme.of(context).primaryColor,
+                  ),
                   label: 'الإعدادات',
                 ),
               ],

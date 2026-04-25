@@ -136,8 +136,9 @@ class _LearnPageState extends State<LearnPage> {
                               child: Hero(
                                 tag: 'thomun_image_$index',
                                 child: Image.asset(
-                                  'lib/thomuns/${kThomunsTxt[index]}',
+                                  'lib/thomuns/${kThomunsTxt[index].file}',
                                   fit: BoxFit.contain,
+
                                   width: double.infinity,
                                   height: double.infinity,
                                 ),
@@ -233,7 +234,8 @@ class _LearnPageState extends State<LearnPage> {
   }
 
   Widget _buildRichTitle(int index, ThemeSettings settings) {
-    final filename = kThomunsTxt[index].replaceAll('.txt', '');
+    final entry = kThomunsTxt[index];
+    final filename = entry.file.replaceAll('.txt', '');
     final parts = filename.split('-');
 
     TextStyle baseStyle = TextStyle(
@@ -242,21 +244,34 @@ class _LearnPageState extends State<LearnPage> {
       fontSize: 18,
     );
 
+    TextStyle surahStyle = TextStyle(
+      color: settings.textColor.withAlpha(180),
+      fontWeight: FontWeight.w400,
+      fontSize: 14,
+    );
+
     if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
       try {
         baseStyle = GoogleFonts.getFont(
           settings.fontFamily,
           textStyle: baseStyle,
         );
+        surahStyle = GoogleFonts.getFont(
+          settings.fontFamily,
+          textStyle: surahStyle,
+        );
       } catch (e) {
         baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+        surahStyle = surahStyle.copyWith(fontFamily: settings.fontFamily);
       }
     } else {
       baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+      surahStyle = surahStyle.copyWith(fontFamily: settings.fontFamily);
     }
 
+    Widget titleContent;
     if (parts.length == 2) {
-      return RichText(
+      titleContent = RichText(
         text: TextSpan(
           style: baseStyle,
           children: [
@@ -273,7 +288,17 @@ class _LearnPageState extends State<LearnPage> {
           ],
         ),
       );
+    } else {
+      titleContent = Text(filename, style: baseStyle);
     }
-    return Text(filename, style: baseStyle);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        titleContent,
+        Text(entry.surah, style: surahStyle),
+      ],
+    );
   }
 }
+

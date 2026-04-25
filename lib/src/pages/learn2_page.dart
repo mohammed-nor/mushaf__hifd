@@ -6,6 +6,8 @@ import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'package:mushaf_hifd/src/services/notification_service.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mushaf_hifd/src/pages/thumon_search_delegate.dart';
+
 
 /// A companion to [LearnPage] that displays the text versions of the
 /// thomuns instead of the image assets.  The UI and persistence logic is
@@ -162,8 +164,26 @@ class _Learn2PageState extends State<Learn2Page> {
     super.dispose();
   }
 
+  void _showSearch(BuildContext context, ThemeSettings settings) async {
+    final result = await showSearch<int?>(
+      context: context,
+      delegate: ThumonSearchDelegate(
+        settings: settings,
+        filenames: kThomunsTxt,
+      ),
+    );
+
+    if (result != null && mounted) {
+      setState(() {
+        _currentIndex = result;
+      });
+      _pageController.jumpToPage(_currentIndex);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
     return ValueListenableBuilder<ThemeSettings>(
       valueListenable: themeSettingsNotifier,
       builder: (context, settings, _) {
@@ -180,9 +200,15 @@ class _Learn2PageState extends State<Learn2Page> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.search, color: settings.primaryColor),
+                onPressed: () => _showSearch(context, settings),
+                tooltip: 'بحث في الأثمان',
+              ),
               title: _buildRichTitle(_currentIndex, settings),
               centerTitle: true,
               actions: [
+
                 IconButton(
                   icon: Icon(Icons.bookmark_add, color: settings.primaryColor),
                   onPressed: _saveCurrentPage,
@@ -207,7 +233,7 @@ class _Learn2PageState extends State<Learn2Page> {
                           padding: const EdgeInsets.all(4.0),
                           child: FutureBuilder<String>(
                             future: rootBundle.loadString(
-                              'lib/thomuns_txt/${kThomunsTxt[index]}',
+                              'lib/thomuns_txt/${kThomunsTxt[index].file}',
                             ),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
@@ -404,7 +430,8 @@ class _Learn2PageState extends State<Learn2Page> {
   }
 
   Widget _buildRichTitle(int index, ThemeSettings settings) {
-    final filename = kThomunsTxt[index].replaceAll('.txt', '');
+    final entry = kThomunsTxt[index];
+    final filename = entry.file.replaceAll('.txt', '');
     final parts = filename.split('-');
 
     TextStyle baseStyle = TextStyle(
@@ -413,21 +440,34 @@ class _Learn2PageState extends State<Learn2Page> {
       fontSize: 18,
     );
 
+    TextStyle surahStyle = TextStyle(
+      color: settings.textColor.withAlpha(180),
+      fontWeight: FontWeight.w400,
+      fontSize: 14,
+    );
+
     if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
       try {
         baseStyle = GoogleFonts.getFont(
           settings.fontFamily,
           textStyle: baseStyle,
         );
+        surahStyle = GoogleFonts.getFont(
+          settings.fontFamily,
+          textStyle: surahStyle,
+        );
       } catch (e) {
         baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+        surahStyle = surahStyle.copyWith(fontFamily: settings.fontFamily);
       }
     } else {
       baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+      surahStyle = surahStyle.copyWith(fontFamily: settings.fontFamily);
     }
 
+    Widget titleContent;
     if (parts.length == 2) {
-      return RichText(
+      titleContent = RichText(
         text: TextSpan(
           style: baseStyle,
           children: [
@@ -444,7 +484,17 @@ class _Learn2PageState extends State<Learn2Page> {
           ],
         ),
       );
+    } else {
+      titleContent = Text(filename, style: baseStyle);
     }
-    return Text(filename, style: baseStyle);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        titleContent,
+        Text(entry.surah, style: surahStyle),
+      ],
+    );
   }
 }
+

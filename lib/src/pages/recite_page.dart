@@ -99,8 +99,9 @@ class _RecitePageState extends State<RecitePage> {
       if (_currentThomunIndex != null) {
         try {
           final text = await rootBundle.loadString(
-            'lib/thomuns_txt/${kThomunsTxt[_currentThomunIndex!]}',
+            'lib/thomuns_txt/${kThomunsTxt[_currentThomunIndex!].file}',
           );
+
           if (mounted) {
             setState(() {
               _thomunText = text;
@@ -171,8 +172,9 @@ class _RecitePageState extends State<RecitePage> {
     // Load the text content
     try {
       final text = await rootBundle.loadString(
-        'lib/thomuns_txt/${kThomunsTxt[selectedIndex]}',
+        'lib/thomuns_txt/${kThomunsTxt[selectedIndex].file}',
       );
+
       if (mounted) {
         setState(() {
           _currentThomunIndex = selectedIndex;
@@ -311,8 +313,9 @@ class _RecitePageState extends State<RecitePage> {
   Future<String> _getThomunStartText(int index) async {
     try {
       final text = await rootBundle.loadString(
-        'lib/thomuns_txt/${kThomunsTxt[index]}',
+        'lib/thomuns_txt/${kThomunsTxt[index].file}',
       );
+
       // Get first 50 characters or until first line break
       final lines = text.split('\n');
       final firstLine = lines.first.trim();
@@ -686,7 +689,8 @@ class _RecitePageState extends State<RecitePage> {
   }
 
   Widget _buildRichTitle(int index, ThemeSettings settings, String prefix) {
-    final filename = kThomunsTxt[index].replaceAll('.txt', '');
+    final entry = kThomunsTxt[index];
+    final filename = entry.file.replaceAll('.txt', '');
     final parts = filename.split('-');
 
     TextStyle baseStyle = TextStyle(
@@ -695,17 +699,29 @@ class _RecitePageState extends State<RecitePage> {
       fontSize: 16,
     );
 
+    TextStyle surahStyle = TextStyle(
+      color: settings.textColor.withAlpha(180),
+      fontWeight: FontWeight.w400,
+      fontSize: 13,
+    );
+
     if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
       try {
         baseStyle = GoogleFonts.getFont(
           settings.fontFamily,
           textStyle: baseStyle,
         );
+        surahStyle = GoogleFonts.getFont(
+          settings.fontFamily,
+          textStyle: surahStyle,
+        );
       } catch (e) {
         baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+        surahStyle = surahStyle.copyWith(fontFamily: settings.fontFamily);
       }
     } else {
       baseStyle = baseStyle.copyWith(fontFamily: settings.fontFamily);
+      surahStyle = surahStyle.copyWith(fontFamily: settings.fontFamily);
     }
 
     Widget mainTitle;
@@ -731,6 +747,13 @@ class _RecitePageState extends State<RecitePage> {
       mainTitle = Text(filename, style: baseStyle);
     }
 
-    return mainTitle;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        mainTitle,
+        Text(entry.surah, style: surahStyle),
+      ],
+    );
   }
 }
+

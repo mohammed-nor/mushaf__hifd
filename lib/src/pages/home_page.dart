@@ -50,12 +50,8 @@ class _MainHomePageState extends State<MainHomePage> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               shadowColor: Colors.black.withValues(alpha: 0),
-              surfaceTintColor: settings.isDarkMode
-                  ? Theme.of(context).primaryColor.withValues(alpha: 0.1)
-                  : kDarkTeal.withValues(alpha: 0),
-              indicatorColor: settings.isDarkMode
-                  ? Theme.of(context).primaryColor.withValues(alpha: 0.2)
-                  : kDarkTeal.withValues(alpha: 0.2),
+              surfaceTintColor: settings.primaryColor.withValues(alpha: 0.1),
+              indicatorColor: settings.primaryColor.withValues(alpha: 0.2),
               selectedIndex: _selectedIndex,
               onDestinationSelected: _onItemTapped,
               destinations: [
@@ -63,7 +59,7 @@ class _MainHomePageState extends State<MainHomePage> {
                   icon: const Icon(Icons.mic_outlined),
                   selectedIcon: Icon(
                     Icons.mic,
-                    color: Theme.of(context).primaryColor,
+                    color: settings.primaryColor,
                   ),
                   label: 'الإستظهار',
                 ),
@@ -71,7 +67,7 @@ class _MainHomePageState extends State<MainHomePage> {
                   icon: const Icon(Icons.text_snippet_outlined),
                   selectedIcon: Icon(
                     Icons.text_snippet,
-                    color: Theme.of(context).primaryColor,
+                    color: settings.primaryColor,
                   ),
                   label: 'الحفظ و التلاوة',
                 ),
@@ -79,7 +75,7 @@ class _MainHomePageState extends State<MainHomePage> {
                   icon: const Icon(Icons.settings_outlined),
                   selectedIcon: Icon(
                     Icons.settings,
-                    color: Theme.of(context).primaryColor,
+                    color: settings.primaryColor,
                   ),
                   label: 'الإعدادات',
                 ),

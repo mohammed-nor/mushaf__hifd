@@ -346,23 +346,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ],
                       ),
                     ),
-                    // ── Background colour picker ─────────────────────────
-                    _buildBgThemePicker(context, settings),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveHeight(
-                        context,
-                        0.02,
-                      ),
-                    ),
-                    // ── Accent colour picker ─────────────────────────
-                    _buildAccentColorPicker(context, settings),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveHeight(
-                        context,
-                        0.02,
-                      ),
-                    ),
-                    _buildTextColorPicker(context, settings),
+                    _buildUnifiedColorPicker(context, settings),
                     SizedBox(
                       height: ResponsiveUtils.getResponsiveHeight(
                         context,
@@ -570,6 +554,36 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  Widget _buildUnifiedColorPicker(
+    BuildContext context,
+    ThemeSettings settings,
+  ) {
+    return _buildSettingCard(
+      settings: settings,
+      child: Column(
+        children: [
+          _buildBgThemePicker(context, settings),
+          Divider(
+            color: settings.isDarkMode
+                ? kLightBackground.withAlpha(20)
+                : Colors.black12,
+            indent: 12,
+            endIndent: 12,
+          ),
+          _buildAccentColorPicker(context, settings),
+          Divider(
+            color: settings.isDarkMode
+                ? kLightBackground.withAlpha(20)
+                : Colors.black12,
+            indent: 12,
+            endIndent: 12,
+          ),
+          _buildTextColorPicker(context, settings),
+        ],
+      ),
+    );
+  }
+
   Widget _buildBgThemePicker(BuildContext context, ThemeSettings settings) {
     final darkThemes = kBgThemes.where((t) => t.isDark).toList();
     final lightThemes = kBgThemes.where((t) => !t.isDark).toList();
@@ -616,27 +630,25 @@ class _SettingsPageState extends State<SettingsPage> {
       );
     }
 
-    return _buildSettingCard(
-      settings: settings,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.palette, color: settings.primaryColor, size: 22),
-                const SizedBox(width: 10),
-                Text(
-                  'لون الخلفية',
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: settings.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // ── Dark mode swatches ──────────────────────────────────────
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.palette, color: settings.primaryColor, size: 22),
+              const SizedBox(width: 10),
+              Text(
+                'لون الخلفية',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium!.copyWith(color: settings.primaryColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (settings.isDarkMode) ...[
             Text(
               'الوضع الداكن',
               style: Theme.of(context).textTheme.labelMedium!.copyWith(
@@ -664,8 +676,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 14),
-            // ── Light mode swatches ─────────────────────────────────────
+          ] else ...[
             Text(
               'الوضع الفاتح',
               style: Theme.of(context).textTheme.labelMedium!.copyWith(
@@ -694,7 +705,7 @@ class _SettingsPageState extends State<SettingsPage> {
               }).toList(),
             ),
           ],
-        ),
+        ],
       ),
     );
   }
@@ -740,35 +751,32 @@ class _SettingsPageState extends State<SettingsPage> {
       );
     }
 
-    return _buildSettingCard(
-      settings: settings,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.color_lens, color: settings.primaryColor, size: 22),
-                const SizedBox(width: 10),
-                Text(
-                  'لون التمييز الأساسي',
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: settings.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            Wrap(
-              spacing: 12,
-              runSpacing: 10,
-              children: kAccentColors
-                  .map((opt) => colorBox(opt, opt.key == currentKey))
-                  .toList(),
-            ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.color_lens, color: settings.primaryColor, size: 22),
+              const SizedBox(width: 10),
+              Text(
+                'لون التمييز الأساسي',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium!.copyWith(color: settings.primaryColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 12,
+            runSpacing: 10,
+            children: kAccentColors
+                .map((opt) => colorBox(opt, opt.key == currentKey))
+                .toList(),
+          ),
+        ],
       ),
     );
   }
@@ -834,26 +842,25 @@ class _SettingsPageState extends State<SettingsPage> {
       );
     }
 
-    return _buildSettingCard(
-      settings: settings,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.text_format, color: settings.primaryColor, size: 22),
-                const SizedBox(width: 10),
-                Text(
-                  'لون النص',
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: settings.primaryColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.text_format, color: settings.primaryColor, size: 22),
+              const SizedBox(width: 10),
+              Text(
+                'لون النص',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium!.copyWith(color: settings.primaryColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          if (settings.isDarkMode) ...[
             Text(
               'ألوان الوضع الداكن',
               style: Theme.of(context).textTheme.labelMedium!.copyWith(
@@ -868,7 +875,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   .map((opt) => colorBox(opt, opt.key == currentDarkKey))
                   .toList(),
             ),
-            const SizedBox(height: 18),
+          ] else ...[
             Text(
               'ألوان الوضع الفاتح',
               style: Theme.of(context).textTheme.labelMedium!.copyWith(
@@ -884,7 +891,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   .toList(),
             ),
           ],
-        ),
+        ],
       ),
     );
   }

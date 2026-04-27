@@ -57,7 +57,7 @@ class _RecitePageState extends State<RecitePage> {
         final s = diff.inSeconds.remainder(60);
 
         String timeStr = '';
-        if (d > 0) timeStr += '${d}ي ';
+        if (d > 0) timeStr += '$dي ';
         if (h > 0 || d > 0) timeStr += '${h.toString().padLeft(2, '0')}:';
         timeStr +=
             '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
@@ -239,7 +239,7 @@ class _RecitePageState extends State<RecitePage> {
         TextSpan(
           text: match.group(0),
           style: baseStyle.copyWith(
-            color: Theme.of(context).primaryColor,
+            color: themeSettingsNotifier.value.primaryColor,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -269,13 +269,13 @@ class _RecitePageState extends State<RecitePage> {
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
         decoration: BoxDecoration(
           color: isRevised
-              ? Theme.of(context).primaryColor.withAlpha(80)
+              ? settings.primaryColor.withAlpha(80)
               : kLightBackground.withAlpha(8),
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
             color: isRevised
-                ? Theme.of(context).primaryColor
-                : Theme.of(context).primaryColor.withAlpha(100),
+                ? settings.primaryColor
+                : settings.primaryColor.withAlpha(100),
             width: isRevised ? 1.5 : 0.5,
           ),
         ),
@@ -285,7 +285,7 @@ class _RecitePageState extends State<RecitePage> {
               label,
               style: TextStyle(
                 fontSize: 8,
-                color: Theme.of(context).primaryColor,
+                color: settings.primaryColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -356,20 +356,16 @@ class _RecitePageState extends State<RecitePage> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).primaryColor.withValues(alpha: 0.1),
+                          color: settings.primaryColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
-                            color: Theme.of(
-                              context,
-                            ).primaryColor.withValues(alpha: 0.3),
+                            color: settings.primaryColor.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Text(
                           _elapsedTime,
                           style: TextStyle(
-                            color: Theme.of(context).primaryColor,
+                            color: settings.primaryColor,
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'monospace',
@@ -406,14 +402,12 @@ class _RecitePageState extends State<RecitePage> {
                       ),
                       decoration: BoxDecoration(
                         color: _filterMode != ReciteFilter.all
-                            ? Theme.of(
-                                context,
-                              ).primaryColor.withValues(alpha: 0.1)
+                            ? settings.primaryColor.withValues(alpha: 0.1)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _filterMode != ReciteFilter.all
-                              ? Theme.of(context).primaryColor
+                              ? settings.primaryColor
                               : (settings.isDarkMode
                                     ? kLightBackground.withValues(alpha: 0.5)
                                     : Colors.black26),
@@ -432,7 +426,7 @@ class _RecitePageState extends State<RecitePage> {
                             style: Theme.of(context).textTheme.labelMedium
                                 ?.copyWith(
                                   color: _filterMode != ReciteFilter.all
-                                      ? Theme.of(context).primaryColor
+                                      ? settings.primaryColor
                                       : (settings.isDarkMode
                                             ? kLightBackground
                                             : Colors.black54),
@@ -571,16 +565,14 @@ class _RecitePageState extends State<RecitePage> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Theme.of(context).primaryColor,
-                                  Theme.of(context).primaryColor,
+                                  settings.primaryColor,
+                                  settings.primaryColor,
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(10),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Theme.of(
-                                    context,
-                                  ).primaryColor.withAlpha(77),
+                                  color: settings.primaryColor.withAlpha(77),
                                   blurRadius: 3, // 0.3 opacity
                                   //offset: const Offset(0, 2),
                                 ),
@@ -669,7 +661,7 @@ class _RecitePageState extends State<RecitePage> {
                                       _revisedThomuns.contains(
                                         _currentThomunIndex,
                                       )
-                                  ? Theme.of(context).primaryColor
+                                  ? settings.primaryColor
                                   : Colors.grey,
                               size: 35,
                             ),
@@ -733,12 +725,12 @@ class _RecitePageState extends State<RecitePage> {
             TextSpan(text: '$prefix الثمن '),
             TextSpan(
               text: '(${parts[1]})',
-              style: TextStyle(color: Theme.of(context).primaryColor),
+              style: TextStyle(color: settings.primaryColor),
             ),
             const TextSpan(text: ' الحزب '),
             TextSpan(
               text: '(${parts[0]})',
-              style: TextStyle(color: Theme.of(context).primaryColor),
+              style: TextStyle(color: settings.primaryColor),
             ),
           ],
         ),

@@ -60,7 +60,7 @@ class _Learn2PageState extends State<Learn2Page> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('تم حفظ الصفحة الحالية بنجاح'),
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: themeSettingsNotifier.value.primaryColor,
           duration: const Duration(seconds: 2),
         ),
       );
@@ -106,7 +106,7 @@ class _Learn2PageState extends State<Learn2Page> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('تم جدولة تذكير المراجعة 📬'),
-            backgroundColor: Theme.of(context).primaryColor,
+            backgroundColor: themeSettingsNotifier.value.primaryColor,
             duration: const Duration(seconds: 2),
           ),
         );
@@ -138,7 +138,7 @@ class _Learn2PageState extends State<Learn2Page> {
         TextSpan(
           text: match.group(0),
           style: baseStyle.copyWith(
-            color: Theme.of(context).primaryColor,
+            color: themeSettingsNotifier.value.primaryColor,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -304,7 +304,7 @@ class _Learn2PageState extends State<Learn2Page> {
                                   : Colors.grey.withAlpha(0),
                               border: Border.all(
                                 color: _learnedThomuns.contains(_currentIndex)
-                                    ? Theme.of(context).primaryColor
+                                    ? settings.primaryColor
                                     : Colors.grey,
                               ),
                               borderRadius: BorderRadius.circular(12),

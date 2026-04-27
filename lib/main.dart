@@ -78,6 +78,8 @@ class MyApp extends StatelessWidget {
     return ThemeData(
       brightness: Brightness.dark,
       fontFamily: settings.fontFamily,
+      primaryColor: settings.primaryColor,
+      useMaterial3: true,
       colorScheme: ColorScheme.dark(
         primary: settings.primaryColor,
         secondary: kSecondaryTeal,
@@ -204,6 +206,7 @@ class MyApp extends StatelessWidget {
     return ThemeData(
       brightness: Brightness.light,
       fontFamily: settings.fontFamily,
+      primaryColor: settings.primaryColor,
       colorScheme: ColorScheme.light(
         primary: settings.primaryColor,
         secondary: kTertiaryTeal,

@@ -8,7 +8,6 @@ import 'package:mushaf_hifd/src/services/notification_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mushaf_hifd/src/pages/thumon_search_delegate.dart';
 
-
 /// A companion to [LearnPage] that displays the text versions of the
 /// thomuns instead of the image assets.  The UI and persistence logic is
 /// intentionally almost identical so the two screens behave the same for the
@@ -183,7 +182,6 @@ class _Learn2PageState extends State<Learn2Page> {
 
   @override
   Widget build(BuildContext context) {
-
     return ValueListenableBuilder<ThemeSettings>(
       valueListenable: themeSettingsNotifier,
       builder: (context, settings, _) {
@@ -208,7 +206,6 @@ class _Learn2PageState extends State<Learn2Page> {
               title: _buildRichTitle(_currentIndex, settings),
               centerTitle: true,
               actions: [
-
                 IconButton(
                   icon: Icon(Icons.bookmark_add, color: settings.primaryColor),
                   onPressed: _saveCurrentPage,
@@ -497,4 +494,3 @@ class _Learn2PageState extends State<Learn2Page> {
     );
   }
 }
-

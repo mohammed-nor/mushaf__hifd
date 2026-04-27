@@ -10,11 +10,7 @@ class ThumonSearchDelegate extends SearchDelegate<int?> {
   Map<int, String>? _textCache;
   List<_ThumonSearchResult>? _allData;
 
-
-  ThumonSearchDelegate({
-    required this.settings,
-    required this.filenames,
-  });
+  ThumonSearchDelegate({required this.settings, required this.filenames});
 
   @override
   String get searchFieldLabel => 'بحث في الأثمان...';
@@ -65,12 +61,16 @@ class ThumonSearchDelegate extends SearchDelegate<int?> {
 
     final data = <_ThumonSearchResult>[];
     for (int i = 0; i < filenames.length; i++) {
-      final text = await rootBundle.loadString('lib/thomuns_txt/${filenames[i].file}');
-      data.add(_ThumonSearchResult(
-        index: i,
-        filename: filenames[i].file,
-        originalText: text,
-      ));
+      final text = await rootBundle.loadString(
+        'lib/thomuns_txt/${filenames[i].file}',
+      );
+      data.add(
+        _ThumonSearchResult(
+          index: i,
+          filename: filenames[i].file,
+          originalText: text,
+        ),
+      );
     }
 
     _allData = data;
@@ -136,10 +136,14 @@ class ThumonSearchDelegate extends SearchDelegate<int?> {
     );
   }
 
-  Widget _buildResultTile(BuildContext context, _ThumonSearchResult result, String normalizedQuery) {
+  Widget _buildResultTile(
+    BuildContext context,
+    _ThumonSearchResult result,
+    String normalizedQuery,
+  ) {
     final filename = result.filename.replaceAll('.txt', '');
     final parts = filename.split('-');
-    
+
     // Find snippet
     final matchIndex = result.normalizedText.indexOf(normalizedQuery);
     String snippet = '';
@@ -153,33 +157,40 @@ class ThumonSearchDelegate extends SearchDelegate<int?> {
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      color: settings.isDarkMode ? Colors.white.withAlpha(10) : Colors.black.withAlpha(5),
+      color: settings.isDarkMode
+          ? Colors.white.withAlpha(10)
+          : Colors.black.withAlpha(5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'الحزب ${parts[0]} - الثمن ${parts[1]}',
-              style: TextStyle(
-                color: settings.primaryColor,
-                fontWeight: FontWeight.bold,
+        title: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'الحزب ${parts[0]} - الثمن ${parts[1]}',
+                style: TextStyle(
+                  color: settings.primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            snippet,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: settings.textColor.withAlpha(200),
-              fontFamily: settings.fontFamily,
-              fontSize: 14,
+        subtitle: Center(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              snippet,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: settings.textColor.withAlpha(200),
+                fontFamily: settings.fontFamily,
+                fontSize: 14,
+              ),
+              textAlign: TextAlign.right,
             ),
-            textAlign: TextAlign.right,
           ),
         ),
         onTap: () {
@@ -193,30 +204,37 @@ class ThumonSearchDelegate extends SearchDelegate<int?> {
     final normalizedOriginal = _normalizeArabic(originalText);
     final normalizedQuery = _normalizeArabic(query);
     final matchIndex = normalizedOriginal.indexOf(normalizedQuery);
-    
-    if (matchIndex == -1) return originalText.length > 100 ? originalText.substring(0, 100) + '...' : originalText;
+
+    if (matchIndex == -1)
+      return originalText.length > 120
+          ? originalText.substring(0, 120) + '...'
+          : originalText;
 
     // We try to find a window in original that corresponds to the match
     // This is an approximation
     int start = (matchIndex - 40).clamp(0, normalizedOriginal.length);
-    int end = (matchIndex + normalizedQuery.length + 40).clamp(0, normalizedOriginal.length);
-    
+    int end = (matchIndex + normalizedQuery.length + 40).clamp(
+      0,
+      normalizedOriginal.length,
+    );
+
     // Since original has more chars (diacritics), we need to expand the window
     // A safe factor is 2x
     int origStart = (matchIndex * 1.5).toInt() - 60;
     int origEnd = ((matchIndex + normalizedQuery.length) * 2.5).toInt() + 60;
-    
+
     // Better way: iterate through original and count non-diacritic chars
     int currentNormCount = 0;
     int finalStart = 0;
     int finalEnd = originalText.length;
     bool startFound = false;
-    
+
     final diacritics = RegExp(r'[\u064B-\u0652\u0671\u0670]');
-    
+
     for (int i = 0; i < originalText.length; i++) {
       if (!originalText[i].contains(diacritics)) {
-        if (!startFound && currentNormCount >= (matchIndex - 20).clamp(0, matchIndex)) {
+        if (!startFound &&
+            currentNormCount >= (matchIndex - 20).clamp(0, matchIndex)) {
           finalStart = i;
           startFound = true;
         }
@@ -236,7 +254,10 @@ class ThumonSearchDelegate extends SearchDelegate<int?> {
 
   String _normalizeArabic(String text) {
     return text
-        .replaceAll(RegExp(r'[\u064B-\u0652\u0671\u0670]'), '') // Remove tashkeel, wasla, dagger alif
+        .replaceAll(
+          RegExp(r'[\u064B-\u0652\u0671\u0670]'),
+          '',
+        ) // Remove tashkeel, wasla, dagger alif
         .replaceAll('ٱ', 'ا')
         .replaceAll('إ', 'ا')
         .replaceAll('أ', 'ا')

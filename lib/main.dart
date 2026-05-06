@@ -9,7 +9,12 @@ import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'src/utils/responsive.dart';
+import 'src/services/progress_service.dart';
 import 'dart:io';
+
+// Global key for navigation
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +38,9 @@ void main() async {
       appPath: Platform.resolvedExecutable,
     );
   }
+
+  // Load progress data globally
+  await progressService.load();
 
   // load persisted theme settings before the app starts so the
   // first frame uses the correct font/size.
@@ -74,7 +82,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  ThemeData _buildDarkTheme(ThemeSettings settings) {
+  ThemeData _buildDarkTheme(BuildContext context, ThemeSettings settings) {
     return ThemeData(
       brightness: Brightness.dark,
       fontFamily: settings.fontFamily,
@@ -92,11 +100,11 @@ class MyApp extends StatelessWidget {
         surfaceTintColor: Colors.transparent,
         titleTextStyle: _getGoogleFontOrLocal(
           settings.fontFamily,
-          const TextStyle(
+          TextStyle(
             fontWeight: FontWeight.w600,
             letterSpacing: 1.2,
             color: kLightBackground,
-            fontSize: 20,
+            fontSize: ResponsiveUtils.sp(context, 20) * settings.fontScale,
           ),
         ),
         iconTheme: const IconThemeData(color: kLightBackground),
@@ -112,67 +120,71 @@ class MyApp extends StatelessWidget {
         elevation: 8,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
-      textTheme: _buildTextTheme(settings, kLightBackground),
+      textTheme: _buildTextTheme(context, settings, kLightBackground),
       scaffoldBackgroundColor: Colors.transparent,
     );
   }
 
-  TextTheme _buildTextTheme(ThemeSettings settings, Color textColor) {
+  TextTheme _buildTextTheme(
+    BuildContext context,
+    ThemeSettings settings,
+    Color textColor,
+  ) {
     final baseTextTheme = TextTheme(
       bodyLarge: TextStyle(
-        fontSize: 16 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 16) * settings.fontScale,
         color: textColor,
       ),
       bodyMedium: TextStyle(
-        fontSize: 14 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 14) * settings.fontScale,
         color: textColor,
       ),
       bodySmall: TextStyle(
-        fontSize: 12 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 12) * settings.fontScale,
         color: textColor,
       ),
       headlineLarge: TextStyle(
-        fontSize: 30 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 30) * settings.fontScale,
         color: textColor,
         fontWeight: FontWeight.bold,
       ),
       headlineMedium: TextStyle(
-        fontSize: 27 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 27) * settings.fontScale,
         color: textColor,
         fontWeight: FontWeight.bold,
       ),
       headlineSmall: TextStyle(
-        fontSize: 24 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 24) * settings.fontScale,
         color: textColor,
         fontWeight: FontWeight.bold,
       ),
       titleLarge: TextStyle(
-        fontSize: 20 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 20) * settings.fontScale,
         color: textColor,
         fontWeight: FontWeight.bold,
       ),
       titleMedium: TextStyle(
-        fontSize: 17 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 17) * settings.fontScale,
         color: textColor,
         fontWeight: FontWeight.bold,
       ),
       titleSmall: TextStyle(
-        fontSize: 14 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 14) * settings.fontScale,
         color: textColor,
         fontWeight: FontWeight.bold,
       ),
       labelLarge: TextStyle(
-        fontSize: 14 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 14) * settings.fontScale,
         color: textColor,
         fontWeight: FontWeight.bold,
       ),
       labelMedium: TextStyle(
-        fontSize: 12 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 12) * settings.fontScale,
         color: textColor,
         fontWeight: FontWeight.bold,
       ),
       labelSmall: TextStyle(
-        fontSize: 11 * (settings.fontSize / 18.0),
+        fontSize: ResponsiveUtils.sp(context, 11) * settings.fontScale,
         color: textColor,
         fontWeight: FontWeight.bold,
       ),
@@ -202,7 +214,7 @@ class MyApp extends StatelessWidget {
     }
   }
 
-  ThemeData _buildLightTheme(ThemeSettings settings) {
+  ThemeData _buildLightTheme(BuildContext context, ThemeSettings settings) {
     return ThemeData(
       brightness: Brightness.light,
       fontFamily: settings.fontFamily,
@@ -224,7 +236,7 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.w600,
             letterSpacing: 1.2,
             color: kDarkTeal,
-            fontSize: 20,
+            fontSize: ResponsiveUtils.sp(context, 20) * settings.fontScale,
           ),
         ),
         iconTheme: const IconThemeData(color: kDarkTeal),
@@ -235,7 +247,7 @@ class MyApp extends StatelessWidget {
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
-      textTheme: _buildTextTheme(settings, Colors.black87),
+      textTheme: _buildTextTheme(context, settings, Colors.black87),
       scaffoldBackgroundColor: kLightBackground,
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -254,10 +266,11 @@ class MyApp extends StatelessWidget {
       valueListenable: themeSettingsNotifier,
       builder: (context, settings, _) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           title: 'حفظ القرآن',
           theme: settings.isDarkMode
-              ? _buildDarkTheme(settings)
-              : _buildLightTheme(settings),
+              ? _buildDarkTheme(context, settings)
+              : _buildLightTheme(context, settings),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

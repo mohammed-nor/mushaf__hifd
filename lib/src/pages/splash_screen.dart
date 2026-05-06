@@ -220,7 +220,7 @@ class _SplashScreenState extends State<SplashScreen>
                                           ) ??
                                           TextStyle(
                                             color: settings.textColor,
-                                            fontSize: 32,
+                                            fontSize: ResponsiveUtils.sp(context, 32) * settings.fontScale,
                                             fontWeight: FontWeight.bold,
                                             letterSpacing: 1,
                                           ),
@@ -242,7 +242,7 @@ class _SplashScreenState extends State<SplashScreen>
                                             color: settings.textColor.withAlpha(
                                               180,
                                             ),
-                                            fontSize: 32,
+                                            fontSize: ResponsiveUtils.sp(context, 32) * settings.fontScale,
                                             fontWeight: FontWeight.bold,
                                             letterSpacing: 1,
                                           ),
@@ -296,11 +296,11 @@ class _SplashScreenState extends State<SplashScreen>
                                           color: Theme.of(context).primaryColor,
                                           letterSpacing: 1,
                                         ) ??
-                                        TextStyle(
-                                          color: Theme.of(context).primaryColor,
-                                          fontSize: 20,
-                                          letterSpacing: 1,
-                                        ),
+                                          TextStyle(
+                                            color: Theme.of(context).primaryColor,
+                                            fontSize: ResponsiveUtils.sp(context, 20) * settings.fontScale,
+                                            letterSpacing: 1,
+                                          ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -339,7 +339,7 @@ class _SplashScreenState extends State<SplashScreen>
                             'جميع الحقوق محفوظة للمطور  © 2026',
                             style: TextStyle(
                               color: settings.textColor.withAlpha(150),
-                              fontSize: 12,
+                              fontSize: ResponsiveUtils.sp(context, 12) * settings.fontScale,
                             ),
                             textDirection: TextDirection.rtl,
                           ),

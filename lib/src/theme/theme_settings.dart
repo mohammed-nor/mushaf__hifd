@@ -232,7 +232,11 @@ const List<AccentColorOption> kAccentColors = [
   AccentColorOption(key: 'teal', label: 'تيل', color: Color(0xFF1ABC9C)),
   AccentColorOption(key: 'blue', label: 'أزرق', color: Color(0xFF2196F3)),
   AccentColorOption(key: 'purple', label: 'بنفسجي', color: Color(0xFF9C27B0)),
-  AccentColorOption(key: 'orange', label: 'برتقالي', color: Color(0xFFFF9800)),
+  AccentColorOption(
+    key: 'orange',
+    label: 'برتقالي',
+    color: Color.fromARGB(255, 255, 94, 0),
+  ),
   AccentColorOption(key: 'red', label: 'أحمر', color: Color(0xFFF44336)),
   AccentColorOption(key: 'green', label: 'أخضر', color: Color(0xFF4CAF50)),
 ];
@@ -318,6 +322,8 @@ class ThemeSettings {
   }
 
   Color get primaryColor => accentColorForKey(accentColor).color;
+
+  double get fontScale => fontSize / 18.0;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -373,10 +379,7 @@ Future<void> updateThemeMode(bool isDarkMode) async {
   themeSettingsNotifier.value = current.copyWith(isDarkMode: isDarkMode);
 }
 
-Future<void> updateBgTheme({
-  String? darkBgTheme,
-  String? lightBgTheme,
-}) async {
+Future<void> updateBgTheme({String? darkBgTheme, String? lightBgTheme}) async {
   final prefs = await SharedPreferences.getInstance();
   if (darkBgTheme != null) {
     await prefs.setString('dark_bg_theme', darkBgTheme);

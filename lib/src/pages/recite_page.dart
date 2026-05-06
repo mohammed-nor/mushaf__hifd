@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mushaf_hifd/src/services/progress_service.dart';
 import 'package:mushaf_hifd/src/constants.dart';
+import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-enum ReciteFilter { all, learned, notLearned }
+enum ReciteFilter { all, learned, notLearned, sequentialNotLearned }
 
 class RecitePage extends StatefulWidget {
   const RecitePage({super.key});
@@ -23,9 +25,6 @@ class _RecitePageState extends State<RecitePage> {
 
   /// Filter mode for picking random thomuns
   ReciteFilter _filterMode = ReciteFilter.all;
-
-  /// Track thomuns marked as revised
-  Set<int> _revisedThomuns = {};
 
   /// Time when the current thomun was selected
   DateTime? _selectionTime;
@@ -75,7 +74,6 @@ class _RecitePageState extends State<RecitePage> {
     final prefs = await SharedPreferences.getInstance();
     final savedIndex = prefs.getInt('current_random_thomun_index');
     final filterIndex = prefs.getInt('recite_filter_mode') ?? 0;
-    final revisedList = prefs.getStringList('revised_thomuns_txt') ?? [];
     final selectionTimeMillis = prefs.getInt(
       'current_thomun_selection_time_millis',
     );
@@ -84,7 +82,6 @@ class _RecitePageState extends State<RecitePage> {
       setState(() {
         _currentThomunIndex = savedIndex;
         _filterMode = ReciteFilter.values[filterIndex];
-        _revisedThomuns = revisedList.map((e) => int.tryParse(e) ?? 0).toSet();
         if (selectionTimeMillis != null) {
           _selectionTime = DateTime.fromMillisecondsSinceEpoch(
             selectionTimeMillis,
@@ -121,18 +118,20 @@ class _RecitePageState extends State<RecitePage> {
   Future<void> _toggleRevisedStatus() async {
     if (_currentThomunIndex == null) return;
 
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      if (_revisedThomuns.contains(_currentThomunIndex)) {
-        _revisedThomuns.remove(_currentThomunIndex);
-      } else {
-        _revisedThomuns.add(_currentThomunIndex!);
-      }
-    });
-    await prefs.setStringList(
-      'revised_thomuns_txt',
-      _revisedThomuns.map((e) => e.toString()).toList(),
+    final isLearned = progressService.learnedThomuns.contains(
+      _currentThomunIndex!,
     );
+    final isRevised = progressService.revisedThomuns.contains(
+      _currentThomunIndex!,
+    );
+
+    if (isLearned && isRevised) {
+      await progressService.toggleLearned(_currentThomunIndex!);
+      await progressService.toggleRevised(_currentThomunIndex!);
+    } else {
+      if (!isLearned) await progressService.toggleLearned(_currentThomunIndex!);
+      if (!isRevised) await progressService.toggleRevised(_currentThomunIndex!);
+    }
   }
 
   Future<void> _saveSavedState() async {
@@ -144,13 +143,7 @@ class _RecitePageState extends State<RecitePage> {
     List<int> pool = List<int>.generate(kThomunsTxt.length, (i) => i);
 
     if (_filterMode != ReciteFilter.all) {
-      final prefs = await SharedPreferences.getInstance();
-      final learnedList = prefs.getStringList('learned_thomuns_txt') ?? [];
-      final learnedIndices = learnedList
-          .map(int.tryParse)
-          .whereType<int>()
-          .where((i) => i >= 0 && i < kThomunsTxt.length)
-          .toSet();
+      final learnedIndices = progressService.learnedThomuns;
 
       if (_filterMode == ReciteFilter.learned) {
         if (learnedIndices.isNotEmpty) {
@@ -166,8 +159,23 @@ class _RecitePageState extends State<RecitePage> {
       }
     }
 
-    int randomIndex = _random.nextInt(pool.length);
-    int selectedIndex = pool[randomIndex];
+    int selectedIndex;
+
+    if (_filterMode == ReciteFilter.sequentialNotLearned) {
+      final learnedIndices = progressService.learnedThomuns;
+
+      final notLearned = pool
+          .where((i) => !learnedIndices.contains(i))
+          .toList();
+      if (notLearned.isEmpty) {
+        selectedIndex = pool[_random.nextInt(pool.length)];
+      } else {
+        selectedIndex = notLearned.first;
+      }
+    } else {
+      int randomIndex = _random.nextInt(pool.length);
+      selectedIndex = pool[randomIndex];
+    }
 
     // Load the text content
     try {
@@ -284,7 +292,7 @@ class _RecitePageState extends State<RecitePage> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 8,
+                fontSize: ResponsiveUtils.sp(context, 8) * settings.fontScale,
                 color: settings.primaryColor,
                 fontWeight: FontWeight.w500,
               ),
@@ -296,7 +304,8 @@ class _RecitePageState extends State<RecitePage> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 8.5,
+                  fontSize:
+                      ResponsiveUtils.sp(context, 8.5) * settings.fontScale,
                   color: settings.isDarkMode
                       ? kLightBackground
                       : Colors.black54,
@@ -346,6 +355,7 @@ class _RecitePageState extends State<RecitePage> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
+              //toolbarHeight: 70,
               leading: _selectionTime == null
                   ? null
                   : Center(
@@ -366,7 +376,9 @@ class _RecitePageState extends State<RecitePage> {
                           _elapsedTime,
                           style: TextStyle(
                             color: settings.primaryColor,
-                            fontSize: 11,
+                            fontSize:
+                                ResponsiveUtils.sp(context, 11) *
+                                settings.fontScale,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'monospace',
                           ),
@@ -377,7 +389,12 @@ class _RecitePageState extends State<RecitePage> {
               title: _currentThomunIndex == null
                   ? Text(
                       'إمتحن حفظك',
-                      style: TextStyle(color: settings.textColor),
+                      style: TextStyle(
+                        color: settings.textColor,
+                        fontSize:
+                            ResponsiveUtils.sp(context, 16) *
+                            settings.fontScale,
+                      ),
                     )
                   : _buildRichTitle(_currentThomunIndex!, settings, 'تلاوة'),
               centerTitle: true,
@@ -422,7 +439,9 @@ class _RecitePageState extends State<RecitePage> {
                                 ? 'الكل'
                                 : (_filterMode == ReciteFilter.learned
                                       ? 'من المحفوظ'
-                                      : 'غير المحفوظ'),
+                                      : (_filterMode == ReciteFilter.notLearned
+                                            ? 'غير المحفوظ'
+                                            : 'بالتوالي (غير محفوظ)')),
                             style: Theme.of(context).textTheme.labelMedium
                                 ?.copyWith(
                                   color: _filterMode != ReciteFilter.all
@@ -443,180 +462,192 @@ class _RecitePageState extends State<RecitePage> {
               ],
             ),
             body: SafeArea(
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: _currentThomunIndex != null && _thomunText != null
-                        ? Padding(
-                            padding: const EdgeInsets.all(0),
-                            child: Card(
-                              elevation: 8,
-                              //shadowColor: Colors.black.withValues(alpha: 0.3),
-                              color: kLightBackground.withAlpha(0),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                side: BorderSide(
-                                  color: settings.isDarkMode
-                                      ? kLightBackground.withAlpha(20)
-                                      : Colors.black.withAlpha(10),
-                                  width: 2,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(4),
-                                child: SingleChildScrollView(
-                                  child: _buildTextWithGreenBrackets(
-                                    _thomunText!
-                                        .replaceAll('(', '﴿')
-                                        .replaceAll(')', '﴾'),
-                                    Theme.of(
-                                      context,
-                                    ).textTheme.titleLarge!.copyWith(
-                                      color: settings.textColor,
-                                      height: settings.lineSpacing,
-                                      fontWeight: FontWeight.normal,
+              child: ListenableBuilder(
+                listenable: progressService,
+                builder: (context, _) {
+                  return Column(
+                    children: <Widget>[
+                      Expanded(
+                        child:
+                            _currentThomunIndex != null && _thomunText != null
+                            ? Padding(
+                                padding: const EdgeInsets.all(0),
+                                child: Card(
+                                  elevation: 8,
+                                  //shadowColor: Colors.black.withValues(alpha: 0.3),
+                                  color: kLightBackground.withAlpha(0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: BorderSide(
+                                      color: settings.isDarkMode
+                                          ? kLightBackground.withAlpha(20)
+                                          : Colors.black.withAlpha(10),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4),
+                                    child: SingleChildScrollView(
+                                      child: _buildTextWithGreenBrackets(
+                                        _thomunText!
+                                            .replaceAll('(', '﴿')
+                                            .replaceAll(')', '﴾'),
+                                        Theme.of(
+                                          context,
+                                        ).textTheme.titleLarge!.copyWith(
+                                          color: settings.textColor,
+                                          height: settings.lineSpacing,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
+                              )
+                            : Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.auto_stories,
+                                      size: 80,
+                                      color: settings.textColor.withAlpha(26),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'لم يتم اختيار ثمن بعد',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyLarge!
+                                          .copyWith(
+                                            color: settings.textColor.withAlpha(
+                                              128,
+                                            ),
+                                            height: settings.lineSpacing,
+                                          ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                          )
-                        : Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.auto_stories,
-                                  size: 80,
-                                  color: settings.textColor.withAlpha(26),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'لم يتم اختيار ثمن بعد',
-                                  style: Theme.of(context).textTheme.bodyLarge!
-                                      .copyWith(
-                                        color: settings.textColor.withAlpha(
-                                          128,
-                                        ),
-                                        height: settings.lineSpacing,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                  ),
-                  if (_currentThomunIndex != null)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 3,
                       ),
-                      child: Row(
-                        children: [
-                          if (_currentThomunIndex! > 0)
-                            FutureBuilder<String>(
-                              future: _getThomunStartText(
-                                _currentThomunIndex! - 1,
-                              ),
-                              builder: (context, snapshot) {
-                                return _buildThomunHintContainer(
-                                  snapshot.data ?? '',
-                                  'السابق',
-                                  settings,
-                                  isRevised: _revisedThomuns.contains(
+                      if (_currentThomunIndex != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
+                          child: Row(
+                            children: [
+                              if (_currentThomunIndex! > 0)
+                                FutureBuilder<String>(
+                                  future: _getThomunStartText(
                                     _currentThomunIndex! - 1,
                                   ),
-                                );
-                              },
-                            ),
-                          if (_currentThomunIndex! > 0 &&
-                              _currentThomunIndex! < kThomunsTxt.length - 1)
-                            const SizedBox(width: 4),
-                          if (_currentThomunIndex! < kThomunsTxt.length - 1)
-                            FutureBuilder<String>(
-                              future: _getThomunStartText(
-                                _currentThomunIndex! + 1,
-                              ),
-                              builder: (context, snapshot) {
-                                return _buildThomunHintContainer(
-                                  snapshot.data ?? '',
-                                  'التالي',
-                                  settings,
-                                  isRevised: _revisedThomuns.contains(
+                                  builder: (context, snapshot) {
+                                    return _buildThomunHintContainer(
+                                      snapshot.data ?? '',
+                                      'السابق',
+                                      settings,
+                                      isRevised: progressService.revisedThomuns
+                                          .contains(_currentThomunIndex! - 1),
+                                    );
+                                  },
+                                ),
+                              if (_currentThomunIndex! > 0 &&
+                                  _currentThomunIndex! < kThomunsTxt.length - 1)
+                                const SizedBox(width: 4),
+                              if (_currentThomunIndex! < kThomunsTxt.length - 1)
+                                FutureBuilder<String>(
+                                  future: _getThomunStartText(
                                     _currentThomunIndex! + 1,
                                   ),
-                                );
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 6,
-                      right: 6,
-                      bottom: 6,
-                      top: 4,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  settings.primaryColor,
-                                  settings.primaryColor,
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: settings.primaryColor.withAlpha(77),
-                                  blurRadius: 3, // 0.3 opacity
-                                  //offset: const Offset(0, 2),
+                                  builder: (context, snapshot) {
+                                    return _buildThomunHintContainer(
+                                      snapshot.data ?? '',
+                                      'التالي',
+                                      settings,
+                                      isRevised: progressService.revisedThomuns
+                                          .contains(_currentThomunIndex! + 1),
+                                    );
+                                  },
                                 ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: _generateRandomThomun,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 2,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(1),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    _filterMode == ReciteFilter.all
-                                        ? 'اختيار ثمن عشوائي'
-                                        : (_filterMode == ReciteFilter.learned
-                                              ? 'اختيار من المحفوظات'
-                                              : 'اختيار من غير المحفوظ'),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall!
-                                        .copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: kDarkBackgroundVariant,
-                                          height: settings.lineSpacing,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            ],
                           ),
                         ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 6,
+                          right: 6,
+                          bottom: 6,
+                          top: 4,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      settings.primaryColor,
+                                      settings.primaryColor,
+                                    ],
+                                  ),
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: settings.primaryColor.withAlpha(
+                                        77,
+                                      ),
+                                      blurRadius: 3, // 0.3 opacity
+                                      //offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: _generateRandomThomun,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 2,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(1),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        _filterMode == ReciteFilter.all
+                                            ? 'اختيار ثمن عشوائي'
+                                            : (_filterMode ==
+                                                      ReciteFilter.learned
+                                                  ? 'اختيار من المحفوظات'
+                                                  : (_filterMode ==
+                                                            ReciteFilter
+                                                                .notLearned
+                                                        ? 'اختيار من غير المحفوظ'
+                                                        : 'الأول غير المحفوظ')),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headlineSmall!
+                                            .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: kDarkBackgroundVariant,
+                                              height: settings.lineSpacing,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
 
-                        Center(
-                          child: /*Container(
+                            Center(
+                              child: /*Container(
                             decoration: BoxDecoration(
                               color:
                                   _currentThomunIndex != null &&
@@ -628,7 +659,7 @@ class _RecitePageState extends State<RecitePage> {
                               border: Border.all(
                                 color:
                                     _currentThomunIndex != null &&
-                                        _revisedThomuns.contains(
+                                        progressService.revisedThomuns.contains(
                                           _currentThomunIndex,
                                         )
                                     ? Theme.of(context).primaryColor
@@ -638,40 +669,44 @@ class _RecitePageState extends State<RecitePage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: */ ElevatedButton(
-                            onPressed: _currentThomunIndex != null
-                                ? _toggleRevisedStatus
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
+                                onPressed: _currentThomunIndex != null
+                                    ? _toggleRevisedStatus
+                                    : null,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
 
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Icon(
+                                  _currentThomunIndex != null &&
+                                          progressService.learnedThomuns
+                                              .contains(_currentThomunIndex) &&
+                                          progressService.revisedThomuns
+                                              .contains(_currentThomunIndex)
+                                      ? Icons.check_circle
+                                      : Icons.circle_outlined,
+                                  color:
+                                      _currentThomunIndex != null &&
+                                          progressService.learnedThomuns
+                                              .contains(_currentThomunIndex) &&
+                                          progressService.revisedThomuns
+                                              .contains(_currentThomunIndex)
+                                      ? settings.primaryColor
+                                      : Colors.grey,
+                                  size: 35,
+                                ),
                               ),
                             ),
-                            child: Icon(
-                              _currentThomunIndex != null &&
-                                      _revisedThomuns.contains(
-                                        _currentThomunIndex,
-                                      )
-                                  ? Icons.check_circle
-                                  : Icons.circle_outlined,
-                              color:
-                                  _currentThomunIndex != null &&
-                                      _revisedThomuns.contains(
-                                        _currentThomunIndex,
-                                      )
-                                  ? settings.primaryColor
-                                  : Colors.grey,
-                              size: 35,
-                            ),
-                          ),
+                            /* ), */
+                          ],
                         ),
-                        /* ), */
-                      ],
-                    ),
-                  ),
-                ],
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -688,13 +723,13 @@ class _RecitePageState extends State<RecitePage> {
     TextStyle baseStyle = TextStyle(
       color: settings.textColor,
       fontWeight: FontWeight.w600,
-      fontSize: 16,
+      fontSize: ResponsiveUtils.sp(context, 15) * settings.fontScale,
     );
 
     TextStyle surahStyle = TextStyle(
       color: settings.textColor.withAlpha(180),
       fontWeight: FontWeight.w400,
-      fontSize: 13,
+      fontSize: ResponsiveUtils.sp(context, 12) * settings.fontScale,
     );
 
     if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
@@ -739,13 +774,15 @@ class _RecitePageState extends State<RecitePage> {
       mainTitle = Text(filename, style: baseStyle);
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        mainTitle,
-        Text(entry.surah, style: surahStyle),
-      ],
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          mainTitle,
+          Text(entry.surah, style: surahStyle),
+        ],
+      ),
     );
   }
 }
-

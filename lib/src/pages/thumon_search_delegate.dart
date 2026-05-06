@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mushaf_hifd/src/constants.dart';
+import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -187,7 +188,7 @@ class ThumonSearchDelegate extends SearchDelegate<int?> {
               style: TextStyle(
                 color: settings.textColor.withAlpha(200),
                 fontFamily: settings.fontFamily,
-                fontSize: 14,
+                fontSize: ResponsiveUtils.sp(context, 14) * settings.fontScale,
               ),
               textAlign: TextAlign.right,
             ),
@@ -254,16 +255,11 @@ class ThumonSearchDelegate extends SearchDelegate<int?> {
 
   String _normalizeArabic(String text) {
     return text
-        .replaceAll(
-          RegExp(r'[\u064B-\u0652\u0671\u0670]'),
-          '',
-        ) // Remove tashkeel, wasla, dagger alif
-        .replaceAll('ٱ', 'ا')
-        .replaceAll('إ', 'ا')
-        .replaceAll('أ', 'ا')
-        .replaceAll('آ', 'ا')
+        .replaceAll(RegExp(r'[إأآٱ]'), 'ا')
+        .replaceAll(RegExp(r'[\u064B-\u0652\u0670\u06D6-\u06ED]'), '')
         .replaceAll('ى', 'ي')
-        .replaceAll('ة', 'ه');
+        .replaceAll('ة', 'ه')
+        .replaceAll('ـ', '');
   }
 }
 
@@ -281,12 +277,10 @@ class _ThumonSearchResult {
 
   static String _normalize(String text) {
     return text
-        .replaceAll(RegExp(r'[\u064B-\u0652\u0671\u0670]'), '')
-        .replaceAll('ٱ', 'ا')
-        .replaceAll('إ', 'ا')
-        .replaceAll('أ', 'ا')
-        .replaceAll('آ', 'ا')
+        .replaceAll(RegExp(r'[إأآٱ]'), 'ا')
+        .replaceAll(RegExp(r'[\u064B-\u0652\u0670\u06D6-\u06ED]'), '')
         .replaceAll('ى', 'ي')
-        .replaceAll('ة', 'ه');
+        .replaceAll('ة', 'ه')
+        .replaceAll('ـ', '');
   }
 }

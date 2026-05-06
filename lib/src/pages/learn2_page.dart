@@ -5,6 +5,7 @@ import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'package:mushaf_hifd/src/services/notification_service.dart';
+import 'package:mushaf_hifd/src/services/progress_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mushaf_hifd/src/pages/thumon_search_delegate.dart';
 
@@ -13,7 +14,8 @@ import 'package:mushaf_hifd/src/pages/thumon_search_delegate.dart';
 /// intentionally almost identical so the two screens behave the same for the
 /// user; the primary difference is how the content is loaded.
 class Learn2Page extends StatefulWidget {
-  const Learn2Page({super.key});
+  final int? initialIndex;
+  const Learn2Page({super.key, this.initialIndex});
 
   @override
   State<Learn2Page> createState() => _Learn2PageState();
@@ -22,12 +24,11 @@ class Learn2Page extends StatefulWidget {
 class _Learn2PageState extends State<Learn2Page> {
   int _currentIndex = 0;
   late PageController _pageController;
-  Set<int> _learnedThomuns = {};
-  Set<int> _revisedThomuns = {};
 
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialIndex ?? 0;
     _pageController = PageController(initialPage: _currentIndex);
     _loadSavedData();
   }
@@ -35,14 +36,12 @@ class _Learn2PageState extends State<Learn2Page> {
   Future<void> _loadSavedData() async {
     final prefs = await SharedPreferences.getInstance();
     final savedIndex = prefs.getInt('current_thomun_txt_index') ?? 0;
-    final learnedList = prefs.getStringList('learned_thomuns_txt') ?? [];
-    final revisedList = prefs.getStringList('revised_thomuns_txt') ?? [];
 
     if (mounted) {
       setState(() {
-        _currentIndex = savedIndex;
-        _learnedThomuns = learnedList.map((e) => int.tryParse(e) ?? 0).toSet();
-        _revisedThomuns = revisedList.map((e) => int.tryParse(e) ?? 0).toSet();
+        if (widget.initialIndex == null) {
+          _currentIndex = savedIndex;
+        }
       });
       if (_pageController.hasClients) {
         _pageController.jumpToPage(_currentIndex);
@@ -68,39 +67,15 @@ class _Learn2PageState extends State<Learn2Page> {
   }
 
   Future<void> _toggleLearnedStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      if (_learnedThomuns.contains(_currentIndex)) {
-        _learnedThomuns.remove(_currentIndex);
-      } else {
-        _learnedThomuns.add(_currentIndex);
-      }
-    });
-    await prefs.setStringList(
-      'learned_thomuns_txt',
-      _learnedThomuns.map((e) => e.toString()).toList(),
-    );
+    await progressService.toggleLearned(_currentIndex);
   }
 
   Future<void> _toggleRevisedStatus() async {
-    final prefs = await SharedPreferences.getInstance();
     final notificationService = NotificationService.instance;
-
-    setState(() {
-      if (_revisedThomuns.contains(_currentIndex)) {
-        _revisedThomuns.remove(_currentIndex);
-      } else {
-        _revisedThomuns.add(_currentIndex);
-      }
-    });
-
-    await prefs.setStringList(
-      'revised_thomuns_txt',
-      _revisedThomuns.map((e) => e.toString()).toList(),
-    );
+    await progressService.toggleRevised(_currentIndex);
 
     // Schedule or cancel notification based on revision status
-    if (_revisedThomuns.contains(_currentIndex)) {
+    if (progressService.revisedThomuns.contains(_currentIndex)) {
       await notificationService.scheduleRevisionReminder(_currentIndex);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -198,6 +173,7 @@ class _Learn2PageState extends State<Learn2Page> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
+              //toolbarHeight: 70,
               leading: IconButton(
                 icon: Icon(Icons.search, color: settings.primaryColor),
                 onPressed: () => _showSearch(context, settings),
@@ -214,210 +190,232 @@ class _Learn2PageState extends State<Learn2Page> {
               ],
             ),
             body: SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: kThomunsTxt.length,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentIndex = index;
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: FutureBuilder<String>(
-                            future: rootBundle.loadString(
-                              'lib/thomuns_txt/${kThomunsTxt[index].file}',
-                            ),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
-                              if (snapshot.hasError) {
-                                return const Center(
-                                  child: Text('خطأ في تحميل النص'),
-                                );
-                              }
-                              return Card(
-                                elevation: 2,
-                                //shadowColor: Colors.black.withValues(alpha: 0.3),
-                                color: kLightBackground.withAlpha(0),
-                                margin: const EdgeInsets.all(0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                  side: BorderSide(
-                                    color: settings.isDarkMode
-                                        ? kLightBackground.withAlpha(20)
-                                        : Colors.black.withAlpha(10),
-                                    width: 2,
-                                  ),
+              child: ListenableBuilder(
+                listenable: progressService,
+                builder: (context, _) {
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _pageController,
+                          itemCount: kThomunsTxt.length,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(4.0),
+                              child: FutureBuilder<String>(
+                                future: rootBundle.loadString(
+                                  'lib/thomuns_txt/${kThomunsTxt[index].file}',
                                 ),
-
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5),
-                                  child: SingleChildScrollView(
-                                    child: _buildTextWithGreenBrackets(
-                                      (snapshot.data ?? '')
-                                          .replaceAll('(', '﴿')
-                                          .replaceAll(')', '﴾'),
-                                      Theme.of(
-                                        context,
-                                      ).textTheme.titleLarge!.copyWith(
-                                        color: settings.textColor,
-                                        height: settings.lineSpacing,
-                                        fontWeight: FontWeight.normal,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                  if (snapshot.hasError) {
+                                    return const Center(
+                                      child: Text('خطأ في تحميل النص'),
+                                    );
+                                  }
+                                  return Card(
+                                    elevation: 2,
+                                    //shadowColor: Colors.black.withValues(alpha: 0.3),
+                                    color: kLightBackground.withAlpha(0),
+                                    margin: const EdgeInsets.all(0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      side: BorderSide(
+                                        color: settings.isDarkMode
+                                            ? kLightBackground.withAlpha(20)
+                                            : Colors.black.withAlpha(10),
+                                        width: 2,
                                       ),
                                     ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 7.0,
-                      vertical: 2.0,
-                    ),
-                    child: Row(
-                      children: [
-                        InkWell(
-                          onTap: _toggleLearnedStatus,
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: _learnedThomuns.contains(_currentIndex)
-                                  ? settings.primaryColor.withAlpha(10)
-                                  : Colors.grey.withAlpha(0),
-                              border: Border.all(
-                                color: _learnedThomuns.contains(_currentIndex)
-                                    ? settings.primaryColor
-                                    : Colors.grey,
+
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5),
+                                      child: SingleChildScrollView(
+                                        child: _buildTextWithGreenBrackets(
+                                          (snapshot.data ?? '')
+                                              .replaceAll('(', '﴿')
+                                              .replaceAll(')', '﴾'),
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.titleLarge!.copyWith(
+                                            color: settings.textColor,
+                                            height: settings.lineSpacing,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
+                            );
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 2.0,
+                          vertical: 2.0,
+                        ),
+                        child: Row(
+                          children: [
+                            InkWell(
+                              onTap: _toggleLearnedStatus,
                               borderRadius: BorderRadius.circular(12),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color:
+                                      progressService.learnedThomuns.contains(
+                                        _currentIndex,
+                                      )
+                                      ? settings.primaryColor.withAlpha(10)
+                                      : Colors.grey.withAlpha(0),
+                                  border: Border.all(
+                                    color:
+                                        progressService.learnedThomuns.contains(
+                                          _currentIndex,
+                                        )
+                                        ? settings.primaryColor
+                                        : Colors.grey,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  progressService.learnedThomuns.contains(
+                                        _currentIndex,
+                                      )
+                                      ? 'تم الحفظ'
+                                      : 'قيد الحفظ',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .labelMedium!
+                                      .copyWith(
+                                        color:
+                                            progressService.learnedThomuns
+                                                .contains(_currentIndex)
+                                            ? settings.primaryColor
+                                            : (settings.isDarkMode
+                                                  ? kLightBackground
+                                                  : Colors.black54),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                              ),
                             ),
-                            child: Text(
-                              _learnedThomuns.contains(_currentIndex)
-                                  ? 'تم الحفظ'
-                                  : 'قيد الحفظ',
+
+                            SizedBox(
+                              width: ResponsiveUtils.getResponsiveWidth(
+                                context,
+                                0.016,
+                              ),
+                            ),
+                            Text(
+                              '${_currentIndex + 1} / ${kThomunsTxt.length}',
                               style: Theme.of(context).textTheme.labelMedium!
                                   .copyWith(
-                                    color:
-                                        _learnedThomuns.contains(_currentIndex)
-                                        ? settings.primaryColor
-                                        : (settings.isDarkMode
-                                              ? kLightBackground
-                                              : Colors.black54),
                                     fontWeight: FontWeight.bold,
+                                    color: settings.primaryColor,
                                   ),
                             ),
-                          ),
-                        ),
-
-                        SizedBox(
-                          width: ResponsiveUtils.getResponsiveWidth(
-                            context,
-                            0.016,
-                          ),
-                        ),
-                        Text(
-                          '${_currentIndex + 1} / ${kThomunsTxt.length}',
-                          style: Theme.of(context).textTheme.labelMedium!
-                              .copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: settings.primaryColor,
+                            Expanded(
+                              child: Slider(
+                                value: _currentIndex.toDouble(),
+                                min: 0,
+                                max: (kThomunsTxt.length - 1).toDouble(),
+                                activeColor: settings.primaryColor,
+                                inactiveColor: Colors.grey.withAlpha(77),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _currentIndex = value.toInt();
+                                  });
+                                  _pageController.jumpToPage(_currentIndex);
+                                },
                               ),
-                        ),
-                        Expanded(
-                          child: Slider(
-                            value: _currentIndex.toDouble(),
-                            min: 0,
-                            max: (kThomunsTxt.length - 1).toDouble(),
-                            activeColor: settings.primaryColor,
-                            inactiveColor: Colors.grey.withAlpha(77),
-                            onChanged: (value) {
-                              setState(() {
-                                _currentIndex = value.toInt();
-                              });
-                              _pageController.jumpToPage(_currentIndex);
-                            },
-                          ),
-                        ),
-                        SizedBox(
-                          width: ResponsiveUtils.getResponsiveWidth(
-                            context,
-                            0.016,
-                          ),
-                        ),
-                        if (_revisedThomuns.contains(_currentIndex))
-                          InkWell(
-                            onTap: _toggleRevisedStatus,
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
+                            ),
+                            SizedBox(
+                              width: ResponsiveUtils.getResponsiveWidth(
+                                context,
+                                0.016,
                               ),
-                              decoration: BoxDecoration(
-                                color: settings.primaryColor.withAlpha(50),
-                                border: Border.all(
-                                  color: Theme.of(context).primaryColor,
+                            ),
+                            if (progressService.revisedThomuns.contains(
+                              _currentIndex,
+                            ))
+                              InkWell(
+                                onTap: _toggleRevisedStatus,
+                                borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: settings.primaryColor.withAlpha(50),
+                                    border: Border.all(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    'مراجع',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .copyWith(
+                                          color: settings.primaryColor,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
                                 ),
+                              )
+                            else
+                              InkWell(
+                                onTap: _toggleRevisedStatus,
                                 borderRadius: BorderRadius.circular(12),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.withAlpha(0),
+                                    border: Border.all(color: Colors.grey),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    'لم يراجع',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium!
+                                        .copyWith(
+                                          color: settings.isDarkMode
+                                              ? kLightBackground
+                                              : Colors.black54,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                ),
                               ),
-                              child: Text(
-                                'مراجع',
-                                style: Theme.of(context).textTheme.labelMedium!
-                                    .copyWith(
-                                      color: settings.primaryColor,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                            ),
-                          )
-                        else
-                          InkWell(
-                            onTap: _toggleRevisedStatus,
-                            borderRadius: BorderRadius.circular(12),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.withAlpha(0),
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                'لم يراجع',
-                                style: Theme.of(context).textTheme.labelMedium!
-                                    .copyWith(
-                                      color: settings.isDarkMode
-                                          ? kLightBackground
-                                          : Colors.black54,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
@@ -434,13 +432,13 @@ class _Learn2PageState extends State<Learn2Page> {
     TextStyle baseStyle = TextStyle(
       color: settings.textColor,
       fontWeight: FontWeight.w600,
-      fontSize: 18,
+      fontSize: ResponsiveUtils.sp(context, 14) * settings.fontScale,
     );
 
     TextStyle surahStyle = TextStyle(
       color: settings.textColor.withAlpha(180),
       fontWeight: FontWeight.w400,
-      fontSize: 14,
+      fontSize: ResponsiveUtils.sp(context, 12) * settings.fontScale,
     );
 
     if (GoogleFonts.asMap().containsKey(settings.fontFamily)) {
@@ -485,12 +483,15 @@ class _Learn2PageState extends State<Learn2Page> {
       titleContent = Text(filename, style: baseStyle);
     }
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        titleContent,
-        Text(entry.surah, style: surahStyle),
-      ],
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          titleContent,
+          Text(entry.surah, style: surahStyle),
+        ],
+      ),
     );
   }
 }

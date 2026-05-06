@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // Android / mobile imports — only used on non-Windows platforms
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -11,6 +11,8 @@ import 'package:permission_handler/permission_handler.dart';
 // Windows desktop import
 import 'package:local_notifier/local_notifier.dart';
 import 'package:mushaf_hifd/src/constants.dart';
+import 'package:mushaf_hifd/main.dart'; // For navigatorKey
+import 'package:mushaf_hifd/src/pages/learn2_page.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Singleton accessor
@@ -22,7 +24,7 @@ late NotificationService _notificationService;
 const int _slotsPerDay = 8;
 const int _intervalHours = 3;
 
-class NotificationService {
+class NotificationService extends LocalNotificationListener {
   // ── Android plugin — lazy, created only when needed ───────────────────────
   FlutterLocalNotificationsPlugin? _androidPlugin;
   static const int _baseNotifId = 9000;
@@ -31,7 +33,7 @@ class NotificationService {
   final List<String> _encouragingPhrases = [
     "واصل مسيرك في حفظ كتاب الله! 🌟",
     "المراجعة هي سر الحفظ المتين، لا تهملها! 📖",
-    "خطوة بخطوة نحو الختم، استعن بالله وإحتسب بكل خرف نقرأه حسنة و مل حرف تحفظه درجة في الجنة. ❤️",
+    "خطوة بخطوة نحو الختم، استعن بالله وإحتسب بكل حرف تقرأه حسنة و مل حرف تحفظه درجة في الجنة. ❤️",
     "وقت الحفظ هو أعظم أوقات يومك، اغتنمه. ⌛",
   ];
 
@@ -66,6 +68,22 @@ class NotificationService {
       appName: 'مصحف الحفظ',
       shortcutPolicy: ShortcutPolicy.requireCreate,
     );
+
+    localNotifier.addListener(this);
+  }
+
+  @override
+  void onClick(LocalNotification notification) {
+    if (notification.identifier != null) {
+      final int? index = int.tryParse(notification.identifier!);
+      if (index != null) {
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder: (context) => Learn2Page(initialIndex: index),
+          ),
+        );
+      }
+    }
   }
 
   // ── Android ──────────────────────────────────────────────────────────────
@@ -110,7 +128,16 @@ class NotificationService {
     await _androidPlugin!.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse details) {
-        debugPrint('Notification clicked: ${details.id}');
+        if (details.payload != null) {
+          final int? index = int.tryParse(details.payload!);
+          if (index != null) {
+            navigatorKey.currentState?.push(
+              MaterialPageRoute(
+                builder: (context) => Learn2Page(initialIndex: index),
+              ),
+            );
+          }
+        }
       },
     );
 
@@ -142,6 +169,7 @@ class NotificationService {
     required String body,
     required int hour,
     required int minute,
+    String? payload,
   }) async {
     _windowsTimers[id]?.cancel();
 
@@ -154,7 +182,7 @@ class NotificationService {
 
     _windowsTimers[id] = Timer(delay, () async {
       await _showWindowsToast(
-        identifier: 'reminder_$id',
+        identifier: payload ?? 'reminder_$id',
         title: title,
         body: body,
       );
@@ -165,6 +193,7 @@ class NotificationService {
         body: body,
         hour: hour,
         minute: minute,
+        payload: payload,
       );
     });
   }
@@ -200,10 +229,17 @@ class NotificationService {
     required String body,
     required int hour,
     required int minute,
+    String? payload,
   }) async {
     if (_androidPlugin == null) return;
 
-    const AndroidNotificationDetails androidDetails =
+    final bigTextStyle = BigTextStyleInformation(
+      body,
+      contentTitle: title,
+      summaryText: 'اسحب لرؤية الثمن كاملاً',
+    );
+
+    final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
           'hifd_reminder_channel',
           'تذكيرات الحفظ والمراجعة',
@@ -212,9 +248,17 @@ class NotificationService {
           priority: Priority.high,
           playSound: true,
           enableVibration: true,
+          styleInformation: bigTextStyle,
+          actions: <AndroidNotificationAction>[
+            const AndroidNotificationAction(
+              'show_more',
+              'عرض الثمن في المصحف',
+              showsUserInterface: true,
+            ),
+          ],
         );
 
-    const NotificationDetails notificationDetails = NotificationDetails(
+    final NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
     );
 
@@ -238,9 +282,10 @@ class NotificationService {
       await _androidPlugin!.zonedSchedule(
         id,
         title,
-        body,
+        body.length > 100 ? '${body.substring(0, 100)}...' : body,
         scheduledDate,
         notificationDetails,
+        payload: payload,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
@@ -324,6 +369,7 @@ class NotificationService {
             body: body,
             hour: slotHour,
             minute: startMinute,
+            payload: selectedIndices[slot].toString(),
           );
         } else {
           await _scheduleAndroidSlot(
@@ -332,6 +378,7 @@ class NotificationService {
             body: body,
             hour: slotHour,
             minute: startMinute,
+            payload: selectedIndices[slot].toString(),
           );
         }
       }
@@ -347,6 +394,7 @@ class NotificationService {
             hour: slotHour,
             body: body,
             title: title,
+            payload: learningIndex.toString(),
           );
         } else {
           await _scheduleAndroidSlot(
@@ -355,6 +403,7 @@ class NotificationService {
             hour: slotHour,
             body: body,
             title: title,
+            payload: learningIndex.toString(),
           );
         }
       }
@@ -364,13 +413,10 @@ class NotificationService {
   Future<String> _getThomunSnippet(int index) async {
     try {
       final text = await rootBundle.loadString(
-        'lib/thomuns_txt/${kThomunsTxt[index]}',
+        'lib/thomuns_txt/${kThomunsTxt[index].file}',
       );
-      final lines = text.split('\n');
-      final firstLine = lines.first.trim();
-      return firstLine.length > 80
-          ? '${firstLine.substring(0, 80)}...'
-          : firstLine;
+      // Formatting for better readability in notification
+      return text.replaceAll('(', '﴿').replaceAll(')', '﴾').trim();
     } catch (_) {
       return 'ثمن للمراجعة...';
     }

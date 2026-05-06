@@ -35,4 +35,22 @@ class ResponsiveUtils {
   static bool isLandscape(BuildContext context) {
     return MediaQuery.of(context).orientation == Orientation.landscape;
   }
+  /// Get responsive font size based on screen width
+  /// This helps keep text proportional across different devices
+  static double getFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    
+    // Use 400.0 as a baseline width for standard phones
+    // On tablet or desktop, we don't want it to grow indefinitely
+    double scaleFactor = screenWidth / 400.0;
+    
+    // Clamp the scale factor to reasonable bounds
+    if (scaleFactor > 1.4) scaleFactor = 1.4;
+    if (scaleFactor < 0.85) scaleFactor = 0.85;
+    
+    return baseSize * scaleFactor;
+  }
+
+  /// Shorthand for getFontSize
+  static double sp(BuildContext context, double size) => getFontSize(context, size);
 }

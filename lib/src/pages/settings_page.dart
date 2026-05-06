@@ -7,6 +7,7 @@ import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'package:mushaf_hifd/src/services/notification_service.dart';
+import 'package:mushaf_hifd/src/services/progress_service.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -16,8 +17,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  Set<int> _learnedThomuns = {};
-  Set<int> _revisedThomuns = {};
   String _reminderTime = '09:00';
 
   @override
@@ -28,14 +27,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _loadProgressData() async {
     final prefs = await SharedPreferences.getInstance();
-    final learnedList = prefs.getStringList('learned_thomuns_txt') ?? [];
-    final revisedList = prefs.getStringList('revised_thomuns_txt') ?? [];
     final reminderTime = prefs.getString('revision_reminder_time') ?? '09:00';
 
     if (mounted) {
       setState(() {
-        _learnedThomuns = learnedList.map((e) => int.tryParse(e) ?? 0).toSet();
-        _revisedThomuns = revisedList.map((e) => int.tryParse(e) ?? 0).toSet();
         _reminderTime = reminderTime;
       });
     }
@@ -59,467 +54,473 @@ class _SettingsPageState extends State<SettingsPage> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              title: Text(
-                'الإعدادات',
-                style: TextStyle(
-                  color: settings.textColor,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
+              toolbarHeight: 38,
+              //toolbarHeight: 70,
+              title: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  'الإعدادات',
+                  style: TextStyle(
+                    color: settings.textColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize:
+                        ResponsiveUtils.sp(context, 14) * settings.fontScale,
+                  ),
                 ),
               ),
               centerTitle: true,
             ),
             body: SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(4.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    /* Text(
+              child: ListenableBuilder(
+                listenable: progressService,
+                builder: (context, _) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        /* Text(
                       'تخصيص الخط',
                       style: Theme.of(context).textTheme.headlineSmall!
                           .copyWith(color: settings.primaryColor)),
                     ), */
-                    _buildSettingCard(
-                      settings: settings,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Icon(
-                              Icons.brightness_4,
-                              color: settings.primaryColor,
-                            ),
-                            title: Text(
-                              'المظهر',
-                              style: TextStyle(color: settings.textColor),
-                            ),
-                            trailing: Switch(
-                              value: !settings.isDarkMode,
-                              onChanged: (bool value) {
-                                updateThemeMode(!value);
-                              },
-                              activeTrackColor: settings.primaryColor.withAlpha(
-                                100,
+                        _buildSettingCard(
+                          settings: settings,
+                          child: Column(
+                            children: [
+                              ListTile(
+                                leading: Icon(
+                                  Icons.brightness_4,
+                                  color: settings.primaryColor,
+                                ),
+                                title: Text(
+                                  'المظهر',
+                                  style: TextStyle(color: settings.textColor),
+                                ),
+                                trailing: Switch(
+                                  value: !settings.isDarkMode,
+                                  onChanged: (bool value) {
+                                    updateThemeMode(!value);
+                                  },
+                                  activeTrackColor: settings.primaryColor
+                                      .withAlpha(100),
+                                  activeThumbColor: settings.primaryColor,
+                                  inactiveThumbColor: Colors.grey,
+                                ),
                               ),
-                              activeThumbColor: settings.primaryColor,
-                              inactiveThumbColor: Colors.grey,
-                            ),
-                          ),
-                          if (Platform.isWindows ||
-                              Platform.isLinux ||
-                              Platform.isMacOS) ...[
-                            Divider(
-                              color: settings.isDarkMode
-                                  ? kLightBackground.withAlpha(20)
-                                  : Colors.black12,
-                            ),
-                            ListTile(
-                              leading: Icon(
-                                Icons.rocket_launch,
-                                color: settings.primaryColor,
-                              ),
-                              title: Text(
-                                'التشغيل التلقائي',
-                                style: TextStyle(color: settings.textColor),
-                              ),
-                              subtitle: Text(
-                                'تشغيل التطبيق تلقائياً عند بدء تشغيل الجهاز',
-                                style: TextStyle(
-                                  color: settings.textColor.withValues(
-                                    alpha: 0.6,
+                              if (Platform.isWindows ||
+                                  Platform.isLinux ||
+                                  Platform.isMacOS) ...[
+                                Divider(
+                                  color: settings.isDarkMode
+                                      ? kLightBackground.withAlpha(20)
+                                      : Colors.black12,
+                                ),
+                                ListTile(
+                                  leading: Icon(
+                                    Icons.rocket_launch,
+                                    color: settings.primaryColor,
                                   ),
-                                  fontSize: 12,
+                                  title: Text(
+                                    'التشغيل التلقائي',
+                                    style: TextStyle(color: settings.textColor),
+                                  ),
+                                  subtitle: Text(
+                                    'تشغيل التطبيق تلقائياً عند بدء تشغيل الجهاز',
+                                    style: TextStyle(
+                                      color: settings.textColor.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                      fontSize:
+                                          ResponsiveUtils.sp(context, 12) *
+                                          settings.fontScale,
+                                    ),
+                                  ),
+                                  trailing: Switch(
+                                    value: settings.autostart,
+                                    onChanged: (bool value) {
+                                      updateAutostart(value);
+                                    },
+                                    activeTrackColor: settings.primaryColor
+                                        .withAlpha(100),
+                                    activeThumbColor: settings.primaryColor,
+                                    inactiveThumbColor: Colors.grey,
+                                  ),
+                                ),
+                                Divider(
+                                  color: settings.isDarkMode
+                                      ? kLightBackground.withAlpha(20)
+                                      : Colors.black12,
+                                ),
+                              ],
+                              ListTile(
+                                leading: Icon(
+                                  Icons.light_mode,
+                                  color: settings.primaryColor,
+                                ),
+                                title: Text(
+                                  'إبقاء الشاشة مضاءة',
+                                  style: TextStyle(color: settings.textColor),
+                                ),
+                                subtitle: Text(
+                                  'منع الشاشة من الإغلاق أثناء القراءة',
+                                  style: TextStyle(
+                                    color: settings.textColor.withValues(
+                                      alpha: 0.6,
+                                    ),
+                                    fontSize:
+                                        ResponsiveUtils.sp(context, 12) *
+                                        settings.fontScale,
+                                  ),
+                                ),
+                                trailing: Switch(
+                                  value: settings.keepScreenOn,
+                                  onChanged: (bool value) {
+                                    updateKeepScreenOn(value);
+                                  },
+                                  activeTrackColor: settings.primaryColor
+                                      .withAlpha(100),
+                                  activeThumbColor: settings.primaryColor,
+                                  inactiveThumbColor: Colors.grey,
                                 ),
                               ),
-                              trailing: Switch(
-                                value: settings.autostart,
-                                onChanged: (bool value) {
-                                  updateAutostart(value);
-                                },
-                                activeTrackColor: settings.primaryColor
-                                    .withAlpha(100),
-                                activeThumbColor: settings.primaryColor,
-                                inactiveThumbColor: Colors.grey,
+                              Divider(
+                                color: settings.isDarkMode
+                                    ? kLightBackground.withAlpha(20)
+                                    : Colors.black12,
                               ),
-                            ),
-                            Divider(
-                              color: settings.isDarkMode
-                                  ? kLightBackground.withAlpha(20)
-                                  : Colors.black12,
-                            ),
-                          ],
-                          ListTile(
+                              ListTile(
+                                leading: Icon(
+                                  Icons.font_download,
+                                  color: settings.primaryColor,
+                                ),
+                                title: Text(
+                                  'نوع الخط',
+                                  style: TextStyle(color: settings.textColor),
+                                ),
+                                trailing: DropdownButton<String>(
+                                  value: settings.fontFamily,
+                                  dropdownColor: settings.isDarkMode
+                                      ? kDarkBackground
+                                      : kLightBackground,
+                                  underline: Container(),
+                                  items:
+                                      [
+                                        'System',
+                                        'Amiri',
+                                        'Scheherazade New',
+                                        'Noto Naskh Arabic',
+                                        'Cairo',
+                                        'Almarai',
+                                        'Aref Ruqaa',
+                                        'Markazi Text',
+                                        'Harmattan',
+                                        'Reem Kufi',
+                                        'Mada',
+                                        'Mirza',
+                                        'Lateef',
+                                        'Tajawal',
+                                        'El Messiri',
+                                        'Gulzar',
+                                        'Alkalami',
+                                        'Vazirmatn',
+                                        'Katibeh',
+                                        'Readex Pro',
+                                      ].map((String value) {
+                                        final displayNames = {
+                                          'System': 'خط النظام',
+                                          'Amiri': 'خط الأميري',
+                                          'Scheherazade New':
+                                              'الرسم المغربي الأصيل',
+                                          'Noto Naskh Arabic': 'خط نوتو نسخ',
+                                          'Cairo': 'خط القاهرة',
+                                          'Almarai': 'خط المراعي',
+                                          'Aref Ruqaa': 'خط عارف رقعة',
+                                          'Markazi Text': 'خط مركزي',
+                                          'Harmattan': 'خط هرماتان',
+                                          'Reem Kufi': 'خط ريم كوفي',
+                                          'Mada': 'خط مدى',
+                                          'Mirza': 'خط ميرزا',
+                                          'Lateef': 'خط لطيف',
+                                          'Tajawal': 'خط تجول',
+                                          'El Messiri': 'خط المسيري',
+                                          'Gulzar': 'خط جولزار',
+                                          'Alkalami': 'خط القلمي',
+                                          'Vazirmatn': 'خط وزير',
+                                          'Katibeh': 'خط كتيبة',
+                                          'Readex Pro': 'خط ريديكس بروب',
+                                        };
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(
+                                            displayNames[value] ?? value,
+                                            style: TextStyle(
+                                              color: settings.textColor,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                  onChanged: (String? newValue) {
+                                    if (newValue != null) {
+                                      updateThemeSettings(
+                                        newValue,
+                                        settings.fontSize,
+                                        settings.lineSpacing,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              Divider(
+                                color: settings.isDarkMode
+                                    ? kLightBackground.withAlpha(20)
+                                    : Colors.black12,
+                              ),
+                              ListTile(
+                                leading: Icon(
+                                  Icons.format_size,
+                                  color: settings.primaryColor,
+                                ),
+                                title: Text(
+                                  'حجم الخط',
+                                  style: TextStyle(color: settings.textColor),
+                                ),
+                                subtitle: Slider(
+                                  value: settings.fontSize,
+                                  min: 14,
+                                  max: 30,
+                                  divisions: 16,
+                                  activeColor: settings.primaryColor,
+                                  inactiveColor: Colors.grey.withAlpha(77),
+                                  label: settings.fontSize.round().toString(),
+                                  onChanged: (double value) {
+                                    updateThemeSettings(
+                                      settings.fontFamily,
+                                      value,
+                                      settings.lineSpacing,
+                                    );
+                                  },
+                                ),
+                                trailing: Text(
+                                  settings.fontSize.round().toString(),
+                                  style: TextStyle(
+                                    fontSize:
+                                        ResponsiveUtils.sp(context, 16) *
+                                        settings.fontScale,
+                                    fontWeight: FontWeight.bold,
+                                    color: settings.textColor,
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                color: settings.isDarkMode
+                                    ? kLightBackground.withAlpha(20)
+                                    : Colors.black12,
+                              ),
+                              ListTile(
+                                leading: Icon(
+                                  Icons.line_weight,
+                                  color: settings.primaryColor,
+                                ),
+                                title: Text(
+                                  'تباعد الأسطر',
+                                  style: TextStyle(color: settings.textColor),
+                                ),
+                                subtitle: Slider(
+                                  value: settings.lineSpacing,
+                                  min: 1.0,
+                                  max: 2.0,
+                                  divisions: 20,
+                                  activeColor: settings.primaryColor,
+                                  inactiveColor: Colors.grey.withAlpha(77),
+                                  label: settings.lineSpacing.toStringAsFixed(
+                                    1,
+                                  ),
+                                  onChanged: (double value) {
+                                    updateThemeSettings(
+                                      settings.fontFamily,
+                                      settings.fontSize,
+                                      value,
+                                    );
+                                  },
+                                ),
+                                trailing: Text(
+                                  settings.lineSpacing.toStringAsFixed(1),
+                                  style: TextStyle(
+                                    fontSize:
+                                        ResponsiveUtils.sp(context, 16) *
+                                        settings.fontScale,
+                                    fontWeight: FontWeight.bold,
+                                    color: settings.textColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        _buildUnifiedColorPicker(context, settings),
+                        SizedBox(
+                          height: ResponsiveUtils.getResponsiveHeight(
+                            context,
+                            0.03,
+                          ),
+                        ),
+                        _buildSettingCard(
+                          settings: settings,
+                          child: ListTile(
                             leading: Icon(
-                              Icons.light_mode,
+                              Icons.notifications,
                               color: settings.primaryColor,
                             ),
-                            title: Text(
-                              'إبقاء الشاشة مضاءة',
-                              style: TextStyle(color: settings.textColor),
-                            ),
+                            title: const Text('تذكير كل 3 ساعات'),
                             subtitle: Text(
-                              'منع الشاشة من الإغلاق أثناء القراءة',
-                              style: TextStyle(
-                                color: settings.textColor.withValues(
-                                  alpha: 0.6,
-                                ),
-                                fontSize: 12,
-                              ),
+                              'تبدأ التذكيرات من $_reminderTime وتتكرر كل 3 ساعات طوال اليوم',
+                              style: Theme.of(context).textTheme.bodySmall,
                             ),
-                            trailing: Switch(
-                              value: settings.keepScreenOn,
-                              onChanged: (bool value) {
-                                updateKeepScreenOn(value);
-                              },
-                              activeTrackColor: settings.primaryColor.withAlpha(
-                                100,
-                              ),
-                              activeThumbColor: settings.primaryColor,
-                              inactiveThumbColor: Colors.grey,
-                            ),
-                          ),
-                          Divider(
-                            color: settings.isDarkMode
-                                ? kLightBackground.withAlpha(20)
-                                : Colors.black12,
-                          ),
-                          ListTile(
-                            leading: Icon(
-                              Icons.font_download,
-                              color: settings.primaryColor,
-                            ),
-                            title: Text(
-                              'نوع الخط',
-                              style: TextStyle(color: settings.textColor),
-                            ),
-                            trailing: DropdownButton<String>(
-                              value: settings.fontFamily,
-                              dropdownColor: settings.isDarkMode
-                                  ? kDarkBackground
-                                  : kLightBackground,
-                              underline: Container(),
-                              items:
-                                  [
-                                    'System',
-                                    'Amiri',
-                                    'Scheherazade New',
-                                    'Noto Naskh Arabic',
-                                    'Cairo',
-                                    'Almarai',
-                                    'Aref Ruqaa',
-                                    'Markazi Text',
-                                    'Harmattan',
-                                    'Reem Kufi',
-                                    'Mada',
-                                    'Mirza',
-                                    'Lateef',
-                                    'Tajawal',
-                                    'El Messiri',
-                                    'Gulzar',
-                                    'Alkalami',
-                                    'Vazirmatn',
-                                    'Katibeh',
-                                    'Readex Pro',
-                                  ].map((String value) {
-                                    final displayNames = {
-                                      'System': 'خط النظام',
-                                      'Amiri': 'خط الأميري',
-                                      'Scheherazade New':
-                                          'الرسم المغربي الأصيل',
-                                      'Noto Naskh Arabic': 'خط نوتو نسخ',
-                                      'Cairo': 'خط القاهرة',
-                                      'Almarai': 'خط المراعي',
-                                      'Aref Ruqaa': 'خط عارف رقعة',
-                                      'Markazi Text': 'خط مركزي',
-                                      'Harmattan': 'خط هرماتان',
-                                      'Reem Kufi': 'خط ريم كوفي',
-                                      'Mada': 'خط مدى',
-                                      'Mirza': 'خط ميرزا',
-                                      'Lateef': 'خط لطيف',
-                                      'Tajawal': 'خط تجول',
-                                      'El Messiri': 'خط المسيري',
-                                      'Gulzar': 'خط جولزار',
-                                      'Alkalami': 'خط القلمي',
-                                      'Vazirmatn': 'خط وزير',
-                                      'Katibeh': 'خط كتيبة',
-                                      'Readex Pro': 'خط ريديكس بروب',
-                                    };
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        displayNames[value] ?? value,
-                                        style: TextStyle(
-                                          color: settings.textColor,
+                            trailing: TextButton(
+                              onPressed: () async {
+                                final TimeOfDay? picked = await showTimePicker(
+                                  context: context,
+                                  initialTime: TimeOfDay(
+                                    hour: int.parse(
+                                      _reminderTime.split(':')[0],
+                                    ),
+                                    minute: int.parse(
+                                      _reminderTime.split(':')[1],
+                                    ),
+                                  ),
+                                );
+                                if (picked != null) {
+                                  final timeString =
+                                      '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+                                  setState(() {
+                                    _reminderTime = timeString;
+                                  });
+                                  await NotificationService.instance
+                                      .setReminderTime(timeString);
+                                  // Re-schedule all active reminders with the new time
+                                  await NotificationService.instance
+                                      .rescheduleAllReminders();
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'تم تحديث التذكيرات — تبدأ من $timeString كل 3 ساعات',
                                         ),
+                                        backgroundColor: settings.primaryColor,
+                                        duration: const Duration(seconds: 3),
                                       ),
                                     );
-                                  }).toList(),
-                              onChanged: (String? newValue) {
-                                if (newValue != null) {
-                                  updateThemeSettings(
-                                    newValue,
-                                    settings.fontSize,
-                                    settings.lineSpacing,
-                                  );
+                                  }
                                 }
                               },
+                              child: const Text('تغيير'),
                             ),
                           ),
-                          Divider(
-                            color: settings.isDarkMode
-                                ? kLightBackground.withAlpha(20)
-                                : Colors.black12,
-                          ),
-                          ListTile(
-                            leading: Icon(
-                              Icons.format_size,
-                              color: settings.primaryColor,
-                            ),
-                            title: Text(
-                              'حجم الخط',
-                              style: TextStyle(color: settings.textColor),
-                            ),
-                            subtitle: Slider(
-                              value: settings.fontSize,
-                              min: 14,
-                              max: 30,
-                              divisions: 16,
-                              activeColor: settings.primaryColor,
-                              inactiveColor: Colors.grey.withAlpha(77),
-                              label: settings.fontSize.round().toString(),
-                              onChanged: (double value) {
-                                updateThemeSettings(
-                                  settings.fontFamily,
-                                  value,
-                                  settings.lineSpacing,
-                                );
-                              },
-                            ),
-                            trailing: Text(
-                              settings.fontSize.round().toString(),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: settings.textColor,
-                              ),
-                            ),
-                          ),
-                          Divider(
-                            color: settings.isDarkMode
-                                ? kLightBackground.withAlpha(20)
-                                : Colors.black12,
-                          ),
-                          ListTile(
-                            leading: Icon(
-                              Icons.line_weight,
-                              color: settings.primaryColor,
-                            ),
-                            title: Text(
-                              'تباعد الأسطر',
-                              style: TextStyle(color: settings.textColor),
-                            ),
-                            subtitle: Slider(
-                              value: settings.lineSpacing,
-                              min: 1.0,
-                              max: 2.0,
-                              divisions: 20,
-                              activeColor: settings.primaryColor,
-                              inactiveColor: Colors.grey.withAlpha(77),
-                              label: settings.lineSpacing.toStringAsFixed(1),
-                              onChanged: (double value) {
-                                updateThemeSettings(
-                                  settings.fontFamily,
-                                  settings.fontSize,
-                                  value,
-                                );
-                              },
-                            ),
-                            trailing: Text(
-                              settings.lineSpacing.toStringAsFixed(1),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: settings.textColor,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    _buildUnifiedColorPicker(context, settings),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveHeight(
-                        context,
-                        0.03,
-                      ),
-                    ),
-                    _buildSettingCard(
-                      settings: settings,
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.notifications,
-                          color: settings.primaryColor,
                         ),
-                        title: const Text('تذكير كل 3 ساعات'),
-                        subtitle: Text(
-                          'تبدأ التذكيرات من $_reminderTime وتتكرر كل 3 ساعات طوال اليوم',
-                          style: Theme.of(context).textTheme.bodySmall,
+                        SizedBox(
+                          height: ResponsiveUtils.getResponsiveHeight(
+                            context,
+                            0.03,
+                          ),
                         ),
-                        trailing: TextButton(
-                          onPressed: () async {
-                            final TimeOfDay? picked = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay(
-                                hour: int.parse(_reminderTime.split(':')[0]),
-                                minute: int.parse(_reminderTime.split(':')[1]),
-                              ),
-                            );
-                            if (picked != null) {
-                              final timeString =
-                                  '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-                              setState(() {
-                                _reminderTime = timeString;
-                              });
-                              await NotificationService.instance
-                                  .setReminderTime(timeString);
-                              // Re-schedule all active reminders with the new time
-                              await NotificationService.instance
-                                  .rescheduleAllReminders();
-                              if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'تم تحديث التذكيرات — تبدأ من $timeString كل 3 ساعات',
-                                    ),
-                                    backgroundColor: settings.primaryColor,
-                                    duration: const Duration(seconds: 3),
-                                  ),
-                                );
-                              }
-                            }
-                          },
-                          child: const Text('تغيير'),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveHeight(
-                        context,
-                        0.03,
-                      ),
-                    ),
 
-                    /*  Text(
+                        /*  Text(
                       'حول التطبيق',
                       style: Theme.of(context).textTheme.headlineSmall!
                           .copyWith(color: kSecondaryTeal),
                     ), */
-                    _buildProgressCard(context, settings),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveHeight(
-                        context,
-                        0.03,
-                      ),
-                    ),
+                        _buildProgressCard(context, settings),
+                        SizedBox(
+                          height: ResponsiveUtils.getResponsiveHeight(
+                            context,
+                            0.03,
+                          ),
+                        ),
 
-                    _buildSettingCard(
-                      settings: settings,
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: ResponsiveUtils.getResponsiveHeight(
-                              context,
-                              0.025,
-                            ),
-                          ),
-                          Icon(
-                            Icons.info_outline,
-                            size: 60,
-                            color: settings.primaryColor,
-                          ),
-                          SizedBox(
-                            height: ResponsiveUtils.getResponsiveHeight(
-                              context,
-                              0.02,
-                            ),
-                          ),
-                          Text(
-                            'مصحف الحفظ - ورش مثمن',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleLarge!
-                                .copyWith(
+                        _buildSettingCard(
+                          settings: settings,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: ResponsiveUtils.getResponsiveHeight(
+                                  context,
+                                  0.025,
+                                ),
+                              ),
+                              Icon(
+                                Icons.info_outline,
+                                size: 60,
+                                color: settings.primaryColor,
+                              ),
+                              SizedBox(
+                                height: ResponsiveUtils.getResponsiveHeight(
+                                  context,
+                                  0.02,
+                                ),
+                              ),
+                              Text(
+                                'مصحف الحفظ - ورش مثمن',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.titleLarge!
+                                    .copyWith(
+                                      color: settings.textColor.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                    ),
+                              ),
+                              SizedBox(
+                                height: ResponsiveUtils.getResponsiveHeight(
+                                  context,
+                                  0.01,
+                                ),
+                              ),
+                              Text(
+                                'تطبيق صمم خصيصاً لمساعدتك على حفظ القرآن الكريم وتسجيل ما تحفظه بسهولة.',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium!
+                                    .copyWith(
+                                      color: settings.isDarkMode
+                                          ? kLightBackground
+                                          : Colors.black54,
+                                    ),
+                              ),
+                              SizedBox(height: 10),
+
+                              Text(
+                                'جميع الحقوق محفوظة © 2026',
+                                style: TextStyle(
                                   color: settings.textColor.withValues(
                                     alpha: 0.6,
                                   ),
                                 ),
-                          ),
-                          SizedBox(
-                            height: ResponsiveUtils.getResponsiveHeight(
-                              context,
-                              0.01,
-                            ),
-                          ),
-                          Text(
-                            'تطبيق صمم خصيصاً لمساعدتك على حفظ القرآن الكريم وتسجيل ما تحفظه بسهولة.',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyMedium!
-                                .copyWith(
-                                  color: settings.isDarkMode
-                                      ? kLightBackground
-                                      : Colors.black54,
-                                ),
-                          ),
-                          SizedBox(
-                            height: ResponsiveUtils.getResponsiveHeight(
-                              context,
-                              0.01,
-                            ),
-                          ),
-                          Divider(
-                            color: settings.isDarkMode
-                                ? kLightBackground.withAlpha(20)
-                                : Colors.black12,
-                          ),
-                          SizedBox(
-                            height: ResponsiveUtils.getResponsiveHeight(
-                              context,
-                              0.01,
-                            ),
-                          ),
-                          ListTile(
-                            leading: Icon(
-                              Icons.copyright,
-                              color: settings.primaryColor,
-                              size: 35,
-                            ),
-                            title: const Text('حقوق النشر'),
-                            subtitle: Text(
-                              'جميع الحقوق محفوظة © 2026',
-                              style: TextStyle(
-                                color: settings.textColor.withValues(
-                                  alpha: 0.6,
+                              ),
+                              SizedBox(
+                                height: ResponsiveUtils.getResponsiveHeight(
+                                  context,
+                                  0.025,
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        SizedBox(
+                          height: ResponsiveUtils.getResponsiveHeight(
+                            context,
+                            0.03,
+                          ),
+                        ),
+                        _buildDeveloperCard(context, settings),
+                        SizedBox(
+                          height: ResponsiveUtils.getResponsiveHeight(
+                            context,
+                            0.02,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveHeight(
-                        context,
-                        0.03,
-                      ),
-                    ),
-                    _buildDeveloperCard(context, settings),
-                    SizedBox(
-                      height: ResponsiveUtils.getResponsiveHeight(
-                        context,
-                        0.02,
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ),
@@ -668,7 +669,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text(
                       opt.label,
                       style: TextStyle(
-                        fontSize: 9.5,
+                        fontSize:
+                            ResponsiveUtils.sp(context, 9.5) *
+                            settings.fontScale,
                         color: settings.textColor.withValues(alpha: 0.6),
                       ),
                     ),
@@ -696,7 +699,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     Text(
                       opt.label,
                       style: TextStyle(
-                        fontSize: 9.5,
+                        fontSize:
+                            ResponsiveUtils.sp(context, 9.5) *
+                            settings.fontScale,
                         color: settings.textColor.withValues(alpha: 0.6),
                       ),
                     ),
@@ -742,7 +747,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Text(
               opt.label,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: ResponsiveUtils.sp(context, 10) * settings.fontScale,
                 color: settings.textColor.withValues(alpha: 0.6),
               ),
             ),
@@ -833,7 +838,7 @@ class _SettingsPageState extends State<SettingsPage> {
             Text(
               opt.label,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: ResponsiveUtils.sp(context, 10) * settings.fontScale,
                 color: settings.textColor.withValues(alpha: 0.6),
               ),
             ),
@@ -898,9 +903,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildProgressCard(BuildContext context, ThemeSettings settings) {
     final total = kThomunsTxt.length;
-    final learned = _learnedThomuns.length;
-    final learnedAndRevised = _learnedThomuns
-        .intersection(_revisedThomuns)
+    final learned = progressService.learnedThomuns.length;
+    final learnedAndRevised = progressService.learnedThomuns
+        .intersection(progressService.revisedThomuns)
         .length;
     final learnedOnly = learned - learnedAndRevised;
     final advancement = total > 0
@@ -1020,7 +1025,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Text(
                   'الحزب ${rowIndex + 1}',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize:
+                        ResponsiveUtils.sp(context, 12) * settings.fontScale,
                     color: settings.primaryColor,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1041,8 +1047,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   itemCount: endIndex - startIndex,
                   itemBuilder: (context, dotIndex) {
                     final int index = startIndex + dotIndex;
-                    final isRevised = _revisedThomuns.contains(index);
-                    final isLearned = _learnedThomuns.contains(index);
+                    final isRevised = progressService.revisedThomuns.contains(
+                      index,
+                    );
+                    final isLearned = progressService.learnedThomuns.contains(
+                      index,
+                    );
 
                     Color dotColor;
                     if (isRevised && isLearned) {
@@ -1229,7 +1239,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 label,
                 style: TextStyle(
                   color: settings.primaryColor,
-                  fontSize: 12,
+                  fontSize:
+                      ResponsiveUtils.sp(context, 12) * settings.fontScale,
                   fontWeight: FontWeight.w600,
                 ),
               ),

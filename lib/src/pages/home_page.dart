@@ -47,6 +47,7 @@ class _MainHomePageState extends State<MainHomePage> {
             backgroundColor: Colors.transparent,
             body: _pages[_selectedIndex],
             bottomNavigationBar: NavigationBar(
+              height: 65,
               backgroundColor: Colors.transparent,
               elevation: 0,
               shadowColor: Colors.black.withValues(alpha: 0),
@@ -58,7 +59,7 @@ class _MainHomePageState extends State<MainHomePage> {
                 NavigationDestination(
                   icon: const Icon(Icons.mic_outlined),
                   selectedIcon: Icon(
-                    Icons.mic,
+                    Icons.history_edu,
                     color: settings.primaryColor,
                   ),
                   label: 'الإستظهار',

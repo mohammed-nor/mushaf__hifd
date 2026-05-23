@@ -113,7 +113,7 @@ class _TestPageState extends State<TestPage> {
     }
 
     // Skip the first aya segment to make the quiz harder,
-    // then use the next two aya segments only.
+    // then use the next three aya segments for a longer prompt.
     final startIndex = 1;
     if (segments.length <= startIndex + 1) {
       return normalized;
@@ -191,7 +191,7 @@ class _TestPageState extends State<TestPage> {
       text = await rootBundle.loadString('lib/thomuns_txt/$file');
     } catch (_) {}
 
-    // load short snippets for options (first 40 chars)
+    // load short snippets for options (first 80 chars)
     final Map<int, String> snippets = {};
     for (var o in opts) {
       final ofile = kThomunsTxt[o].file;
@@ -200,7 +200,7 @@ class _TestPageState extends State<TestPage> {
         otext = await rootBundle.loadString('lib/thomuns_txt/$ofile');
       } catch (_) {}
       otext = otext.replaceAll('\n', ' ').trim();
-      final short = otext.length > 40 ? otext.substring(0, 40) + '...' : otext;
+      final short = otext.length > 55 ? otext.substring(0, 55) + '...' : otext;
       snippets[o] = short;
     }
 
@@ -209,7 +209,7 @@ class _TestPageState extends State<TestPage> {
       _correctIndex = correct;
       _options = opts;
       _optionSnippets = snippets;
-      _snippet = text.trim().split('\n').take(3).join(' ');
+      _snippet = text.trim().split('\n').take(5).join(' ');
     });
   }
 
@@ -227,7 +227,7 @@ class _TestPageState extends State<TestPage> {
       text = await rootBundle.loadString('lib/thomuns_txt/$file');
     } catch (_) {}
 
-    // load short snippets for options (first 40 chars)
+    // load short snippets for options (first 80 chars)
     final Map<int, String> snippets = {};
     for (var o in opts) {
       final ofile = kThomunsTxt[o].file;
@@ -236,7 +236,7 @@ class _TestPageState extends State<TestPage> {
         otext = await rootBundle.loadString('lib/thomuns_txt/$ofile');
       } catch (_) {}
       otext = otext.replaceAll('\n', ' ').trim();
-      final short = otext.length > 40 ? otext.substring(0, 40) + '...' : otext;
+      final short = otext.length > 80 ? otext.substring(0, 80) + '...' : otext;
       snippets[o] = short;
     }
 
@@ -331,7 +331,17 @@ class _TestPageState extends State<TestPage> {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: const Expanded(child: Text('اختبر حفظك')),
+            title: Text(
+              _mode == QuizMode.guessNextThumon
+                  ? 'تعرف على الثمن التالي'
+                  : 'تعرف أي ثمن هذا',
+              style: TextStyle(
+                color: settings.primaryColor,
+                fontWeight: FontWeight.bold,
+                fontSize: ResponsiveUtils.sp(context, 16) * settings.fontScale,
+              ),
+              textAlign: TextAlign.center,
+            ),
             actions: [
               PopupMenuButton<QuizMode>(
                 onSelected: (m) async {
@@ -360,7 +370,7 @@ class _TestPageState extends State<TestPage> {
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(4.0),
               child: _available.length < 2
                   ? Text(
                       'لا توجد أثمان كافية للمراجعة والاختبار. علّم وراجع بعض الأثمان أولاً.',
@@ -393,59 +403,31 @@ class _TestPageState extends State<TestPage> {
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(6.0),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: [
-                                    Text(
-                                      _mode == QuizMode.guessNextThumon
-                                          ? 'المقطع المعروض (اختر الثمن التالي)'
-                                          : 'مقطع - عرف أي ثمن هذا',
-                                      style: TextStyle(
-                                        color: settings.primaryColor,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize:
-                                            ResponsiveUtils.sp(context, 16) *
-                                            settings.fontScale,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    const SizedBox(height: 8),
-                                    // Render snippet like Learn2Page (with green brackets/highlighted digits)
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxHeight: double.infinity,
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxHeight: double.infinity,
+                                  ),
+                                  child: SingleChildScrollView(
+                                    physics: const BouncingScrollPhysics(),
+                                    child: _buildTextWithGreenBrackets(
+                                      (_snippet
+                                          .replaceAll('(', '﴿')
+                                          .replaceAll(')', '﴾')),
+                                      _resolveFont(
+                                        Theme.of(
+                                          context,
+                                        ).textTheme.titleLarge!.copyWith(
+                                          color: settings.textColor,
+                                          height: settings.lineSpacing,
+                                          fontWeight: FontWeight.normal,
+                                          fontSize:
+                                              ResponsiveUtils.sp(context, 18) *
+                                              settings.fontScale,
                                         ),
-                                        child: SingleChildScrollView(
-                                          physics:
-                                              const BouncingScrollPhysics(),
-                                          child: _buildTextWithGreenBrackets(
-                                            (_snippet
-                                                .replaceAll('(', '﴿')
-                                                .replaceAll(')', '﴾')),
-                                            _resolveFont(
-                                              Theme.of(
-                                                context,
-                                              ).textTheme.titleLarge!.copyWith(
-                                                color: settings.textColor,
-                                                height: settings.lineSpacing,
-                                                fontWeight: FontWeight.normal,
-                                                fontSize:
-                                                    ResponsiveUtils.sp(
-                                                      context,
-                                                      18,
-                                                    ) *
-                                                    settings.fontScale,
-                                              ),
-                                              settings,
-                                            ),
-                                          ),
-                                        ),
+                                        settings,
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -486,7 +468,7 @@ class _TestPageState extends State<TestPage> {
                                     : null,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
+                                    vertical: 6,
                                     horizontal: 12,
                                   ),
                                   decoration: BoxDecoration(
@@ -499,7 +481,7 @@ class _TestPageState extends State<TestPage> {
                                     textAlign: TextAlign.center,
                                     style: Theme.of(context)
                                         .textTheme
-                                        .titleMedium!
+                                        .bodyMedium!
                                         .copyWith(
                                           color: textColor,
                                           fontWeight: FontWeight.bold,

@@ -1202,7 +1202,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 20),
 
             Text(
-              'الإصدار 1.0.1',
+              'الإصدار 1.0.2',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
                 color: settings.textColor.withValues(alpha: 0.5),

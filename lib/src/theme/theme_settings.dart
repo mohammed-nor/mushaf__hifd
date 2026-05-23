@@ -25,6 +25,13 @@ class BgThemeOption {
 
 const List<BgThemeOption> kBgThemes = [
   BgThemeOption(
+    key: 'darK',
+    label: 'داكن',
+    start: Color.fromARGB(255, 0, 0, 0),
+    end: Color.fromARGB(255, 0, 0, 0),
+    isDark: true,
+  ),
+  BgThemeOption(
     key: 'dark_blue',
     label: 'أزرق داكن',
     start: Color(0xFF1E1E2C),

@@ -74,7 +74,11 @@ class _SplashScreenState extends State<SplashScreen>
               children: [
                 // Islamic geometric pattern background (subtle)
                 Positioned.fill(
-                  child: CustomPaint(painter: IslamicPatternPainter(Theme.of(context).primaryColor)),
+                  child: CustomPaint(
+                    painter: IslamicPatternPainter(
+                      Theme.of(context).primaryColor,
+                    ),
+                  ),
                 ),
                 // Main content
                 Column(
@@ -98,12 +102,12 @@ class _SplashScreenState extends State<SplashScreen>
                                         width:
                                             ResponsiveUtils.getResponsiveHeight(
                                               context,
-                                              0.4,
+                                              0.3,
                                             ),
                                         height:
                                             ResponsiveUtils.getResponsiveHeight(
                                               context,
-                                              0.4,
+                                              0.3,
                                             ),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
@@ -123,12 +127,12 @@ class _SplashScreenState extends State<SplashScreen>
                                         width:
                                             ResponsiveUtils.getResponsiveHeight(
                                               context,
-                                              0.36,
+                                              0.25,
                                             ),
                                         height:
                                             ResponsiveUtils.getResponsiveHeight(
                                               context,
-                                              0.36,
+                                              0.25,
                                             ),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
@@ -155,12 +159,12 @@ class _SplashScreenState extends State<SplashScreen>
                                         width:
                                             ResponsiveUtils.getResponsiveHeight(
                                               context,
-                                              0.28,
+                                              0.24,
                                             ),
                                         height:
                                             ResponsiveUtils.getResponsiveHeight(
                                               context,
-                                              0.28,
+                                              0.24,
                                             ),
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
@@ -190,7 +194,9 @@ class _SplashScreenState extends State<SplashScreen>
                                         top: 0,
                                         child: CustomPaint(
                                           size: const Size(30, 30),
-                                          painter: IslamicStarPainter(Theme.of(context).primaryColor),
+                                          painter: IslamicStarPainter(
+                                            Theme.of(context).primaryColor,
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -220,7 +226,12 @@ class _SplashScreenState extends State<SplashScreen>
                                           ) ??
                                           TextStyle(
                                             color: settings.textColor,
-                                            fontSize: ResponsiveUtils.sp(context, 32) * settings.fontScale,
+                                            fontSize:
+                                                ResponsiveUtils.sp(
+                                                  context,
+                                                  32,
+                                                ) *
+                                                settings.fontScale,
                                             fontWeight: FontWeight.bold,
                                             letterSpacing: 1,
                                           ),
@@ -242,7 +253,12 @@ class _SplashScreenState extends State<SplashScreen>
                                             color: settings.textColor.withAlpha(
                                               180,
                                             ),
-                                            fontSize: ResponsiveUtils.sp(context, 32) * settings.fontScale,
+                                            fontSize:
+                                                ResponsiveUtils.sp(
+                                                  context,
+                                                  32,
+                                                ) *
+                                                settings.fontScale,
                                             fontWeight: FontWeight.bold,
                                             letterSpacing: 1,
                                           ),
@@ -296,11 +312,13 @@ class _SplashScreenState extends State<SplashScreen>
                                           color: Theme.of(context).primaryColor,
                                           letterSpacing: 1,
                                         ) ??
-                                          TextStyle(
-                                            color: Theme.of(context).primaryColor,
-                                            fontSize: ResponsiveUtils.sp(context, 20) * settings.fontScale,
-                                            letterSpacing: 1,
-                                          ),
+                                        TextStyle(
+                                          color: Theme.of(context).primaryColor,
+                                          fontSize:
+                                              ResponsiveUtils.sp(context, 20) *
+                                              settings.fontScale,
+                                          letterSpacing: 1,
+                                        ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
@@ -339,7 +357,9 @@ class _SplashScreenState extends State<SplashScreen>
                             'جميع الحقوق محفوظة للمطور  © 2026',
                             style: TextStyle(
                               color: settings.textColor.withAlpha(150),
-                              fontSize: ResponsiveUtils.sp(context, 12) * settings.fontScale,
+                              fontSize:
+                                  ResponsiveUtils.sp(context, 12) *
+                                  settings.fontScale,
                             ),
                             textDirection: TextDirection.rtl,
                           ),

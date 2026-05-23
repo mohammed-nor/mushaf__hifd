@@ -3,6 +3,7 @@ import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/pages/recite_page.dart';
 import 'package:mushaf_hifd/src/pages/learn2_page.dart';
 import 'package:mushaf_hifd/src/pages/settings_page.dart';
+import 'package:mushaf_hifd/src/pages/test_page.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 
 /// The root widget that hosts the bottom navigation bar and switches
@@ -19,8 +20,9 @@ class _MainHomePageState extends State<MainHomePage> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = <Widget>[
-    RecitePage(),
     Learn2Page(),
+    RecitePage(),
+    TestPage(),
     SettingsPage(),
   ];
 
@@ -57,7 +59,15 @@ class _MainHomePageState extends State<MainHomePage> {
               onDestinationSelected: _onItemTapped,
               destinations: [
                 NavigationDestination(
-                  icon: const Icon(Icons.mic_outlined),
+                  icon: const Icon(Icons.text_snippet_outlined),
+                  selectedIcon: Icon(
+                    Icons.text_snippet,
+                    color: settings.primaryColor,
+                  ),
+                  label: 'الحفظ و التلاوة',
+                ),
+                NavigationDestination(
+                  icon: const Icon(Icons.history_edu),
                   selectedIcon: Icon(
                     Icons.history_edu,
                     color: settings.primaryColor,
@@ -65,12 +75,9 @@ class _MainHomePageState extends State<MainHomePage> {
                   label: 'الإستظهار',
                 ),
                 NavigationDestination(
-                  icon: const Icon(Icons.text_snippet_outlined),
-                  selectedIcon: Icon(
-                    Icons.text_snippet,
-                    color: settings.primaryColor,
-                  ),
-                  label: 'الحفظ و التلاوة',
+                  icon: const Icon(Icons.quiz),
+                  selectedIcon: Icon(Icons.quiz, color: settings.primaryColor),
+                  label: 'الاختبار',
                 ),
                 NavigationDestination(
                   icon: const Icon(Icons.settings_outlined),

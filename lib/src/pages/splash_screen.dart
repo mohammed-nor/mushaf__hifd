@@ -96,12 +96,12 @@ class _SplashScreenState extends State<SplashScreen>
                                       // Outer glow circle
                                       Container(
                                         width:
-                                            ResponsiveUtils.getResponsiveWidth(
+                                            ResponsiveUtils.getResponsiveHeight(
                                               context,
                                               0.4,
                                             ),
                                         height:
-                                            ResponsiveUtils.getResponsiveWidth(
+                                            ResponsiveUtils.getResponsiveHeight(
                                               context,
                                               0.4,
                                             ),
@@ -121,12 +121,12 @@ class _SplashScreenState extends State<SplashScreen>
                                       // Islamic decorative circle
                                       Container(
                                         width:
-                                            ResponsiveUtils.getResponsiveWidth(
+                                            ResponsiveUtils.getResponsiveHeight(
                                               context,
                                               0.36,
                                             ),
                                         height:
-                                            ResponsiveUtils.getResponsiveWidth(
+                                            ResponsiveUtils.getResponsiveHeight(
                                               context,
                                               0.36,
                                             ),
@@ -153,12 +153,12 @@ class _SplashScreenState extends State<SplashScreen>
                                       // Central icon (Quran/Islamic symbol)
                                       Container(
                                         width:
-                                            ResponsiveUtils.getResponsiveWidth(
+                                            ResponsiveUtils.getResponsiveHeight(
                                               context,
                                               0.28,
                                             ),
                                         height:
-                                            ResponsiveUtils.getResponsiveWidth(
+                                            ResponsiveUtils.getResponsiveHeight(
                                               context,
                                               0.28,
                                             ),
@@ -172,12 +172,12 @@ class _SplashScreenState extends State<SplashScreen>
                                           child: Image.asset(
                                             'assets/splash/splash.png',
                                             width:
-                                                ResponsiveUtils.getResponsiveWidth(
+                                                ResponsiveUtils.getResponsiveHeight(
                                                   context,
                                                   0.2,
                                                 ),
                                             height:
-                                                ResponsiveUtils.getResponsiveWidth(
+                                                ResponsiveUtils.getResponsiveHeight(
                                                   context,
                                                   0.2,
                                                 ),

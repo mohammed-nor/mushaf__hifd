@@ -96,7 +96,7 @@ class _RecitePageState extends State<RecitePage> {
       if (_currentThomunIndex != null) {
         try {
           final text = await rootBundle.loadString(
-            'lib/thomuns_txt/${kThomunsTxt[_currentThomunIndex!].file}',
+            'lib/warsh_thomuns_txt/${kThomunsTxt[_currentThomunIndex!].file}',
           );
 
           if (mounted) {
@@ -180,7 +180,7 @@ class _RecitePageState extends State<RecitePage> {
     // Load the text content
     try {
       final text = await rootBundle.loadString(
-        'lib/thomuns_txt/${kThomunsTxt[selectedIndex].file}',
+        'lib/warsh_thomuns_txt/${kThomunsTxt[selectedIndex].file}',
       );
 
       if (mounted) {
@@ -322,7 +322,7 @@ class _RecitePageState extends State<RecitePage> {
   Future<String> _getThomunStartText(int index) async {
     try {
       final text = await rootBundle.loadString(
-        'lib/thomuns_txt/${kThomunsTxt[index].file}',
+        'lib/warsh_thomuns_txt/${kThomunsTxt[index].file}',
       );
 
       // Get first 50 characters or until first line break

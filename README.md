@@ -80,7 +80,7 @@ mushaf_hifd/
 │   │   ├── theme/
 │   │   │   └── theme_settings.dart  # إعدادات الثيم
 │   │   └── constants.dart           # الثوابت
-│   └── thomuns_txt/                 # ملفات نصوص القرآن
+│   └── warsh_thomuns_txt/                 # ملفات نصوص القرآن
 ├── assets/
 │   ├── fonts/                       # ملفات الخطوط العربية
 │   └── splash/                      # صور شاشة البداية

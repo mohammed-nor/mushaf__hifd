@@ -209,7 +209,7 @@ class _Learn2PageState extends State<Learn2Page> {
                               padding: const EdgeInsets.all(4.0),
                               child: FutureBuilder<String>(
                                 future: rootBundle.loadString(
-                                  'lib/thomuns_txt/${kThomunsTxt[index].file}',
+                                  'lib/warsh_thomuns_txt/${kThomunsTxt[index].file}',
                                 ),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==

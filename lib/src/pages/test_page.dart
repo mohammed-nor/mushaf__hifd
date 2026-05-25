@@ -188,7 +188,7 @@ class _TestPageState extends State<TestPage> {
     final file = kThomunsTxt[base].file;
     String text = '';
     try {
-      text = await rootBundle.loadString('lib/thomuns_txt/$file');
+      text = await rootBundle.loadString('lib/warsh_thomuns_txt/$file');
     } catch (_) {}
 
     // load short snippets for options (first 80 chars)
@@ -197,7 +197,7 @@ class _TestPageState extends State<TestPage> {
       final ofile = kThomunsTxt[o].file;
       String otext = '';
       try {
-        otext = await rootBundle.loadString('lib/thomuns_txt/$ofile');
+        otext = await rootBundle.loadString('lib/warsh_thomuns_txt/$ofile');
       } catch (_) {}
       otext = otext.replaceAll('\n', ' ').trim();
       final short = otext.length > 55 ? otext.substring(0, 55) + '...' : otext;
@@ -224,7 +224,7 @@ class _TestPageState extends State<TestPage> {
     final file = kThomunsTxt[base].file;
     String text = '';
     try {
-      text = await rootBundle.loadString('lib/thomuns_txt/$file');
+      text = await rootBundle.loadString('lib/warsh_thomuns_txt/$file');
     } catch (_) {}
 
     // load short snippets for options (first 80 chars)
@@ -233,7 +233,7 @@ class _TestPageState extends State<TestPage> {
       final ofile = kThomunsTxt[o].file;
       String otext = '';
       try {
-        otext = await rootBundle.loadString('lib/thomuns_txt/$ofile');
+        otext = await rootBundle.loadString('lib/warsh_thomuns_txt/$ofile');
       } catch (_) {}
       otext = otext.replaceAll('\n', ' ').trim();
       final short = otext.length > 80 ? otext.substring(0, 80) + '...' : otext;
@@ -329,6 +329,7 @@ class _TestPageState extends State<TestPage> {
       builder: (context, settings, _) {
         return Scaffold(
           appBar: AppBar(
+            centerTitle: true,
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: Text(

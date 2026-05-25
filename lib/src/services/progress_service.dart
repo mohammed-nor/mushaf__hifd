@@ -16,9 +16,9 @@ class ProgressService extends ChangeNotifier {
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
-    final learnedList = prefs.getStringList('learned_thomuns_txt') ?? [];
-    final revisedList = prefs.getStringList('revised_thomuns_txt') ?? [];
-    
+    final learnedList = prefs.getStringList('learned_warsh_thomuns_txt') ?? [];
+    final revisedList = prefs.getStringList('revised_warsh_thomuns_txt') ?? [];
+
     _learnedThomuns = learnedList.map((e) => int.tryParse(e) ?? 0).toSet();
     _revisedThomuns = revisedList.map((e) => int.tryParse(e) ?? 0).toSet();
     _isLoaded = true;
@@ -32,10 +32,10 @@ class ProgressService extends ChangeNotifier {
       _learnedThomuns.add(index);
     }
     notifyListeners();
-    
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
-      'learned_thomuns_txt',
+      'learned_warsh_thomuns_txt',
       _learnedThomuns.map((e) => e.toString()).toList(),
     );
   }
@@ -50,7 +50,7 @@ class ProgressService extends ChangeNotifier {
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList(
-      'revised_thomuns_txt',
+      'revised_warsh_thomuns_txt',
       _revisedThomuns.map((e) => e.toString()).toList(),
     );
   }

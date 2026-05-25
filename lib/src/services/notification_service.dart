@@ -331,7 +331,7 @@ class NotificationService extends LocalNotificationListener {
     final prefs = await SharedPreferences.getInstance();
 
     // 1. REVISION PREP
-    final revisedList = (prefs.getStringList('revised_thomuns_txt') ?? [])
+    final revisedList = (prefs.getStringList('revised_warsh_thomuns_txt') ?? [])
         .map((e) => int.tryParse(e))
         .whereType<int>()
         .toList();
@@ -413,7 +413,7 @@ class NotificationService extends LocalNotificationListener {
   Future<String> _getThomunSnippet(int index) async {
     try {
       final text = await rootBundle.loadString(
-        'lib/thomuns_txt/${kThomunsTxt[index].file}',
+        'lib/warsh_thomuns_txt/${kThomunsTxt[index].file}',
       );
       // Formatting for better readability in notification
       return text.replaceAll('(', '﴿').replaceAll(')', '﴾').trim();

@@ -63,7 +63,7 @@ class ThumonSearchDelegate extends SearchDelegate<int?> {
     final data = <_ThumonSearchResult>[];
     for (int i = 0; i < filenames.length; i++) {
       final text = await rootBundle.loadString(
-        'lib/thomuns_txt/${filenames[i].file}',
+        'lib/warsh_thomuns_txt/${filenames[i].file}',
       );
       data.add(
         _ThumonSearchResult(

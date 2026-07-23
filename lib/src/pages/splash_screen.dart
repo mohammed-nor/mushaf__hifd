@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
 import 'home_page.dart';

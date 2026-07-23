@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:mushaf_hifd/src/constants.dart';
 import 'package:mushaf_hifd/src/utils/responsive.dart';
 import 'package:mushaf_hifd/src/theme/theme_settings.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ThumonSearchDelegate extends SearchDelegate<int?> {
   final ThemeSettings settings;
